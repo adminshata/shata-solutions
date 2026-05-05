@@ -3,7 +3,7 @@
 import { useSite } from "@/lib/shata-cafe/context";
 import { SECTION_MAP } from "@/components/templates/shata-cafe/sections/HomeSections";
 
-export default function CafeHomePage() {
+export default function Cafe1HomePage() {
   const config = useSite();
   return (
     <>
