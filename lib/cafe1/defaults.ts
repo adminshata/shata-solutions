@@ -15,7 +15,7 @@ function item(
     category,
     price,
     description: desc,
-    images: [],
+    images: ["/templates/cafe1/menu/placeholder.jpg"],
     ...(badge ? { badge } : {}),
     active: true,
   };

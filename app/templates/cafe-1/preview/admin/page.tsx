@@ -9,7 +9,7 @@ import { ItemsManager } from "@/components/templates/shared/items-manager";
 import { Cafe1Provider } from "@/lib/cafe1/context";
 import { SiteShell } from "@/components/templates/cafe1/layout/SiteShell";
 import { HomeSections } from "@/components/templates/cafe1/sections/HomeSections";
-import { listAllCafe1Images, listMenuImages } from "./actions";
+import { checkCafe1Images, listAllCafe1Images, listMenuImages } from "./actions";
 
 const STORAGE_KEY = "cafe1/config-draft";
 
@@ -20,6 +20,10 @@ export default function Cafe1AdminPage() {
   const [activeTab, setActiveTab] = useState<Tab>("brand");
   const [imagePool, setImagePool] = useState<string[]>([]);
   const [menuImagePool, setMenuImagePool] = useState<string[]>([]);
+  const [imageReport, setImageReport] = useState<{ checked: number; missing: string[] }>({
+    checked: 0,
+    missing: [],
+  });
   const [savedMsg, setSavedMsg] = useState("");
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -44,6 +48,16 @@ export default function Cafe1AdminPage() {
       } catch { /* ignore */ }
     }, 800);
   }, [config]);
+
+  useEffect(() => {
+    const paths = config.menuItems.flatMap((item) => item.images);
+    const id = setTimeout(() => {
+      checkCafe1Images(paths).then(setImageReport).catch(() => {
+        setImageReport({ checked: paths.length, missing: [] });
+      });
+    }, 400);
+    return () => clearTimeout(id);
+  }, [config.menuItems]);
 
   // "Saved X ago" ticker
   useEffect(() => {
@@ -101,18 +115,28 @@ export default function Cafe1AdminPage() {
             <div className="text-sm font-bold">Cafert Editor</div>
             <div className="text-[11px] text-gray-500">{savedMsg || "No changes yet"}</div>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              if (confirm("Reset to defaults? This will clear all changes.")) {
-                window.localStorage.removeItem(STORAGE_KEY);
-                setConfig(CAFE1_DEFAULTS);
-              }
-            }}
-            className="text-[11px] text-gray-500 hover:text-red-400 transition-colors"
-          >
-            Reset
-          </button>
+          <div className="flex items-center gap-3">
+            <a
+              href="/templates/cafe-1/preview"
+              target="_blank"
+              rel="noopener"
+              className="text-[11px] text-gray-500 hover:text-[#B38E6A] transition-colors"
+            >
+              Preview ↗
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                if (confirm("Reset to defaults? This will clear all changes.")) {
+                  window.localStorage.removeItem(STORAGE_KEY);
+                  setConfig(CAFE1_DEFAULTS);
+                }
+              }}
+              className="text-[11px] text-gray-500 hover:text-red-400 transition-colors"
+            >
+              Reset
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -307,12 +331,37 @@ export default function Cafe1AdminPage() {
 
           {/* ── MENU ITEMS ── */}
           {activeTab === "menu" && (
-            <ItemsManager
-              items={config.menuItems}
-              onChange={(next) => patch({ menuItems: next })}
-              schema={menuSchema}
-              theme="dark"
-            />
+            <>
+              <EditorSection title="Image Library">
+                <div className="rounded border border-gray-800 bg-gray-900/60 p-3 text-[11px] leading-5 text-gray-400">
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Available cafe assets</span>
+                    <span className="font-semibold text-gray-200">{imagePool.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Menu image choices</span>
+                    <span className="font-semibold text-gray-200">{menuImagePool.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Referenced item images checked</span>
+                    <span className={imageReport.missing.length ? "font-semibold text-red-300" : "font-semibold text-emerald-300"}>
+                      {imageReport.checked}
+                    </span>
+                  </div>
+                  {imageReport.missing.length > 0 && (
+                    <div className="mt-2 rounded border border-red-500/30 bg-red-500/10 p-2 text-red-200">
+                      Missing: {imageReport.missing.join(", ")}
+                    </div>
+                  )}
+                </div>
+              </EditorSection>
+              <ItemsManager
+                items={config.menuItems}
+                onChange={(next) => patch({ menuItems: next })}
+                schema={menuSchema}
+                theme="dark"
+              />
+            </>
           )}
 
           {/* ── CONTACT ── */}

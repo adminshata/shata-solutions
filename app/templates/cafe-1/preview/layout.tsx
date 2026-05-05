@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Montserrat, Raleway } from "next/font/google";
-import { Cafe1Provider } from "@/lib/cafe1/context";
-import { SiteShell } from "@/components/templates/cafe1/layout/SiteShell";
+import { PreviewFrame } from "@/components/templates/cafe1/layout/PreviewFrame";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -18,9 +17,7 @@ const raleway = Raleway({
 export default function Cafe1PreviewLayout({ children }: { children: ReactNode }) {
   return (
     <div className={`${montserrat.variable} ${raleway.variable}`}>
-      <Cafe1Provider>
-        <SiteShell>{children}</SiteShell>
-      </Cafe1Provider>
+      <PreviewFrame>{children}</PreviewFrame>
     </div>
   );
 }
