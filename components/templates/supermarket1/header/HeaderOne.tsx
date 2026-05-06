@@ -33,6 +33,12 @@ function HeaderOne() {
     { id: 4, title: "Me Profitable business makes your profit" },
     { id: 5, title: "Details business makes your profit" },
     { id: 6, title: "Firebase business makes your profit" },
+    { id: 7, title: "Netlyfy business makes your profit" },
+    { id: 8, title: "Profitable business makes your profit" },
+    { id: 9, title: "Valuable business makes your profit" },
+    { id: 10, title: "System business makes your profit" },
+    { id: 11, title: "Profitables business makes your profit" },
+    { id: 12, title: "Content business makes your profit" },
   ].map((item) => ({ ...item, slug: makeSlug(item.title) }));
 
   useEffect(() => {
@@ -183,6 +189,7 @@ function HeaderOne() {
                           <li><a href="#"><span>Euro</span></a></li>
                         </ul>
                       </li>
+                      <li><Link href={`${BASE_PATH}/trackorder`}>Track Order</Link></li>
                     </ul>
                   </div>
                 </div>

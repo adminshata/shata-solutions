@@ -14,10 +14,10 @@ const counters = [
 ];
 
 const teamMembers = [
-  { name: "David Smith", role: "Founder & CEO", img: "/templates/supermarket1/about/team-01.jpg" },
-  { name: "Sarah Johnson", role: "Operations Manager", img: "/templates/supermarket1/about/team-02.jpg" },
-  { name: "Michael Chen", role: "Head of Marketing", img: "/templates/supermarket1/about/team-03.jpg" },
-  { name: "Emily Davis", role: "Customer Success", img: "/templates/supermarket1/about/team-04.jpg" },
+  { name: "David Smith", role: "Founder & CEO", img: "/templates/supermarket1/images/team/01.jpg" },
+  { name: "Sarah Johnson", role: "Operations Manager", img: "/templates/supermarket1/images/team/02.jpg" },
+  { name: "Michael Chen", role: "Head of Marketing", img: "/templates/supermarket1/images/team/03.jpg" },
+  { name: "Emily Davis", role: "Customer Success", img: "/templates/supermarket1/images/team/04.jpg" },
 ];
 
 export default function AboutPage() {
@@ -69,7 +69,7 @@ export default function AboutPage() {
           <div className="row g-5 align-items-center">
             <div className="col-lg-6">
               <div className="about-image-area">
-                <img src="/templates/supermarket1/about/about-01.jpg" alt="about" style={{ width: "100%", borderRadius: "8px" }} />
+                <img src="/templates/supermarket1/images/about/01.jpg" alt="about" style={{ width: "100%", borderRadius: "8px" }} />
               </div>
             </div>
             <div className="col-lg-6">

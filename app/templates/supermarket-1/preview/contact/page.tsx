@@ -131,7 +131,7 @@ export default function ContactPage() {
                   </div>
                   <div className="col-lg-5 mt_md--30 mt_sm--30">
                     <div className="thumbnail-area">
-                      <img src="/templates/supermarket1/contact/02.jpg" alt="contact_form"
+                      <img src="/templates/supermarket1/images/contact/02.jpg" alt="contact_form"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                     </div>
                   </div>

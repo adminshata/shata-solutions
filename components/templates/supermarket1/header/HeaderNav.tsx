@@ -54,11 +54,16 @@ function HeaderNav() {
                     <img className="parent" src="/templates/supermarket1/icons/bar-1.svg" alt="icons" />
                     <span>Categories</span>
                     <ul className="category-sub-menu">
-                      <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/01.svg" alt="icons" /><span>Breakfast &amp; Dairy</span></a></li>
-                      <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/02.svg" alt="icons" /><span>Meats &amp; Seafood</span></a></li>
+                      <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/01.svg" alt="icons" /><span>Breakfast &amp; Dairy</span><i className="fa-regular fa-plus" /></a></li>
+                      <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/02.svg" alt="icons" /><span>Meats &amp; Seafood</span><i className="fa-regular fa-plus" /></a></li>
                       <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/03.svg" alt="icons" /><span>Breads &amp; Bakery</span></a></li>
-                      <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/04.svg" alt="icons" /><span>Chips &amp; Snacks</span></a></li>
+                      <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/04.svg" alt="icons" /><span>Chips &amp; Snacks</span><i className="fa-regular fa-plus" /></a></li>
                       <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/05.svg" alt="icons" /><span>Medical Healthcare</span></a></li>
+                      <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/06.svg" alt="icons" /><span>Breads &amp; Bakery</span></a></li>
+                      <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/07.svg" alt="icons" /><span>Biscuits &amp; Snacks</span><i className="fa-regular fa-plus" /></a></li>
+                      <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/08.svg" alt="icons" /><span>Frozen Foods</span></a></li>
+                      <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/09.svg" alt="icons" /><span>Grocery &amp; Staples</span></a></li>
+                      <li><a href="#" className="menu-item"><img src="/templates/supermarket1/icons/10.svg" alt="icons" /><span>Other Items</span></a></li>
                     </ul>
                   </div>
                   <form action="#" className="search-header">
