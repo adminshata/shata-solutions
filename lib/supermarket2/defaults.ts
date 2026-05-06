@@ -1,4 +1,4 @@
-import type { Product, Post, Category } from "./types";
+import type { Product, Post, Category, SiteConfig, StoreProduct } from "./types";
 
 export const PRODUCTS: Product[] = [
   { id: 1, slug: "profitable-business-makes-your-profit-Best-Solution", image: "15.jpg", bannerImg: "15.jpg", category: "Business Solution", title: "Profitable business makes your profit Best Solution", author: "David Smith", publishedDate: "15 Jan, 2023", price: "36.00", descripTion: "Collaboratively pontificate bleeding edge resources with inexpensive methodologies globally initiate multidisciplinary compatible architectures." },
@@ -55,3 +55,257 @@ export const CATEGORIES: Category[] = [
   { id: 9, name: "Healthcare", image: "/templates/supermarket2/category/09.jpg", count: 60, slug: "healthcare" },
   { id: 10, name: "Other Items", image: "/templates/supermarket2/category/10.jpg", count: 180, slug: "other-items" },
 ];
+
+export const SUPERMARKET2_STORAGE_KEY = "supermarket2/config-draft";
+
+const storeCategories = CATEGORIES.map((category) => ({
+  id: `cat-${category.id}`,
+  handle: category.slug,
+  name: category.name,
+  image: category.image,
+  icon: `/templates/supermarket2/icons/${String(Math.min(category.id, 9)).padStart(2, "0")}.svg`,
+  active: true,
+}));
+
+const storeProducts: StoreProduct[] = PRODUCTS.slice(17).map((product, index) => {
+  const category = storeCategories[index % storeCategories.length];
+  const price = Math.round(Number(product.price ?? "0") * 100);
+  return {
+    id: `prod-${product.id}`,
+    handle: product.slug.toLowerCase(),
+    name: product.title ?? "QuickMart product",
+    shortDescription: "Fresh grocery pick from the QuickMart reference catalog.",
+    description: product.descripTion ?? "Premium grocery product prepared for daily supermarket shopping.",
+    category: category?.handle,
+    images: [`/templates/supermarket2/products/${product.image}`],
+    badge: index % 4 === 0 ? "sale" : index % 5 === 0 ? "new" : null,
+    featured: index < 8,
+    active: true,
+    price,
+    compareAtPrice: index % 3 === 0 ? Math.round(price * 1.25) : undefined,
+    unit: index % 2 === 0 ? "1 kg" : "each",
+    stock: 30 + index * 4,
+    rating: 4.4 + (index % 5) / 10,
+  };
+});
+
+export const SUPERMARKET2_DEFAULTS: SiteConfig = {
+  name: "QuickMart",
+  tagline: "Fresh grocery deals every day",
+  logo: { text: "QuickMart" },
+  theme: {
+    primary: "#DC2626",
+    primaryFg: "#FFFFFF",
+    secondary: "#7F1D1D",
+    accent: "#F59E0B",
+    background: "#FFFFFF",
+    foreground: "#1F1F25",
+    muted: "#6B7280",
+    surface: "#F9FAFB",
+    border: "#E5E7EB",
+    radius: "md",
+    fontStyle: "clean",
+  },
+  contact: {
+    email: "hello@quickmart.com",
+    phone: "+1 (555) 234-5678",
+    phone2: "+1 (555) 987-6543",
+    address: "258 Fresh Market Street, Berlin",
+    hours: "Mon-Sat 8:00 AM - 10:00 PM",
+    deliveryHours: "Delivery every day from 8:00 AM - 9:00 PM",
+    mapText: "QuickMart delivery area map",
+    formLabels: {
+      name: "Your name",
+      email: "Email address",
+      phone: "Phone number",
+      message: "How can we help?",
+      button: "Send message",
+    },
+  },
+  social: {
+    facebook: "#",
+    twitter: "#",
+    instagram: "#",
+    youtube: "#",
+  },
+  announcement: {
+    active: true,
+    text: "Welcome to our Organic store QuickMart!",
+  },
+  header: {
+    topBarText: "Welcome to our Organic store QuickMart!",
+    countdownText: "Get up to 30% off on your first $150 purchase",
+    countdownDate: "2026-12-31T23:59:59",
+    saleBlockText: "Get 30% Discount Now",
+    trendingText: "Trending Products",
+    menuItems: [
+      { id: "home", label: "Home", href: "/templates/supermarket-2/preview", visible: true },
+      { id: "about", label: "About", href: "/templates/supermarket-2/preview/about", visible: true },
+      { id: "shop", label: "Shop", href: "/templates/supermarket-2/preview/shop", visible: true },
+      { id: "vendors", label: "Vendors", href: "/templates/supermarket-2/preview/vendors", visible: true },
+      { id: "pages", label: "Pages", href: "#", visible: true },
+      { id: "blog", label: "Blog", href: "/templates/supermarket-2/preview/blog", visible: true },
+      { id: "dashboard", label: "Dashboard", href: "/templates/supermarket-2/preview/dashboard", visible: true },
+      { id: "contact", label: "Contact", href: "/templates/supermarket-2/preview/contact", visible: true },
+    ],
+    shopMegaMenu: [
+      {
+        group: "Shop Layout",
+        items: [
+          { label: "Shop Grid Sidebar", href: "/templates/supermarket-2/preview/shop" },
+          { label: "Shop List Sidebar", href: "/templates/supermarket-2/preview/shop/list" },
+          { label: "Shop Top Filter Grid", href: "/templates/supermarket-2/preview/shop/grid-top-filter" },
+          { label: "Shop Top Filter List", href: "/templates/supermarket-2/preview/shop/list-top-filter" },
+        ],
+      },
+      {
+        group: "Shop Details",
+        items: [
+          { label: "Product Details", href: "/templates/supermarket-2/preview/shop/super-fresh-meat" },
+          { label: "Product Details Variable", href: "/templates/supermarket-2/preview/shop/original-fresh-frut" },
+          { label: "Product Details Group", href: "/templates/supermarket-2/preview/shop/organic-fresh-frut" },
+        ],
+      },
+      {
+        group: "Product Feature",
+        items: [
+          { label: "Shop Compare", href: "/templates/supermarket-2/preview/compare" },
+          { label: "Shop Wishlist", href: "/templates/supermarket-2/preview/wishlist" },
+          { label: "Shop Cart", href: "/templates/supermarket-2/preview/cart" },
+          { label: "Shop Checkout", href: "/templates/supermarket-2/preview/checkout" },
+        ],
+      },
+      {
+        group: "Shop Others",
+        items: [
+          { label: "Cart", href: "/templates/supermarket-2/preview/cart" },
+          { label: "Checkout", href: "/templates/supermarket-2/preview/checkout" },
+          { label: "Order Successful", href: "/templates/supermarket-2/preview/order-successful" },
+          { label: "Track Order", href: "/templates/supermarket-2/preview/track-order" },
+        ],
+      },
+    ],
+    pagesDropdown: [
+      { label: "Dashboard", href: "/templates/supermarket-2/preview/dashboard" },
+      { label: "About", href: "/templates/supermarket-2/preview/about" },
+      { label: "Store", href: "/templates/supermarket-2/preview/store" },
+      { label: "Invoice", href: "/templates/supermarket-2/preview/invoice" },
+      { label: "Contact", href: "/templates/supermarket-2/preview/contact" },
+      { label: "Register", href: "/templates/supermarket-2/preview/register" },
+      { label: "Login", href: "/templates/supermarket-2/preview/login" },
+      { label: "Privacy Policy", href: "/templates/supermarket-2/preview/privacy-policy" },
+      { label: "Cookies Policy", href: "/templates/supermarket-2/preview/cookies-policy" },
+      { label: "Terms & Condition", href: "/templates/supermarket-2/preview/terms-condition" },
+    ],
+  },
+  sections: [
+    { id: "features", label: "Features row", title: "Store features", active: true, order: 1 },
+    { id: "featured", label: "Featured products", title: "Featured Products", subtitle: "Hand-picked for you", active: true, order: 2 },
+    { id: "discount", label: "Discount products", title: "Up to 30% Off", subtitle: "Limited time discount products", active: true, order: 3 },
+    { id: "weekly", label: "Weekly best selling", title: "Weekly Best Selling", active: true, order: 4 },
+    { id: "trending", label: "Trending products", title: "Trending Products", subtitle: "Most loved by customers", active: true, order: 5 },
+    { id: "blog", label: "Blog posts", title: "From Our Blog", subtitle: "Tips, recipes, and grocery guides", active: true, order: 6 },
+  ],
+  slides: [
+    {
+      id: "slide-1",
+      eyebrow: "Fresh Arrivals",
+      title: "Fresh Organic Produce Daily",
+      subtitle: "Farm to table grocery deals for every family.",
+      ctaText: "Shop Now",
+      ctaLink: "/templates/supermarket-2/preview/shop",
+      image: "/templates/supermarket2/banner/01.webp",
+      active: true,
+    },
+    {
+      id: "slide-2",
+      eyebrow: "Weekly Deals",
+      title: "Save Big on Grocery Essentials",
+      subtitle: "Up to 30% off on staples this week only.",
+      ctaText: "View Deals",
+      ctaLink: "/templates/supermarket-2/preview/shop",
+      image: "/templates/supermarket2/banner/02.jpg",
+      active: true,
+    },
+  ],
+  categories: storeCategories,
+  products: storeProducts,
+  offers: [
+    {
+      id: "deal-1",
+      title: "Weekend grocery bundle",
+      discountText: "Save 30%",
+      countdownDate: "2026-12-31T23:59:59",
+      image: "/templates/supermarket2/offer/01.png",
+      ctaText: "Shop deal",
+      ctaLink: "/templates/supermarket-2/preview/shop",
+      active: true,
+    },
+  ],
+  blog: POSTS.slice(0, 6).map((post) => ({
+    id: `post-${post.id}`,
+    title: post.title ?? "QuickMart blog post",
+    slug: post.slug.toLowerCase(),
+    image: `/templates/supermarket2/blog/${post.image}`,
+    excerpt: post.descripTion ?? "Fresh grocery tips and shopping ideas.",
+    content: post.descripTion ?? "Fresh grocery tips and shopping ideas.",
+    author: post.author ?? "QuickMart Team",
+    date: post.publishedDate ?? "May 6, 2026",
+    category: post.category ?? "Grocery",
+    active: true,
+  })),
+  vendors: [
+    {
+      id: "vendor-1",
+      name: "Fresh Juice Bar",
+      handle: "fresh-juice-bar",
+      logo: "/templates/supermarket2/vendor/01.svg",
+      image: "/templates/supermarket2/vendor/01.jpg",
+      description: "Cold-pressed juices, fruit cups, and daily wellness drinks.",
+      rating: 4.9,
+      address: "12 Citrus Lane, Market Hall",
+      contact: "+1 (555) 444-1200",
+      active: true,
+    },
+    {
+      id: "vendor-2",
+      name: "Green Valley Farms",
+      handle: "green-valley-farms",
+      logo: "/templates/supermarket2/vendor/02.svg",
+      image: "/templates/supermarket2/vendor/02.jpg",
+      description: "Seasonal vegetables and organic farm boxes.",
+      rating: 4.8,
+      address: "44 Farm Road",
+      contact: "+1 (555) 555-2200",
+      active: true,
+    },
+  ],
+  pages: [
+    { id: "about", title: "About QuickMart", subtitle: "Fresh food, fast delivery.", heroImage: "/templates/supermarket2/about/01.jpg", content: "QuickMart brings fresh grocery essentials, local vendors, and daily supermarket deals into one easy shopping experience.", active: true },
+    { id: "contact", title: "Contact", subtitle: "We are here to help.", heroImage: "/templates/supermarket2/contact/01.jpg", content: "Reach the QuickMart team for delivery, vendor, and order support.", active: true },
+    { id: "privacy-policy", title: "Privacy Policy", subtitle: "How customer information is handled.", content: "We use customer information to process orders, improve delivery, and support account services.", active: true },
+    { id: "cookies-policy", title: "Cookies Policy", subtitle: "How cookies support the shopping experience.", content: "Cookies help remember preferences, carts, and storefront settings.", active: true },
+    { id: "terms-condition", title: "Terms & Condition", subtitle: "Store terms for using QuickMart.", content: "Orders, delivery windows, vendor listings, and promotional offers are subject to store availability.", active: true },
+    { id: "store", title: "Store", subtitle: "QuickMart store locations and departments.", content: "Browse departments, vendor counters, and in-store services.", active: true },
+    { id: "invoice", title: "Invoice", subtitle: "Printable order invoice.", content: "Manage invoice details, billing address, and payment records.", active: true },
+    { id: "track-order", title: "Track Order", subtitle: "Follow your grocery delivery.", content: "Track order status and delivery details.", active: true },
+  ],
+  footer: {
+    newsletterTitle: "Newsletter",
+    newsletterText: "Get the latest deals and offers in your inbox.",
+    copyright: "© 2026 QuickMart. All rights reserved.",
+    columns: [
+      { title: "Our Stores", links: [
+        { label: "Delivery Info", href: "/templates/supermarket-2/preview/track-order" },
+        { label: "Privacy Policy", href: "/templates/supermarket-2/preview/privacy-policy" },
+        { label: "Terms & Conditions", href: "/templates/supermarket-2/preview/terms-condition" },
+      ] },
+      { title: "Quick Links", links: [
+        { label: "About", href: "/templates/supermarket-2/preview/about" },
+        { label: "Contact", href: "/templates/supermarket-2/preview/contact" },
+        { label: "Vendors", href: "/templates/supermarket-2/preview/vendors" },
+      ] },
+    ],
+    paymentIcons: ["visa", "mc", "paypal", "amex"],
+  },
+};

@@ -5,10 +5,10 @@ import BackToTop from "@/components/templates/supermarket2/common/BackToTop";
 import Link from "next/link";
 const BASE_PATH = "/templates/supermarket-2/preview";
 const vendors = [
-  { name: "Green Valley Farms", location: "Berlin, Germany", products: 45, rating: 4.8, img: "01.jpg", desc: "Premium organic produce from local German farms." },
-  { name: "Fresh Morning Co.", location: "Frankfurt, Germany", products: 32, rating: 4.6, img: "02.jpg", desc: "Fresh daily deliveries of seasonal vegetables and fruits." },
-  { name: "Organic Roots", location: "Hamburg, Germany", products: 58, rating: 4.9, img: "03.jpg", desc: "Certified organic products sourced directly from farmers." },
-  { name: "Pure Nature Store", location: "Munich, Germany", products: 27, rating: 4.5, img: "04.jpg", desc: "Natural and chemical-free grocery products." },
+  { handle: "fresh-juice-bar", name: "Fresh Juice Bar", location: "Berlin, Germany", products: 45, rating: 4.9, img: "01.jpg", desc: "Cold-pressed juices, fruit cups, and wellness drinks." },
+  { handle: "green-valley-farms", name: "Green Valley Farms", location: "Frankfurt, Germany", products: 32, rating: 4.8, img: "02.jpg", desc: "Fresh daily deliveries of seasonal vegetables and fruits." },
+  { handle: "organic-roots", name: "Organic Roots", location: "Hamburg, Germany", products: 58, rating: 4.9, img: "01.webp", desc: "Certified organic products sourced directly from farmers." },
+  { handle: "pure-nature-store", name: "Pure Nature Store", location: "Munich, Germany", products: 27, rating: 4.5, img: "02.webp", desc: "Natural and chemical-free grocery products." },
 ];
 export default function Page() {
   return (
@@ -38,7 +38,7 @@ export default function Page() {
                   <div style={{ textAlign: 'center', flexShrink: 0 }}>
                     <p style={{ margin: '0 0 4px' }}>{v.products} Products</p>
                     <p style={{ margin: '0 0 12px' }}>{v.rating} <i className="fa-solid fa-star" style={{ color: '#f59e0b' }} /></p>
-                    <Link href={`${BASE_PATH}/vendors/vendor-${i+1}`} className="rts-btn btn-primary">View Store</Link>
+                    <Link href={`${BASE_PATH}/vendors/${v.handle}`} className="rts-btn btn-primary">View Store</Link>
                   </div>
                 </div>
               </div>

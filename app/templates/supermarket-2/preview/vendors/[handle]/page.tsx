@@ -8,6 +8,10 @@ import type { Product } from "@/lib/supermarket2/types";
 import Link from "next/link";
 const BASE_PATH = "/templates/supermarket-2/preview";
 export default function Page({ params }: { params: { handle: string } }) {
+  const vendorName = params.handle === "fresh-juice-bar" ? "Fresh Juice Bar" : params.handle.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+  const vendorDescription = params.handle === "fresh-juice-bar"
+    ? "Cold-pressed juices, fruit cups, wellness drinks, and fresh produce prepared daily."
+    : "Premium organic produce from local farms with over 10 years of experience.";
   return (
     <div className="demo-one">
       <HeaderTwo />
@@ -28,9 +32,9 @@ export default function Page({ params }: { params: { handle: string } }) {
             <div className="col-lg-4">
               <div style={{ background: '#fff', borderRadius: 8, padding: 32, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', textAlign: 'center' }}>
                 <img src="/templates/supermarket2/vendor/01.jpg" alt="vendor" style={{ width: 100, height: 100, borderRadius: '50%', objectFit: 'cover', marginBottom: 16 }} onError={e => { (e.target as HTMLImageElement).src = '/templates/supermarket2/products/01.jpg'; }} />
-                <h4>Green Valley Farms</h4>
+                <h4>{vendorName}</h4>
                 <p style={{ color: '#666' }}><i className="fa-light fa-location-dot" /> Berlin, Germany</p>
-                <p>Premium organic produce from local German farms with over 10 years of experience.</p>
+                <p>{vendorDescription}</p>
                 <div style={{ display: 'flex', justifyContent: 'space-around', margin: '16px 0' }}>
                   <div><strong>45</strong><br /><small>Products</small></div>
                   <div><strong>4.8</strong><br /><small>Rating</small></div>

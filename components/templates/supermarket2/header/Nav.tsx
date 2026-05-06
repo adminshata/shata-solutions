@@ -29,12 +29,26 @@ function NavItem() {
                           <li><Link href={`${BP}/shop`}>Shop Grid Sidebar</Link></li>
                           <li><Link href={`${BP}/shop/list`}>Shop List Sidebar</Link></li>
                           <li><Link href={`${BP}/shop/grid-top-filter`}>Shop Top Filter Grid</Link></li>
+                          <li><Link href={`${BP}/shop/list-top-filter`}>Shop Top Filter List</Link></li>
+                          <li><Link href={`${BP}/shop`}>Shop Wide</Link></li>
+                        </ul>
+                      </div>
+                      <div className="single-megamenu-wrapper">
+                        <p className="title">Shop Details</p>
+                        <ul>
+                          <li><Link href={`${BP}/shop/super-fresh-meat`}>Product Details</Link></li>
+                          <li><Link href={`${BP}/shop/original-fresh-frut`}>Product Variable</Link></li>
+                          <li><Link href={`${BP}/shop/organic-fresh-frut`}>Product Grouped</Link></li>
+                          <li><Link href={`${BP}/shop/lite-fresh-frut`}>Product Affiliate</Link></li>
                         </ul>
                       </div>
                       <div className="single-megamenu-wrapper">
                         <p className="title">Product Feature</p>
                         <ul>
                           <li><Link className="sub-b" href={`${BP}/compare`}>Shop Compare</Link></li>
+                          <li><Link className="sub-b" href={`${BP}/wishlist`}>Shop Wishlist</Link></li>
+                          <li><Link className="sub-b" href={`${BP}/cart`}>Cart Sidebar</Link></li>
+                          <li><Link className="sub-b" href={`${BP}/checkout`}>Checkout</Link></li>
                         </ul>
                       </div>
                       <div className="single-megamenu-wrapper">
@@ -42,6 +56,7 @@ function NavItem() {
                         <ul>
                           <li><Link className="sub-b" href={`${BP}/cart`}>Cart</Link></li>
                           <li><Link className="sub-b" href={`${BP}/checkout`}>Checkout</Link></li>
+                          <li><Link className="sub-b" href={`${BP}/order-successful`}>Order Successful</Link></li>
                           <li><Link className="sub-b" href={`${BP}/track-order`}>Track Order</Link></li>
                         </ul>
                       </div>
@@ -61,7 +76,7 @@ function NavItem() {
             <ul className="submenu">
               <li><Link className="sub-b" href={`${BP}/vendors/list`}>Vendor List</Link></li>
               <li><Link className="sub-b" href={`${BP}/vendors`}>Vendor Grid</Link></li>
-              <li><Link className="sub-b" href={`${BP}/vendors/quickmart-store`}>Vendor Details</Link></li>
+              <li><Link className="sub-b" href={`${BP}/vendors/fresh-juice-bar`}>Vendor Details</Link></li>
             </ul>
           </li>
           <li className="parent has-dropdown">

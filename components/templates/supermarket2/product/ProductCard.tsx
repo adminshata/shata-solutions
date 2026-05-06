@@ -4,12 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/supermarket2/context";
 import { formatPrice, lineSignature } from "@/lib/supermarket2/utils";
-import type { Product } from "@/lib/supermarket2/types";
+import type { StoreProduct } from "@/lib/supermarket2/types";
 import { Badge } from "../ui/Atoms";
 
 const BASE_PATH = "/templates/supermarket-2/preview";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product }: { product: StoreProduct }) {
   const cart = useCart();
   const sig = lineSignature(product.id);
   const inCart = cart.cart.lines.find((l) => lineSignature(l.productId) === sig);

@@ -5,12 +5,12 @@ import BackToTop from "@/components/templates/supermarket2/common/BackToTop";
 import Link from "next/link";
 const BASE_PATH = "/templates/supermarket-2/preview";
 const vendors = [
-  { name: "Green Valley Farms", location: "Berlin, Germany", products: 45, rating: 4.8, img: "01.jpg" },
-  { name: "Fresh Morning Co.", location: "Frankfurt, Germany", products: 32, rating: 4.6, img: "02.jpg" },
-  { name: "Organic Roots", location: "Hamburg, Germany", products: 58, rating: 4.9, img: "03.jpg" },
-  { name: "Pure Nature Store", location: "Munich, Germany", products: 27, rating: 4.5, img: "04.jpg" },
-  { name: "Daily Fresh Market", location: "Cologne, Germany", products: 61, rating: 4.7, img: "05.jpg" },
-  { name: "Harvest Grove", location: "Stuttgart, Germany", products: 39, rating: 4.4, img: "06.jpg" },
+  { handle: "fresh-juice-bar", name: "Fresh Juice Bar", location: "Berlin, Germany", products: 45, rating: 4.9, img: "01.jpg" },
+  { handle: "green-valley-farms", name: "Green Valley Farms", location: "Frankfurt, Germany", products: 32, rating: 4.8, img: "02.jpg" },
+  { handle: "organic-roots", name: "Organic Roots", location: "Hamburg, Germany", products: 58, rating: 4.9, img: "01.webp" },
+  { handle: "pure-nature-store", name: "Pure Nature Store", location: "Munich, Germany", products: 27, rating: 4.5, img: "02.webp" },
+  { handle: "daily-fresh-market", name: "Daily Fresh Market", location: "Cologne, Germany", products: 61, rating: 4.7, img: "01.jpg" },
+  { handle: "harvest-grove", name: "Harvest Grove", location: "Stuttgart, Germany", products: 39, rating: 4.4, img: "02.jpg" },
 ];
 export default function Page() {
   return (
@@ -42,7 +42,7 @@ export default function Page() {
                     <span>{v.products} Products</span>
                     <span>{v.rating} <i className="fa-solid fa-star" style={{ color: '#f59e0b' }} /></span>
                   </div>
-                  <Link href={`${BASE_PATH}/vendors/vendor-${i+1}`} className="rts-btn btn-primary" style={{ display: 'block', textAlign: 'center' }}>View Store</Link>
+                  <Link href={`${BASE_PATH}/vendors/${v.handle}`} className="rts-btn btn-primary" style={{ display: 'block', textAlign: 'center' }}>View Store</Link>
                 </div>
               </div>
             ))}

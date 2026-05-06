@@ -79,11 +79,16 @@ function HeaderTwo() {
               <div className="row">
                 <div className="col-lg-12">
                   <div className="hader-top-between-two">
-                    <p>Welcome to our Organic store QuickMart!</p>
+                    <p>
+                      Welcome to our Organic store QuickMart! <span style={{ marginLeft: 12 }}>Get 30% Discount Now</span>
+                    </p>
                     <ul className="nav-header-top">
-                      <li><Link href={`${BP}/track-order`}>Track Order</Link></li>
                       <li><Link href={`${BP}/about`}>About Us</Link></li>
-                      <li><Link href={`${BP}/contact`}>Contact</Link></li>
+                      <li><Link href={`${BP}/account`}>My Account</Link></li>
+                      <li><Link href={`${BP}/wishlist`}>Wishlist</Link></li>
+                      <li><a href="#">English</a></li>
+                      <li><a href="#">USD</a></li>
+                      <li><Link href={`${BP}/track-order`}>Track Order</Link></li>
                     </ul>
                   </div>
                 </div>
@@ -143,7 +148,7 @@ function HeaderTwo() {
                     <div className="nav-area"><Nav /></div>
                     <div className="right-location-area">
                       <i className="fa-solid fa-location-dot" />
-                      <p>Delivery: <a href="#">258 FKD Street, Berlin</a></p>
+                      <p><Link href={`${BP}/shop`}>Trending Products</Link> <span style={{ padding: "0 10px" }}>|</span> Delivery: <a href="#">258 FKD Street, Berlin</a></p>
                     </div>
                   </div>
                   <div className="logo-search-category-wrapper">

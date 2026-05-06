@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 
 const BP = "/templates/supermarket-2/preview";
-const DA = "/templates/supermarket2/dashboard-assets";
+const DA = "/templates/supermarket2";
 
 interface HeaderProps { onToggleSidebar: () => void; }
 

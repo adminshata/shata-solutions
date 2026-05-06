@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 const BP = "/templates/supermarket-2/preview";
 const DASH = `${BP}/dashboard`;
-const DA = "/templates/supermarket2/dashboard-assets";
+const DA = "/templates/supermarket2";
 
 interface MenuItem {
   title: string;
@@ -22,7 +22,7 @@ const menuItems: MenuItem[] = [
   { title: "Transactions", icon: `${DA}/icons/06.svg`, href: `${DASH}/transaction` },
   { title: "Reviews", icon: `${DA}/icons/07.svg`, href: `${DASH}/review` },
   { title: "Brand", icon: `${DA}/icons/16.svg`, href: `${DASH}/brand` },
-  { title: "Payment", icon: `${DA}/icons/17.svg`, href: `${DASH}/payment` },
+  { title: "Payment", icon: `${DA}/icons/15.svg`, href: `${DASH}/payment` },
   { title: "User Profile", icon: `${DA}/icons/05.svg`, children: [{ title: "Profile Setting", href: `${DASH}/profile-setting` }, { title: "Log In", href: `${DASH}/log-in` }, { title: "Registration", href: `${DASH}/registration` }] },
 ];
 
