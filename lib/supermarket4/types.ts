@@ -22,7 +22,7 @@ export type Product = {
   id: string; handle: string; name: string;
   shortDescription?: string; description?: string;
   category?: string; images: string[];
-  badge?: ProductBadge; featured?: boolean; active?: boolean;
+  badge?: string | null; featured?: boolean; active?: boolean;
   price: Money; compareAtPrice?: Money; unit?: string; stock?: number;
 };
 

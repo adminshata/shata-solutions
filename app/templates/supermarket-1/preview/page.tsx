@@ -1,46 +1,29 @@
 "use client";
 
-import { SiteShell } from "@/components/templates/supermarket1/layout/SiteShell";
-import { Header } from "@/components/templates/supermarket1/layout/Header";
-import { Footer } from "@/components/templates/supermarket1/layout/Footer";
-import { CartDrawer } from "@/components/templates/supermarket1/layout/CartDrawer";
-import {
-  BannerSlider,
-  CategoryQuickLinks,
-  FeaturesRow,
-  FeaturedProducts,
-  DiscountProducts,
-  WeeklyBestSelling,
-  TrendingProducts,
-  BlogPosts,
-} from "@/components/templates/supermarket1/sections/HomeSections";
-import { useSite } from "@/lib/supermarket1/context";
+import HeaderOne from "@/components/templates/supermarket1/header/HeaderOne";
+import BannerOne from "@/components/templates/supermarket1/banner/BannerOne";
+import FeatureOne from "@/components/templates/supermarket1/feature/FeatureOne";
+import FeatureProduct from "@/components/templates/supermarket1/product/FeatureProduct";
+import DiscountProduct from "@/components/templates/supermarket1/product/DiscountProduct";
+import WeeklyBestSelling from "@/components/templates/supermarket1/product/WeeklyBestSelling";
+import FeatureDiscount from "@/components/templates/supermarket1/product/FeatureDiscount";
+import TrandingProduct from "@/components/templates/supermarket1/product/TrandingProduct";
+import BlogOne from "@/components/templates/supermarket1/blog/BlogOne";
+import FooterOne from "@/components/templates/supermarket1/footer/FooterOne";
 
-export default function SupermarketHomePage() {
-  const config = useSite();
-  const sectionMap: Record<string, React.ReactNode> = {
-    features: <FeaturesRow />,
-    featured: <FeaturedProducts />,
-    discount: <DiscountProducts />,
-    weekly: <WeeklyBestSelling />,
-    trending: <TrendingProducts />,
-    blog: <BlogPosts />,
-  };
-
+export default function Home() {
   return (
-    <SiteShell>
-      <Header />
-      <main>
-        <BannerSlider />
-        <CategoryQuickLinks />
-        {config.sections
-          .filter((s) => s.active)
-          .map((s) => (
-            <div key={s.id}>{sectionMap[s.id] ?? null}</div>
-          ))}
-      </main>
-      <Footer />
-      <CartDrawer />
-    </SiteShell>
+    <div className="demo-one">
+      <HeaderOne />
+      <BannerOne />
+      <FeatureOne />
+      <FeatureProduct />
+      <DiscountProduct />
+      <WeeklyBestSelling />
+      <FeatureDiscount />
+      <TrandingProduct />
+      <BlogOne />
+      <FooterOne />
+    </div>
   );
 }

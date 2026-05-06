@@ -86,6 +86,10 @@ export function themeVars(theme: StoreTheme): Record<string, string> {
   };
 }
 
+export function lineSignature(productId: string): string {
+  return productId;
+}
+
 export function classes(...parts: (string | false | null | undefined)[]): string {
   return parts.filter(Boolean).join(" ");
 }

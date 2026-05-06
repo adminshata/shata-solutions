@@ -33,7 +33,7 @@ export type Product = {
   description?: string;
   category?: string;
   images: string[];
-  badge?: ProductBadge;
+  badge?: string | null;
   featured?: boolean;
   active?: boolean;
   price: Money;

@@ -1,178 +1,232 @@
 "use client";
 
-import {
+import React, {
   createContext,
-  useCallback,
   useContext,
   useEffect,
-  useMemo,
-  useReducer,
   useState,
   type ReactNode,
 } from "react";
-import { SUPERMARKET1_DEFAULTS } from "./defaults";
-import type { Product, SiteConfig } from "./types";
-import { cartTotals, lineSignature } from "./utils";
 
-/* ------------------------------------------------------------------ */
-/* Site config context                                                  */
-/* ------------------------------------------------------------------ */
+/* ─────────────────────────────── CART ──────────────────────────────── */
 
-const SiteContext = createContext<SiteConfig | null>(null);
-
-export function useSite(): SiteConfig {
-  const ctx = useContext(SiteContext);
-  if (!ctx) throw new Error("useSite must be used inside <SiteProvider>");
-  return ctx;
-}
-
-export function SiteProvider({
-  children,
-  config,
-}: {
-  children: ReactNode;
-  config?: SiteConfig;
-}) {
-  const value = config ?? SUPERMARKET1_DEFAULTS;
-  return (
-    <SiteContext.Provider value={value}>
-      <CartProvider config={value}>{children}</CartProvider>
-    </SiteContext.Provider>
-  );
-}
-
-/** Alias for import compatibility */
-export const Supermarket1Provider = SiteProvider;
-
-/* ------------------------------------------------------------------ */
-/* Cart                                                                */
-/* ------------------------------------------------------------------ */
-
-type CartLine = {
-  productId: string;
+interface CartItem {
+  id: number;
+  image: string;
+  title: string;
+  price: number;
   quantity: number;
-};
-
-type Cart = {
-  lines: CartLine[];
-};
-
-type CartAction =
-  | { type: "hydrate"; cart: Cart }
-  | { type: "add"; productId: string; quantity: number }
-  | { type: "update"; signature: string; quantity: number }
-  | { type: "remove"; signature: string }
-  | { type: "clear" };
-
-function cartReducer(cart: Cart, action: CartAction): Cart {
-  switch (action.type) {
-    case "hydrate":
-      return action.cart;
-
-    case "add": {
-      const sig = lineSignature(action.productId);
-      const idx = cart.lines.findIndex((l) => lineSignature(l.productId) === sig);
-      const next: CartLine[] = [...cart.lines];
-      if (idx >= 0) {
-        next[idx] = { ...next[idx], quantity: next[idx].quantity + action.quantity };
-      } else {
-        next.push({ productId: action.productId, quantity: action.quantity });
-      }
-      return { lines: next };
-    }
-
-    case "update": {
-      if (action.quantity <= 0) {
-        return { lines: cart.lines.filter((l) => lineSignature(l.productId) !== action.signature) };
-      }
-      return {
-        lines: cart.lines.map((l) =>
-          lineSignature(l.productId) === action.signature ? { ...l, quantity: action.quantity } : l
-        ),
-      };
-    }
-
-    case "remove":
-      return { lines: cart.lines.filter((l) => lineSignature(l.productId) !== action.signature) };
-
-    case "clear":
-      return { lines: [] };
-  }
+  active: boolean;
 }
 
-const CART_KEY = "supermarket1/cart";
+interface CartContextProps {
+  cartItems: CartItem[];
+  addToCart: (item: CartItem) => void;
+  addToWishlistViaCart: (item: CartItem) => void;
+  removeFromCart: (id: number) => void;
+  updateItemQuantity: (id: number, quantity: number) => void;
+  isCartLoaded: boolean;
+}
 
-type CartContextValue = {
-  cart: Cart;
-  itemCount: number;
-  subtotal: number;
-  shippingHint: string;
-  resolveProduct: (id: string) => Product | null;
-  add: (productId: string, quantity?: number) => void;
-  update: (signature: string, quantity: number) => void;
-  remove: (signature: string) => void;
-  clear: () => void;
-  drawerOpen: boolean;
-  openDrawer: () => void;
-  closeDrawer: () => void;
-};
+const CartContext = createContext<CartContextProps | undefined>(undefined);
 
-const CartContext = createContext<CartContextValue | null>(null);
-
-export function useCart(): CartContextValue {
+export const useCart = () => {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be used inside <SiteProvider>");
+  if (!ctx) throw new Error("useCart must be used within a CartProvider");
   return ctx;
-}
+};
 
-function CartProvider({ children, config }: { children: ReactNode; config: SiteConfig }) {
-  const [cart, dispatch] = useReducer(cartReducer, { lines: [] });
-  const [drawerOpen, setDrawerOpen] = useState(false);
+export const CartProvider = ({ children }: { children: ReactNode }) => {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isCartLoaded, setIsCartLoaded] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const raw = window.localStorage.getItem(CART_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Cart;
-        if (parsed && Array.isArray(parsed.lines)) {
-          dispatch({ type: "hydrate", cart: parsed });
-        }
-      }
-    } catch { /* ignore */ }
+    const stored = localStorage.getItem("sm1_cart");
+    if (stored) {
+      try { setCartItems(JSON.parse(stored)); } catch { localStorage.removeItem("sm1_cart"); }
+    }
+    setIsCartLoaded(true);
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    } catch { /* ignore */ }
-  }, [cart]);
+    if (isCartLoaded) localStorage.setItem("sm1_cart", JSON.stringify(cartItems));
+  }, [cartItems, isCartLoaded]);
 
-  const resolveProduct = useCallback(
-    (id: string) => config.products.find((p) => p.id === id) ?? null,
-    [config.products]
+  const addToCart = (item: CartItem) => {
+    setCartItems((prev) => {
+      const existing = prev.find((i) => i.id === item.id && i.active === true);
+      if (existing) {
+        return prev.map((i) =>
+          i.id === item.id && i.active === true ? { ...i, quantity: i.quantity + item.quantity } : i
+        );
+      }
+      return [...prev, item];
+    });
+  };
+
+  const addToWishlistViaCart = (item: CartItem) => {
+    setCartItems((prev) => {
+      const existing = prev.find((i) => i.id === item.id && i.active === false);
+      if (existing) return prev;
+      return [...prev, { ...item, active: false }];
+    });
+  };
+
+  const removeFromCart = (id: number) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const updateItemQuantity = (id: number, quantity: number) => {
+    setCartItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item))
+    );
+  };
+
+  return (
+    <CartContext.Provider
+      value={{ cartItems, addToCart, addToWishlistViaCart, removeFromCart, updateItemQuantity, isCartLoaded }}
+    >
+      {children}
+    </CartContext.Provider>
   );
+};
 
-  const totals = useMemo(() => cartTotals(cart.lines, resolveProduct), [cart.lines, resolveProduct]);
+/* ──────────────────────────── WISHLIST ─────────────────────────────── */
 
-  const value: CartContextValue = useMemo(
-    () => ({
-      cart,
-      itemCount: totals.itemCount,
-      subtotal: totals.subtotal,
-      shippingHint: totals.shippingHint,
-      resolveProduct,
-      add: (productId, quantity = 1) => dispatch({ type: "add", productId, quantity }),
-      update: (signature, quantity) => dispatch({ type: "update", signature, quantity }),
-      remove: (signature) => dispatch({ type: "remove", signature }),
-      clear: () => dispatch({ type: "clear" }),
-      drawerOpen,
-      openDrawer: () => setDrawerOpen(true),
-      closeDrawer: () => setDrawerOpen(false),
-    }),
-    [cart, totals, resolveProduct, drawerOpen]
+interface WishlistItem {
+  id: number;
+  image: string;
+  title: string;
+  price: number;
+  quantity: number;
+}
+
+interface WishlistContextProps {
+  wishlistItems: WishlistItem[];
+  addToWishlist: (item: WishlistItem) => void;
+  removeFromWishlist: (id: number) => void;
+  updateItemQuantity: (id: number, quantity: number) => void;
+  isWishlistLoaded: boolean;
+}
+
+const WishlistContext = createContext<WishlistContextProps | undefined>(undefined);
+
+export const useWishlist = (): WishlistContextProps => {
+  const ctx = useContext(WishlistContext);
+  if (!ctx) throw new Error("useWishlist must be used within a WishlistProvider");
+  return ctx;
+};
+
+export const WishlistProvider = ({ children }: { children: ReactNode }) => {
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+  const [isWishlistLoaded, setIsWishlistLoaded] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("sm1_wishlist");
+    if (stored) {
+      try { setWishlistItems(JSON.parse(stored)); } catch { localStorage.removeItem("sm1_wishlist"); }
+    }
+    setIsWishlistLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (isWishlistLoaded) localStorage.setItem("sm1_wishlist", JSON.stringify(wishlistItems));
+  }, [wishlistItems, isWishlistLoaded]);
+
+  const addToWishlist = (item: WishlistItem) => {
+    setWishlistItems((prev) => {
+      const existing = prev.find((i) => i.id === item.id);
+      if (existing) return prev;
+      return [...prev, item];
+    });
+  };
+
+  const removeFromWishlist = (id: number) => {
+    setWishlistItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const updateItemQuantity = (id: number, quantity: number) => {
+    setWishlistItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item))
+    );
+  };
+
+  return (
+    <WishlistContext.Provider
+      value={{ wishlistItems, addToWishlist, removeFromWishlist, updateItemQuantity, isWishlistLoaded }}
+    >
+      {children}
+    </WishlistContext.Provider>
   );
+};
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+/* ──────────────────────────── COMPARE ─────────────────────────────── */
+
+interface CompareItem {
+  image: string;
+  name: string;
+  price: string;
+  description: string;
+  rating: number;
+  ratingCount: number;
+  weight: string;
+  inStock: boolean;
+}
+
+interface CompareContextProps {
+  compareItems: CompareItem[];
+  addToCompare: (item: CompareItem) => void;
+  removeFromCompare: (name: string) => void;
+}
+
+const CompareContext = createContext<CompareContextProps>({
+  compareItems: [],
+  addToCompare: () => {},
+  removeFromCompare: () => {},
+});
+
+export const CompareProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [compareItems, setCompareItems] = useState<CompareItem[]>([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("sm1_compare");
+    if (stored) { try { setCompareItems(JSON.parse(stored)); } catch { /* ignore */ } }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("sm1_compare", JSON.stringify(compareItems));
+  }, [compareItems]);
+
+  const addToCompare = (item: CompareItem) => {
+    setCompareItems((prev) => {
+      if (prev.some((i) => i.name === item.name)) return prev;
+      return [...prev, item];
+    });
+  };
+
+  const removeFromCompare = (name: string) => {
+    setCompareItems((prev) => prev.filter((item) => item.name !== name));
+  };
+
+  return (
+    <CompareContext.Provider value={{ compareItems, addToCompare, removeFromCompare }}>
+      {children}
+    </CompareContext.Provider>
+  );
+};
+
+export const useCompare = () => useContext(CompareContext);
+
+/* ──────────────────────────── COMBINED ─────────────────────────────── */
+
+export function Supermarket1Provider({ children }: { children: ReactNode }) {
+  return (
+    <WishlistProvider>
+      <CartProvider>
+        <CompareProvider>
+          {children}
+        </CompareProvider>
+      </CartProvider>
+    </WishlistProvider>
+  );
 }

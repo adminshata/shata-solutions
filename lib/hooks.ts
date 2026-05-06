@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { supabase } from "./supabase";
+import { supabaseBrowser } from "./supabase";
+const supabase = supabaseBrowser();
 import { ELEVENLABS_VOICE_ID, MAKE_WEBHOOK_URL } from "./constants";
 import type { ChatMessage, CtaType } from "./types";
 

@@ -19,7 +19,7 @@ export interface ManagedItemBase {
   description?: string;
   category?: string;
   images: string[];
-  badge?: string;
+  badge?: string | null;
   featured?: boolean;
   active?: boolean;
 }

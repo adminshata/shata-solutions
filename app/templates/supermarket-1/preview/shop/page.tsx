@@ -1,156 +1,214 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { SiteShell } from "@/components/templates/supermarket1/layout/SiteShell";
-import { Header } from "@/components/templates/supermarket1/layout/Header";
-import { Footer } from "@/components/templates/supermarket1/layout/Footer";
-import { CartDrawer } from "@/components/templates/supermarket1/layout/CartDrawer";
-import { ProductCard } from "@/components/templates/supermarket1/product/ProductCard";
-import { useSite } from "@/lib/supermarket1/context";
-import { activeProducts, activeCategories } from "@/lib/supermarket1/utils";
+import HeaderOne from "@/components/templates/supermarket1/header/HeaderOne";
+import FooterOne from "@/components/templates/supermarket1/footer/FooterOne";
+import WeeklyBestSellingMain from "@/components/templates/supermarket1/product-main/WeeklyBestSellingMain";
 
 const BASE_PATH = "/templates/supermarket-1/preview";
 
-type SortOption = "default" | "price-asc" | "price-desc" | "name-asc";
+interface PostType {
+  slug: string;
+  image: string;
+  title?: string;
+  price?: string;
+  category?: string;
+}
 
-export default function ShopPage() {
-  const config = useSite();
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [sort, setSort] = useState<SortOption>("default");
-  const [search, setSearch] = useState("");
+const ALL_PRODUCTS: PostType[] = [
+  { slug: "profitable-business-makes-your-profit-Best-Solution", image: "15.jpg", title: "Profitable business Best Solution", price: "36.00", category: "Beverages" },
+  { slug: "details-profitable-business-makes-your-profit", image: "16.jpg", title: "Details Profitable business", price: "29.00", category: "Beverages" },
+  { slug: "one-Profitable-business-makes-your-profit", image: "17.jpg", title: "One Profitable business", price: "25.00", category: "Beverages" },
+  { slug: "me-profitable-business-makes-your-profit", image: "18.jpg", title: "Me Profitable business", price: "78.00", category: "Biscuits & Snacks" },
+  { slug: "details-business-makes-your-profit", image: "19.jpg", title: "Details business makes your profit", price: "90.00", category: "Beverages" },
+  { slug: "firebase-business-makes-your-profit", image: "20.jpg", title: "Firebase business makes your profit", price: "50.00", category: "Beverages" },
+  { slug: "netlyfy-business-makes-your-profit", image: "21.jpg", title: "Netlyfy business makes your profit", price: "19.00", category: "Beverages" },
+  { slug: "profitable-business-makes-your-profit", image: "22.jpg", title: "Profitable business makes your profit", price: "30.00", category: "Biscuits & Snacks" },
+  { slug: "Valuable-business-makes-your-profit", image: "23.jpg", title: "Valuable business makes your profit", price: "16.00", category: "Biscuits & Snacks" },
+  { slug: "System-business-makes-your-profit", image: "24.jpg", title: "System business makes your profit", price: "15.00", category: "Biscuits & Snacks" },
+  { slug: "profitables-business-makes-your-profit", image: "25.jpg", title: "Profitables business makes your profit", price: "12.00", category: "Breads & Bakery" },
+  { slug: "content-business-makes-your-profit", image: "26.jpg", title: "Content business makes your profit", price: "79.00", category: "Breads & Bakery" },
+  { slug: "Dalivaring-business-makes-your-profit", image: "01.jpg", title: "Dalivaring business makes your profit", price: "63.00", category: "Breads & Bakery" },
+  { slug: "Staning-business-makes-your-profit", image: "02.jpg", title: "Staning business makes your profit", price: "86.00", category: "Breads & Bakery" },
+  { slug: "Best-business-makes-your-profit", image: "03.jpg", title: "Best business makes your profit", price: "18.00", category: "Breads & Bakery" },
+  { slug: "cooler-business-makes-your-profit", image: "04.jpg", title: "Cooler business makes your profit", price: "18.00", category: "Beverages" },
+];
 
-  const categories = activeCategories(config);
-  let products = activeProducts(config);
+const allCategories = ["Beverages", "Biscuits & Snacks", "Breads & Bakery"];
+const allBrands = ["Frito Lay", "Nespresso", "Oreo", "Quaker", "Welch's"];
 
-  if (selectedCategory) {
-    products = products.filter((p) => p.category === selectedCategory);
-  }
-  if (search.trim()) {
-    const q = search.toLowerCase();
-    products = products.filter((p) =>
-      p.name.toLowerCase().includes(q) ||
-      (p.description ?? "").toLowerCase().includes(q)
+function ShopContent() {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search")?.toLowerCase() || "";
+
+  const [activeTab, setActiveTab] = useState<string>("tab1");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(150);
+
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
     );
-  }
-  if (sort === "price-asc") products = [...products].sort((a, b) => a.price - b.price);
-  if (sort === "price-desc") products = [...products].sort((a, b) => b.price - a.price);
-  if (sort === "name-asc") products = [...products].sort((a, b) => a.name.localeCompare(b.name));
+  };
+
+  const filteredProducts = ALL_PRODUCTS.filter((p) => {
+    const price = parseFloat(p.price ?? "0");
+    if (price < minPrice || price > maxPrice) return false;
+    if (selectedCategories.length > 0 && !selectedCategories.includes(p.category ?? "")) return false;
+    if (searchQuery) {
+      const t = p.title?.toLowerCase() ?? "";
+      if (!t.includes(searchQuery)) return false;
+    }
+    return true;
+  });
 
   return (
-    <SiteShell>
-      <Header />
-      <main className="py-8" style={{ background: "#F3F4F6" }}>
-        <div className="container mx-auto px-4">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1 text-xs text-gray-500 mb-6">
-            <Link href={BASE_PATH} className="hover:text-[#629D23]">Home</Link>
-            <span>/</span>
-            <span className="text-gray-800 font-medium">Shop</span>
-          </nav>
-
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Sidebar */}
-            <aside className="w-full lg:w-56 shrink-0 space-y-4">
-              {/* Search */}
-              <div className="bg-white rounded border border-gray-200 p-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700 mb-3">Search</h3>
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search products..."
-                  className="w-full rounded border border-gray-200 bg-gray-50 px-3 py-2 text-xs outline-none focus:border-[#629D23]"
-                />
+    <div className="shop-page">
+      {/* Breadcrumb */}
+      <div className="rts-navigation-area-breadcrumb bg_light-1">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-12">
+              <div className="navigator-breadcrumb-wrapper">
+                <Link href={BASE_PATH}>Home</Link>
+                <i className="fa-regular fa-chevron-right" />
+                <a className="current" href="#">Shop</a>
               </div>
-
-              {/* Categories */}
-              <div className="bg-white rounded border border-gray-200 p-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700 mb-3">Categories</h3>
-                <ul className="space-y-1">
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedCategory("")}
-                      className={`w-full text-left rounded px-2 py-1.5 text-sm transition-colors ${
-                        selectedCategory === "" ? "text-[#629D23] font-semibold" : "text-gray-600 hover:text-[#629D23]"
-                      }`}
-                    >
-                      All Products
-                    </button>
-                  </li>
-                  {categories.map((cat) => {
-                    const count = activeProducts(config).filter((p) => p.category === cat.handle).length;
-                    return (
-                      <li key={cat.id}>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedCategory(cat.handle)}
-                          className={`w-full text-left rounded px-2 py-1.5 text-sm flex items-center justify-between transition-colors ${
-                            selectedCategory === cat.handle
-                              ? "text-[#629D23] font-semibold"
-                              : "text-gray-600 hover:text-[#629D23]"
-                          }`}
-                        >
-                          <span>{cat.name}</span>
-                          <span className="text-[10px] text-gray-400">({count})</span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            </aside>
-
-            {/* Product grid */}
-            <div className="flex-1 min-w-0">
-              {/* Sort bar */}
-              <div className="flex flex-wrap items-center justify-between gap-3 bg-white rounded border border-gray-200 px-4 py-3 mb-5">
-                <p className="text-sm text-gray-600">
-                  Showing <span className="font-semibold text-gray-800">{products.length}</span> products
-                  {selectedCategory && (
-                    <> in <span className="font-semibold text-[#629D23]">
-                      {categories.find(c => c.handle === selectedCategory)?.name}
-                    </span></>
-                  )}
-                </p>
-                <select
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value as SortOption)}
-                  className="rounded border border-gray-200 bg-white px-3 py-1.5 text-xs outline-none focus:border-[#629D23]"
-                >
-                  <option value="default">Sort: Default</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                  <option value="name-asc">Name: A to Z</option>
-                </select>
-              </div>
-
-              {products.length === 0 ? (
-                <div className="flex flex-col items-center justify-center bg-white rounded border border-gray-200 p-12 text-center">
-                  <p className="text-gray-500">No products found.</p>
-                  <button
-                    type="button"
-                    onClick={() => { setSelectedCategory(""); setSearch(""); }}
-                    className="mt-3 text-sm font-semibold underline"
-                    style={{ color: "#629D23" }}
-                  >
-                    Clear filters
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
-                  {products.map((p) => (
-                    <ProductCard key={p.id} product={p} />
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
-      <CartDrawer />
-    </SiteShell>
+      </div>
+      <div className="section-seperator bg_light-1">
+        <div className="container"><hr className="section-seperator" /></div>
+      </div>
+      <div className="shop-grid-sidebar-area rts-section-gap">
+        <div className="container">
+          <div className="row g-0">
+            {/* Sidebar */}
+            <div className="col-xl-3 col-lg-12 pr--70 pr_lg--10 pr_sm--10 pr_md--5 rts-sticky-column-item">
+              <div className="sidebar-filter-main theiaStickySidebar">
+                <div className="single-filter-box">
+                  <h5 className="title">Widget Price Filter</h5>
+                  <div className="filterbox-body">
+                    <form action="#" className="price-input-area" onSubmit={(e) => e.preventDefault()}>
+                      <div className="half-input-wrapper">
+                        <div className="single">
+                          <label htmlFor="min">Min price</label>
+                          <input id="min" type="number" value={minPrice} min={0} onChange={(e) => setMinPrice(parseFloat(e.target.value) || 0)} />
+                        </div>
+                        <div className="single">
+                          <label htmlFor="max">Max price</label>
+                          <input id="max" type="number" value={maxPrice} min={0} onChange={(e) => setMaxPrice(parseFloat(e.target.value) || 150)} />
+                        </div>
+                      </div>
+                      <input type="range" className="range" min={0} max={150} value={maxPrice} onChange={(e) => setMaxPrice(parseInt(e.target.value, 10))} />
+                      <div className="filter-value-min-max">
+                        <span>Price: ${minPrice} — ${maxPrice}</span>
+                        <button type="submit" className="rts-btn btn-primary">Filter</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div className="single-filter-box">
+                  <h5 className="title">Product Categories</h5>
+                  <div className="filterbox-body">
+                    <div className="category-wrapper">
+                      {allCategories.map((cat, i) => (
+                        <div className="single-category" key={i}>
+                          <input id={`cat${i+1}`} type="checkbox" checked={selectedCategories.includes(cat)} onChange={() => handleCategoryChange(cat)} />
+                          <label htmlFor={`cat${i+1}`}>{cat}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="single-filter-box">
+                  <h5 className="title">Select Brands</h5>
+                  <div className="filterbox-body">
+                    <div className="category-wrapper">
+                      {allBrands.map((brand, i) => (
+                        <div className="single-category" key={i}>
+                          <input id={`brand${i+1}`} type="checkbox" />
+                          <label htmlFor={`brand${i+1}`}>{brand}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Main */}
+            <div className="col-xl-9 col-lg-12">
+              <div className="filter-select-area">
+                <div className="top-filter">
+                  <span>Showing {filteredProducts.length} results</span>
+                  <div className="right-end">
+                    <span>Sort: Short By Latest</span>
+                    <div className="button-tab-area">
+                      <ul className="nav nav-tabs" id="myTab" role="tablist">
+                        <li className="nav-item">
+                          <button onClick={() => setActiveTab("tab1")} className={`nav-link single-button ${activeTab === "tab1" ? "active" : ""}`}>
+                            <svg width={16} height={16} viewBox="0 0 16 16" fill="none"><rect x="0.5" y="0.5" width={6} height={6} rx="1.5" stroke="#2C3B28" /><rect x="0.5" y="9.5" width={6} height={6} rx="1.5" stroke="#2C3B28" /><rect x="9.5" y="0.5" width={6} height={6} rx="1.5" stroke="#2C3B28" /><rect x="9.5" y="9.5" width={6} height={6} rx="1.5" stroke="#2C3B28" /></svg>
+                          </button>
+                        </li>
+                        <li className="nav-item">
+                          <button onClick={() => setActiveTab("tab2")} className={`nav-link single-button ${activeTab === "tab2" ? "active" : ""}`}>
+                            <svg width={16} height={16} viewBox="0 0 16 16" fill="none"><rect x="0.5" y="0.5" width={6} height={6} rx="1.5" stroke="#2C3C28" /><rect x="0.5" y="9.5" width={6} height={6} rx="1.5" stroke="#2C3C28" /><rect x={9} y={3} width={7} height={1} fill="#2C3C28" /><rect x={9} y={12} width={7} height={1} fill="#2C3C28" /></svg>
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="tab-content mt--20">
+                {activeTab === "tab1" && (
+                  <div className="row g-4">
+                    {filteredProducts.length > 0 ? filteredProducts.map((post, index) => (
+                      <div key={index} className="col-lg-20 col-lg-4 col-md-6 col-sm-6 col-12">
+                        <div className="single-shopping-card-one">
+                          <WeeklyBestSellingMain Slug={post.slug} ProductImage={post.image} ProductTitle={post.title} Price={post.price} />
+                        </div>
+                      </div>
+                    )) : (
+                      <div className="col-12 text-center py-5"><h2>No Product Found</h2></div>
+                    )}
+                  </div>
+                )}
+                {activeTab === "tab2" && (
+                  <div className="row">
+                    {filteredProducts.length > 0 ? filteredProducts.map((post, index) => (
+                      <div key={index} className="col-lg-6">
+                        <div className="single-shopping-card-one discount-offer">
+                          <WeeklyBestSellingMain Slug={post.slug} ProductImage={post.image} ProductTitle={post.title} Price={post.price} />
+                        </div>
+                      </div>
+                    )) : (
+                      <div className="col-12 text-center py-5"><h2>No Product Found</h2></div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <>
+      <HeaderOne />
+      <Suspense fallback={<div className="text-center py-20"><p>Loading products...</p></div>}>
+        <ShopContent />
+      </Suspense>
+      <FooterOne />
+    </>
   );
 }
