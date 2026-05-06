@@ -109,6 +109,22 @@ function ProductExtrasFields({
             className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-[#629D23]"
           />
         </Field>
+
+        <Field label="Rating" hint="0 to 5 stars.">
+          <input
+            type="number"
+            min={0}
+            max={5}
+            step={0.1}
+            value={product.rating ?? ""}
+            onChange={(e) => {
+              const raw = e.target.value;
+              patch({ rating: raw === "" ? undefined : Math.min(5, Math.max(0, Number(raw))) });
+            }}
+            placeholder="4.8"
+            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-[#629D23]"
+          />
+        </Field>
       </div>
     </div>
   );

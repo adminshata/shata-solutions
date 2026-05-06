@@ -3,11 +3,27 @@
 import React, { useState, useEffect } from "react";
 import Nav from "./Nav";
 import Link from "next/link";
+import { useSupermarket1Config } from "@/lib/supermarket1/context";
 
 const BASE_PATH = "/templates/supermarket-1/preview";
 
 function HeaderNav() {
   const [isSticky, setIsSticky] = useState(false);
+  const { config, hasDraft } = useSupermarket1Config();
+
+  type HeaderDraft = {
+    header?: {
+      saleBlockText?: string;
+      saleBlockBadge?: string;
+      trendingProductsText?: string;
+    };
+  };
+  const draft = config as typeof config & HeaderDraft;
+  const brandText = hasDraft ? (config.logo.text || config.name) : "FreshMart";
+  const primary = hasDraft ? config.theme.primary : "#629D23";
+  const trendingText = hasDraft ? draft.header?.trendingProductsText || "Trending Products" : "Trending Products";
+  const saleText = hasDraft ? draft.header?.saleBlockText || "Get 30% Discount Now" : "Get 30% Discount Now";
+  const saleBadge = hasDraft ? draft.header?.saleBlockBadge || "Sale" : "Sale";
 
   useEffect(() => {
     const handleScroll = () => setIsSticky(window.scrollY > 150);
@@ -36,10 +52,10 @@ function HeaderNav() {
                   <Nav />
                 </div>
                 <div className="right-btn-area">
-                  <a href="#" className="btn-narrow">Trending Products</a>
+                  <a href="#" className="btn-narrow">{trendingText}</a>
                   <button className="rts-btn btn-primary">
-                    Get 30% Discount Now
-                    <span>Sale</span>
+                    {saleText}
+                    <span>{saleBadge}</span>
                   </button>
                 </div>
               </div>
@@ -47,7 +63,7 @@ function HeaderNav() {
             <div className="col-lg-12">
               <div className="logo-search-category-wrapper after-md-device-header">
                 <Link href={BASE_PATH} className="logo-area">
-                  <span className="logo-text" style={{ fontWeight: 800, fontSize: "22px", color: "#629D23" }}>FreshMart</span>
+                  <span className="logo-text" style={{ fontWeight: 800, fontSize: "22px", color: primary }}>{brandText}</span>
                 </Link>
                 <div className="category-search-wrapper">
                   <div className="category-btn category-hover-header">

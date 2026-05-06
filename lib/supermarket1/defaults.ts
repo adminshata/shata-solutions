@@ -2,6 +2,8 @@ import type { SiteConfig } from "./types";
 
 const BASE = "/templates/supermarket1";
 
+export const SUPERMARKET1_STORAGE_KEY = "supermarket1/config-draft";
+
 export const SUPERMARKET1_DEFAULTS: SiteConfig = {
   name: "FreshMart",
   tagline: "Your Daily Grocery Store",
@@ -9,13 +11,18 @@ export const SUPERMARKET1_DEFAULTS: SiteConfig = {
   theme: {
     primary: "#629D23",
     primaryFg: "#ffffff",
+    secondary: "#2C3C28",
     accent: "#f59e0b",
     background: "#F3F4F6",
     foreground: "#1f2937",
+    text: "#1f2937",
     muted: "#6b7280",
     surface: "#ffffff",
     border: "#e5e7eb",
     radius: "sm",
+    buttonRadius: "6px",
+    cardRadius: "10px",
+    fontStyle: "Inter / system",
   },
   contact: {
     email: "hello@freshmart.com",

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import WeeklyBestSellingMain from "../product-main/WeeklyBestSellingMain";
+import { useSupermarket1Config } from "@/lib/supermarket1/context";
 
 interface PostType {
   id: number;
@@ -22,9 +23,20 @@ const PRODUCTS: PostType[] = [
 ];
 
 function FeatureProduct() {
+  const { config, hasDraft } = useSupermarket1Config();
   const [currentIdx, setCurrentIdx] = useState(0);
   const perPage = 6;
-  const total = PRODUCTS.length;
+  const sourceProducts = hasDraft
+    ? config.products.filter((product) => product.active !== false).slice(0, 12).map((product, index) => ({
+        id: Number(product.id) || index + 1,
+        slug: product.handle,
+        image: product.images[0] ?? "15.jpg",
+        title: product.name,
+        price: (product.price / 100).toFixed(2),
+      }))
+    : PRODUCTS;
+  const displayProducts = sourceProducts.length ? sourceProducts : PRODUCTS;
+  const total = displayProducts.length;
 
   const prev = () => setCurrentIdx((i) => (i - 1 + total) % total);
   const next = () => setCurrentIdx((i) => (i + 1) % total);
@@ -34,7 +46,7 @@ function FeatureProduct() {
     return () => clearInterval(interval);
   }, [total]);
 
-  const visible = Array.from({ length: perPage }, (_, k) => PRODUCTS[(currentIdx + k) % total]);
+  const visible = Array.from({ length: perPage }, (_, k) => displayProducts[(currentIdx + k) % total]);
 
   return (
     <div>

@@ -40,7 +40,7 @@ const WeeklyBestSellingMain: React.FC<WeeklyBestSellingMainProps> = ({
   const increase = () => setQuantity((prev) => prev + 1);
   const decrease = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
-  const imgSrc = `${BASE_IMG}/${ProductImage}`;
+  const imgSrc = ProductImage.startsWith("/") ? ProductImage : `${BASE_IMG}/${ProductImage}`;
 
   const handleAdd = () => {
     addToCart({ id: Date.now(), image: imgSrc, title: ProductTitle ?? "Product", price: parseFloat(Price ?? "0"), quantity, active: true });

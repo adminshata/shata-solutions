@@ -7,7 +7,7 @@ import Cart from "./Cart";
 import WishList from "./WishList";
 import Sidebar from "./Sidebar";
 import BackToTop from "../common/BackToTop";
-import { useCompare } from "@/lib/supermarket1/context";
+import { useCompare, useSupermarket1Config } from "@/lib/supermarket1/context";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -15,6 +15,7 @@ const BASE_PATH = "/templates/supermarket-1/preview";
 
 function HeaderOne() {
   const { compareItems } = useCompare();
+  const { config, hasDraft } = useSupermarket1Config();
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionRef = useRef<HTMLUListElement>(null);
@@ -22,6 +23,23 @@ function HeaderOne() {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<{ id: number; title: string; slug: string }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  type HeaderDraft = {
+    header?: {
+      topBarText?: string;
+      countdownTarget?: string;
+      countdownText?: string;
+    };
+  };
+  const draft = config as typeof config & HeaderDraft;
+  const brandText = hasDraft ? (config.logo.text || config.name) : "FreshMart";
+  const topBarText = hasDraft
+    ? draft.header?.topBarText || config.announcement.text
+    : "FREE delivery & 40% Discount for next 3 orders! Place your 1st order in.";
+  const countdownTarget = hasDraft ? draft.header?.countdownTarget || "02/02/2026 10:20:00" : "02/02/2026 10:20:00";
+  const deliveryHours = hasDraft ? config.contact.hours ?? "We deliver to your everyday from 7:00 to 22:00" : "We deliver to your everyday from 7:00 to 22:00";
+  const phone = hasDraft ? config.contact.phone : "+258 3268 21485";
+  const primary = hasDraft ? config.theme.primary : "#629D23";
 
   const makeSlug = (text: string) =>
     text.toLowerCase().replace(/[^\w\s-]/g, "").trim().replace(/\s+/g, "-");
@@ -142,14 +160,14 @@ function HeaderOne() {
                 <div className="bwtween-area-header-top">
                   <div className="discount-area">
                     <p className="disc">
-                      FREE delivery &amp; 40% Discount for next 3 orders! Place your 1st order in.
+                      {topBarText}
                     </p>
                     <div className="countdown">
-                      <div className="countDown">02/02/2026 10:20:00</div>
+                      <div className="countDown">{countdownTarget}</div>
                     </div>
                   </div>
                   <div className="contact-number-area">
-                    <p>Need help? Call Us: <a href="tel:+4733378901">+258 3268 21485</a></p>
+                    <p>Need help? Call Us: <a href={`tel:${phone.replace(/[^+0-9]/g, "")}`}>{phone}</a></p>
                   </div>
                 </div>
               </div>
@@ -169,7 +187,7 @@ function HeaderOne() {
                       <li><Link href={`${BASE_PATH}/account`}>My Account</Link></li>
                       <li><Link href={`${BASE_PATH}/wishlist`}>Wishlist</Link></li>
                     </ul>
-                    <p className="para">We deliver to your everyday from 7:00 to 22:00</p>
+                    <p className="para">{deliveryHours}</p>
                   </div>
                   <div className="nav-sm-left">
                     <ul className="nav-h_top language">
@@ -205,7 +223,7 @@ function HeaderOne() {
               <div className="col-lg-12">
                 <div className="logo-search-category-wrapper">
                   <Link href={BASE_PATH} className="logo-area">
-                    <span className="logo-text" style={{ fontWeight: 800, fontSize: "24px", color: "#629D23" }}>FreshMart</span>
+                    <span className="logo-text" style={{ fontWeight: 800, fontSize: "24px", color: primary }}>{brandText}</span>
                   </Link>
                   <div className="category-search-wrapper">
                     <div className="category-btn category-hover-header">

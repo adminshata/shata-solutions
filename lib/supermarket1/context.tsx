@@ -7,6 +7,59 @@ import React, {
   useState,
   type ReactNode,
 } from "react";
+import { SUPERMARKET1_DEFAULTS, SUPERMARKET1_STORAGE_KEY } from "./defaults";
+import type { SiteConfig } from "./types";
+import { themeVars } from "./utils";
+
+/* ─────────────────────────── SITE CONFIG ──────────────────────────── */
+
+interface Supermarket1ConfigContextProps {
+  config: SiteConfig;
+  hasDraft: boolean;
+}
+
+const Supermarket1ConfigContext = createContext<Supermarket1ConfigContextProps>({
+  config: SUPERMARKET1_DEFAULTS,
+  hasDraft: false,
+});
+
+export function useSupermarket1Config() {
+  return useContext(Supermarket1ConfigContext);
+}
+
+function Supermarket1ConfigProvider({ children }: { children: ReactNode }) {
+  const [config, setConfig] = useState<SiteConfig>(SUPERMARKET1_DEFAULTS);
+  const [hasDraft, setHasDraft] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(SUPERMARKET1_STORAGE_KEY);
+      if (raw) {
+        setConfig(JSON.parse(raw) as SiteConfig);
+        setHasDraft(true);
+      }
+    } catch {
+      setConfig(SUPERMARKET1_DEFAULTS);
+      setHasDraft(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasDraft) return;
+    const vars = themeVars(config.theme);
+    for (const [key, value] of Object.entries(vars)) {
+      if (key.startsWith("--") && typeof value === "string") {
+        document.documentElement.style.setProperty(key, value);
+      }
+    }
+  }, [config.theme, hasDraft]);
+
+  return (
+    <Supermarket1ConfigContext.Provider value={{ config, hasDraft }}>
+      {children}
+    </Supermarket1ConfigContext.Provider>
+  );
+}
 
 /* ─────────────────────────────── CART ──────────────────────────────── */
 
@@ -221,12 +274,14 @@ export const useCompare = () => useContext(CompareContext);
 
 export function Supermarket1Provider({ children }: { children: ReactNode }) {
   return (
-    <WishlistProvider>
-      <CartProvider>
-        <CompareProvider>
-          {children}
-        </CompareProvider>
-      </CartProvider>
-    </WishlistProvider>
+    <Supermarket1ConfigProvider>
+      <WishlistProvider>
+        <CartProvider>
+          <CompareProvider>
+            {children}
+          </CompareProvider>
+        </CartProvider>
+      </WishlistProvider>
+    </Supermarket1ConfigProvider>
   );
 }

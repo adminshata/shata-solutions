@@ -2,8 +2,10 @@ export type Money = number;
 
 export type StoreTheme = {
   primary: string; primaryFg: string; accent: string;
+  secondary?: string; text?: string;
   background: string; foreground: string; muted: string;
   surface: string; border: string; radius: "sm"|"md"|"lg";
+  buttonRadius?: string; cardRadius?: string; fontStyle?: string;
 };
 
 export type StoreLogo = { src?: string; alt: string; text: string; };
@@ -24,14 +26,15 @@ export type Product = {
   category?: string; images: string[];
   badge?: string | null; featured?: boolean; active?: boolean;
   price: Money; compareAtPrice?: Money; unit?: string; stock?: number;
+  rating?: number;
 };
 
 export type Category = {
   id: string; handle: string; name: string;
-  image?: string; icon?: string; active?: boolean;
+  image?: string; icon?: string; parent?: string; active?: boolean;
 };
 
-export type HomeSection = { id: string; label: string; active: boolean; };
+export type HomeSection = { id: string; label: string; active: boolean; title?: string; subtitle?: string; };
 
 export type AnnouncementBar = { text: string; active: boolean; };
 

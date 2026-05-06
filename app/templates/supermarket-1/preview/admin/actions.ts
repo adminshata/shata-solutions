@@ -12,6 +12,10 @@ const DIRS = {
   banner:   [...BASE_PUBLIC, "banner"],
   feature:  [...BASE_PUBLIC, "feature"],
   blog:     [...BASE_PUBLIC, "blog"],
+  vendor:   [...BASE_PUBLIC, "images", "vendor"],
+  offer:    [...BASE_PUBLIC, "images", "offer"],
+  store:    [...BASE_PUBLIC, "images", "store"],
+  contact:  [...BASE_PUBLIC, "images", "contact"],
 };
 
 async function listDir(parts: string[], prefix: string): Promise<string[]> {
@@ -28,14 +32,18 @@ async function listDir(parts: string[], prefix: string): Promise<string[]> {
 }
 
 export async function listAllSupermarket1Images(): Promise<string[]> {
-  const [products, category, banner, feature, blog] = await Promise.all([
+  const [products, category, banner, feature, blog, vendor, offer, store, contact] = await Promise.all([
     listDir(DIRS.products, "/templates/supermarket1/products"),
     listDir(DIRS.category, "/templates/supermarket1/category"),
     listDir(DIRS.banner,   "/templates/supermarket1/banner"),
     listDir(DIRS.feature,  "/templates/supermarket1/feature"),
     listDir(DIRS.blog,     "/templates/supermarket1/blog"),
+    listDir(DIRS.vendor,   "/templates/supermarket1/images/vendor"),
+    listDir(DIRS.offer,    "/templates/supermarket1/images/offer"),
+    listDir(DIRS.store,    "/templates/supermarket1/images/store"),
+    listDir(DIRS.contact,  "/templates/supermarket1/images/contact"),
   ]);
-  return [...products, ...category, ...banner, ...feature, ...blog];
+  return [...products, ...category, ...banner, ...feature, ...blog, ...vendor, ...offer, ...store, ...contact];
 }
 
 export async function listProductImages(): Promise<string[]> {
