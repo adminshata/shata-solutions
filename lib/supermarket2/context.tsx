@@ -1,141 +1,121 @@
 "use client";
 
-import {
-  createContext, useCallback, useContext, useEffect,
-  useMemo, useReducer, useState, type ReactNode,
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
 } from "react";
-import { SUPERMARKET2_DEFAULTS } from "./defaults";
-import type { Cart, CartLine, Product, SiteConfig } from "./types";
-import { cartTotals } from "./utils";
 
-/* ------------------------------------------------------------------ */
-/* Site config context                                                  */
-/* ------------------------------------------------------------------ */
-const SiteContext = createContext<SiteConfig | null>(null);
-
-export function useSite(): SiteConfig {
-  const ctx = useContext(SiteContext);
-  if (!ctx) throw new Error("useSite must be inside <Supermarket2Provider>");
+/* ─────────────── CART ─────────────── */
+interface CartItem {
+  id: number;
+  image: string;
+  title: string;
+  price: number;
+  quantity: number;
+  active: boolean;
+}
+interface CartContextProps {
+  cartItems: CartItem[];
+  addToCart: (item: CartItem) => void;
+  addToWishlist: (item: CartItem) => void;
+  removeFromCart: (id: number) => void;
+  updateItemQuantity: (id: number, quantity: number) => void;
+  isCartLoaded: boolean;
+}
+const CartContext = createContext<CartContextProps | undefined>(undefined);
+export const useCart = () => {
+  const ctx = useContext(CartContext);
+  if (!ctx) throw new Error("useCart must be used within a CartProvider");
   return ctx;
-}
-
-/* ------------------------------------------------------------------ */
-/* Cart context                                                         */
-/* ------------------------------------------------------------------ */
-type CartAction =
-  | { type: "hydrate"; cart: Cart }
-  | { type: "add"; productId: string; quantity: number }
-  | { type: "update"; productId: string; quantity: number }
-  | { type: "remove"; productId: string }
-  | { type: "clear" };
-
-function cartReducer(cart: Cart, action: CartAction): Cart {
-  switch (action.type) {
-    case "hydrate": return action.cart;
-    case "add": {
-      const idx = cart.lines.findIndex((l) => l.productId === action.productId);
-      const next: CartLine[] = [...cart.lines];
-      if (idx >= 0) {
-        next[idx] = { ...next[idx], quantity: next[idx].quantity + action.quantity };
-      } else {
-        next.push({ productId: action.productId, quantity: action.quantity });
-      }
-      return { lines: next };
-    }
-    case "update": {
-      if (action.quantity <= 0) {
-        return { lines: cart.lines.filter((l) => l.productId !== action.productId) };
-      }
-      return { lines: cart.lines.map((l) => l.productId === action.productId ? { ...l, quantity: action.quantity } : l) };
-    }
-    case "remove": return { lines: cart.lines.filter((l) => l.productId !== action.productId) };
-    case "clear": return { lines: [] };
-  }
-}
-
-type CartContextValue = {
-  cart: Cart;
-  itemCount: number;
-  subtotal: number;
-  shippingHint: string;
-  resolveProduct: (id: string) => Product | null;
-  add: (productId: string, quantity?: number) => void;
-  update: (productId: string, quantity: number) => void;
-  remove: (productId: string) => void;
-  clear: () => void;
-  drawerOpen: boolean;
-  openDrawer: () => void;
-  closeDrawer: () => void;
+};
+export const CartProvider = ({ children }: { children: ReactNode }) => {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isCartLoaded, setIsCartLoaded] = useState(false);
+  useEffect(() => {
+    const stored = localStorage.getItem("sm2_cart");
+    if (stored) { try { setCartItems(JSON.parse(stored)); } catch { localStorage.removeItem("sm2_cart"); } }
+    setIsCartLoaded(true);
+  }, []);
+  useEffect(() => { if (isCartLoaded) localStorage.setItem("sm2_cart", JSON.stringify(cartItems)); }, [cartItems, isCartLoaded]);
+  const addToCart = (item: CartItem) => setCartItems(prev => {
+    const ex = prev.find(i => i.id === item.id && i.active);
+    if (ex) return prev.map(i => i.id === item.id && i.active ? { ...i, quantity: i.quantity + item.quantity } : i);
+    return [...prev, item];
+  });
+  const addToWishlist = (item: CartItem) => setCartItems(prev => {
+    const ex = prev.find(i => i.id === item.id && !i.active);
+    if (ex) return prev.map(i => i.id === item.id && !i.active ? { ...i, quantity: i.quantity + item.quantity } : i);
+    return [...prev, item];
+  });
+  const removeFromCart = (id: number) => setCartItems(prev => prev.filter(i => i.id !== id));
+  const updateItemQuantity = (id: number, quantity: number) => setCartItems(prev => prev.map(i => i.id === id ? { ...i, quantity: Math.max(1, quantity) } : i));
+  return (
+    <CartContext.Provider value={{ cartItems, addToCart, addToWishlist, removeFromCart, updateItemQuantity, isCartLoaded }}>
+      {children}
+    </CartContext.Provider>
+  );
 };
 
-const CartContext = createContext<CartContextValue | null>(null);
-
-export function useCart(): CartContextValue {
-  const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be inside <Supermarket2Provider>");
+/* ─────────────── WISHLIST ─────────────── */
+interface WishlistItem { id: number; image: string; title: string; price: number; quantity: number; }
+interface WishlistContextProps {
+  wishlistItems: WishlistItem[];
+  addToWishlist: (item: WishlistItem) => void;
+  removeFromWishlist: (id: number) => void;
+  updateItemQuantity: (id: number, quantity: number) => void;
+  isWishlistLoaded: boolean;
+}
+const WishlistContext = createContext<WishlistContextProps | undefined>(undefined);
+export const useWishlist = (): WishlistContextProps => {
+  const ctx = useContext(WishlistContext);
+  if (!ctx) throw new Error("useWishlist must be used within a WishlistProvider");
   return ctx;
-}
-
-/* ------------------------------------------------------------------ */
-/* Combined provider                                                    */
-/* ------------------------------------------------------------------ */
-export function Supermarket2Provider({
-  children,
-  config,
-}: {
-  children: ReactNode;
-  config?: SiteConfig;
-}) {
-  const value = config ?? SUPERMARKET2_DEFAULTS;
+};
+export const WishlistProvider = ({ children }: { children: ReactNode }) => {
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+  const [isWishlistLoaded, setIsWishlistLoaded] = useState(false);
+  useEffect(() => {
+    const stored = localStorage.getItem("sm2_wishlist");
+    if (stored) { try { setWishlistItems(JSON.parse(stored)); } catch { localStorage.removeItem("sm2_wishlist"); } }
+    setIsWishlistLoaded(true);
+  }, []);
+  useEffect(() => { if (isWishlistLoaded) localStorage.setItem("sm2_wishlist", JSON.stringify(wishlistItems)); }, [wishlistItems, isWishlistLoaded]);
+  const addToWishlist = (item: WishlistItem) => setWishlistItems(prev => { if (prev.find(i => i.id === item.id)) return prev; return [...prev, item]; });
+  const removeFromWishlist = (id: number) => setWishlistItems(prev => prev.filter(i => i.id !== id));
+  const updateItemQuantity = (id: number, quantity: number) => setWishlistItems(prev => prev.map(i => i.id === id ? { ...i, quantity: Math.max(1, quantity) } : i));
   return (
-    <SiteContext.Provider value={value}>
-      <CartProvider config={value}>{children}</CartProvider>
-    </SiteContext.Provider>
+    <WishlistContext.Provider value={{ wishlistItems, addToWishlist, removeFromWishlist, updateItemQuantity, isWishlistLoaded }}>
+      {children}
+    </WishlistContext.Provider>
   );
-}
+};
 
-function CartProvider({ children, config }: { children: ReactNode; config: SiteConfig }) {
-  const [cart, dispatch] = useReducer(cartReducer, { lines: [] });
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const storageKey = "supermarket2/cart/" + config.name;
+/* ─────────────── COMPARE ─────────────── */
+interface CompareItem { image: string; name: string; price: string; description: string; rating: number; ratingCount: number; weight: string; inStock: boolean; }
+interface CompareContextProps { compareItems: CompareItem[]; addToCompare: (item: CompareItem) => void; removeFromCompare: (name: string) => void; }
+export const CompareContext = createContext<CompareContextProps>({ compareItems: [], addToCompare: () => {}, removeFromCompare: () => {} });
+export const CompareProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [compareItems, setCompareItems] = useState<CompareItem[]>([]);
+  useEffect(() => { const s = localStorage.getItem("sm2_compare"); if (s) setCompareItems(JSON.parse(s)); }, []);
+  useEffect(() => { localStorage.setItem("sm2_compare", JSON.stringify(compareItems)); }, [compareItems]);
+  const addToCompare = (item: CompareItem) => setCompareItems(prev => { if (prev.some(i => i.name === item.name)) return prev; return [...prev, item]; });
+  const removeFromCompare = (name: string) => setCompareItems(prev => prev.filter(i => i.name !== name));
+  return <CompareContext.Provider value={{ compareItems, addToCompare, removeFromCompare }}>{children}</CompareContext.Provider>;
+};
+export const useCompare = () => useContext(CompareContext);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const raw = window.localStorage.getItem(storageKey);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as Cart;
-      if (parsed && Array.isArray(parsed.lines)) dispatch({ type: "hydrate", cart: parsed });
-    } catch { /* ignore */ }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storageKey]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try { window.localStorage.setItem(storageKey, JSON.stringify(cart)); } catch { /* ignore */ }
-  }, [cart, storageKey]);
-
-  const resolveProduct = useCallback(
-    (id: string) => config.products.find((p) => p.id === id) ?? null,
-    [config.products]
+/* ─────────────── COMBINED PROVIDER ─────────────── */
+export function Supermarket2Provider({ children }: { children: ReactNode }) {
+  return (
+    <CartProvider>
+      <WishlistProvider>
+        <CompareProvider>
+          {children}
+        </CompareProvider>
+      </WishlistProvider>
+    </CartProvider>
   );
-
-  const totals = useMemo(() => cartTotals(cart.lines, resolveProduct), [cart.lines, resolveProduct]);
-
-  const value: CartContextValue = useMemo(() => ({
-    cart,
-    itemCount: totals.itemCount,
-    subtotal: totals.subtotal,
-    shippingHint: totals.shippingHint,
-    resolveProduct,
-    add: (productId, quantity = 1) => dispatch({ type: "add", productId, quantity }),
-    update: (productId, quantity) => dispatch({ type: "update", productId, quantity }),
-    remove: (productId) => dispatch({ type: "remove", productId }),
-    clear: () => dispatch({ type: "clear" }),
-    drawerOpen,
-    openDrawer: () => setDrawerOpen(true),
-    closeDrawer: () => setDrawerOpen(false),
-  }), [cart, totals, resolveProduct, drawerOpen]);
-
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

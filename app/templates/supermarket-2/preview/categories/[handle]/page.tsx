@@ -1,94 +1,42 @@
 "use client";
-
+import HeaderTwo from "@/components/templates/supermarket2/header/HeaderTwo";
+import FooterTwo from "@/components/templates/supermarket2/footer/FooterTwo";
+import BackToTop from "@/components/templates/supermarket2/common/BackToTop";
+import ShopMain from "@/components/templates/supermarket2/shop/ShopMain";
+import { PRODUCTS } from "@/lib/supermarket2/defaults";
+import type { Product } from "@/lib/supermarket2/types";
 import Link from "next/link";
-import { use } from "react";
-import { notFound } from "next/navigation";
-import { SiteShell } from "@/components/templates/supermarket2/layout/SiteShell";
-import { Header } from "@/components/templates/supermarket2/layout/Header";
-import { Footer } from "@/components/templates/supermarket2/layout/Footer";
-import { CartDrawer } from "@/components/templates/supermarket2/layout/CartDrawer";
-import { ProductCard } from "@/components/templates/supermarket2/product/ProductCard";
-import { useSite } from "@/lib/supermarket2/context";
-import { findCategory, productsByCategory } from "@/lib/supermarket2/utils";
 
 const BASE_PATH = "/templates/supermarket-2/preview";
 
-export default function CategoryPage({ params }: { params: Promise<{ handle: string }> }) {
-  const { handle } = use(params);
-  const config = useSite();
-  const category = findCategory(config, handle);
-
-  if (!category) notFound();
-
-  const products = productsByCategory(config, handle);
-
+export default function CategoryPage({ params }: { params: { handle: string } }) {
   return (
-    <SiteShell>
-      <Header />
-      <main style={{ background: "#F3F4F6" }}>
-        {/* Banner */}
-        <div style={{ background: "#DC2626" }} className="py-10">
-          <div className="container mx-auto px-4">
-            <nav className="flex items-center gap-1 text-xs text-white/70 mb-2">
-              <Link href={BASE_PATH} className="hover:text-white">Home</Link>
-              <span>/</span>
-              <Link href={`${BASE_PATH}/shop`} className="hover:text-white">Shop</Link>
-              <span>/</span>
-              <span className="text-white font-medium">{category.name}</span>
-            </nav>
-            <h1 className="text-3xl font-extrabold text-white">{category.name}</h1>
-            <p className="mt-1 text-sm text-white/70">{products.length} product{products.length !== 1 ? "s" : ""}</p>
+    <div className="demo-one">
+      <HeaderTwo />
+      <div className="rts-navigation-area-breadcrumb bg_light-1">
+        <div className="container"><div className="row"><div className="col-lg-12">
+          <div className="navigator-breadcrumb-wrapper">
+            <Link href={BASE_PATH}>Home</Link>
+            <i className="fa-regular fa-chevron-right" />
+            <a className="current" href="#">Category: {params.handle}</a>
+          </div>
+        </div></div></div>
+      </div>
+      <div className="rts-shop-section rts-section-gap bg_light-1">
+        <div className="container">
+          <div className="row g-4">
+            {PRODUCTS.slice(0, 9).map((product: Product, i: number) => (
+              <div key={i} className="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12">
+                <div className="single-shopping-card-one">
+                  <ShopMain Slug={product.slug} ProductImage={product.image} ProductTitle={product.title} Price={product.price} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-
-        <section className="py-8">
-          <div className="container mx-auto px-4">
-            {/* Category pills */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              <Link
-                href={`${BASE_PATH}/shop`}
-                className="rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-semibold text-gray-600 hover:border-[#DC2626] hover:text-[#DC2626] transition-colors"
-              >
-                All
-              </Link>
-              {config.categories.filter(c => c.active !== false).map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`${BASE_PATH}/categories/${cat.handle}`}
-                  className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition-colors ${
-                    cat.handle === handle
-                      ? "border-[#DC2626] text-white"
-                      : "border-gray-200 bg-white text-gray-600 hover:border-[#DC2626] hover:text-[#DC2626]"
-                  }`}
-                  style={cat.handle === handle ? { background: "#DC2626" } : {}}
-                >
-                  {cat.name}
-                </Link>
-              ))}
-            </div>
-
-            {products.length === 0 ? (
-              <div className="flex flex-col items-center justify-center bg-white rounded border border-gray-200 p-16 text-center gap-4">
-                <svg className="h-12 w-12 text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                  <path d="M6 6h15l-1.5 9H7.5z" /><circle cx="9" cy="20" r="1.5" /><circle cx="18" cy="20" r="1.5" /><path d="M6 6L4 2H2" />
-                </svg>
-                <p className="text-gray-500">No products in this category yet.</p>
-                <Link href={`${BASE_PATH}/shop`} className="text-sm font-semibold underline" style={{ color: "#DC2626" }}>
-                  Browse all products
-                </Link>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                {products.map((p) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      </main>
-      <Footer />
-      <CartDrawer />
-    </SiteShell>
+      </div>
+      <FooterTwo />
+      <BackToTop />
+    </div>
   );
 }

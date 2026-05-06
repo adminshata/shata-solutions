@@ -1,46 +1,32 @@
 "use client";
+import HeaderTwo from "@/components/templates/supermarket2/header/HeaderTwo";
+import BannerTwo from "@/components/templates/supermarket2/banner/BannerTwo";
+import CategoryOne from "@/components/templates/supermarket2/category/CategoryOne";
+import FeatureTwo from "@/components/templates/supermarket2/feature/FeatureTwo";
+import WeeklyBestSellingTwo from "@/components/templates/supermarket2/product/WeeklyBestSellingTwo";
+import MethodOne from "@/components/templates/supermarket2/common/MethodOne";
+import OfferAdd from "@/components/templates/supermarket2/common/OfferAdd";
+import DealOfDay from "@/components/templates/supermarket2/product/DealOfDay";
+import FeaturesGrid from "@/components/templates/supermarket2/product/FeaturesGrid";
+import BlogTwo from "@/components/templates/supermarket2/blog/BlogTwo";
+import FooterTwo from "@/components/templates/supermarket2/footer/FooterTwo";
+import BackToTop from "@/components/templates/supermarket2/common/BackToTop";
 
-import { SiteShell } from "@/components/templates/supermarket2/layout/SiteShell";
-import { Header } from "@/components/templates/supermarket2/layout/Header";
-import { Footer } from "@/components/templates/supermarket2/layout/Footer";
-import { CartDrawer } from "@/components/templates/supermarket2/layout/CartDrawer";
-import {
-  BannerSlider,
-  CategoryQuickLinks,
-  FeaturesRow,
-  FeaturedProducts,
-  DiscountProducts,
-  WeeklyBestSelling,
-  TrendingProducts,
-  BlogPosts,
-} from "@/components/templates/supermarket2/sections/HomeSections";
-import { useSite } from "@/lib/supermarket2/context";
-
-export default function SupermarketHomePage() {
-  const config = useSite();
-  const sectionMap: Record<string, React.ReactNode> = {
-    features: <FeaturesRow />,
-    featured: <FeaturedProducts />,
-    discount: <DiscountProducts />,
-    weekly: <WeeklyBestSelling />,
-    trending: <TrendingProducts />,
-    blog: <BlogPosts />,
-  };
-
+export default function Home() {
   return (
-    <SiteShell>
-      <Header />
-      <main>
-        <BannerSlider />
-        <CategoryQuickLinks />
-        {config.sections
-          .filter((s) => s.active)
-          .map((s) => (
-            <div key={s.id}>{sectionMap[s.id] ?? null}</div>
-          ))}
-      </main>
-      <Footer />
-      <CartDrawer />
-    </SiteShell>
+    <div className="demo-one">
+      <HeaderTwo />
+      <BannerTwo />
+      <CategoryOne />
+      <FeatureTwo />
+      <WeeklyBestSellingTwo />
+      <MethodOne />
+      <DealOfDay />
+      <OfferAdd />
+      <FeaturesGrid />
+      <BlogTwo />
+      <FooterTwo />
+      <BackToTop />
+    </div>
   );
 }
