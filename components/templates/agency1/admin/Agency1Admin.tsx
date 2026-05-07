@@ -6,6 +6,7 @@ import type {
   Agency1Config,
   BlogPost,
   HomeSection,
+  FooterColumn,
   NavItem,
   PageItem,
   PortfolioItem,
@@ -170,12 +171,13 @@ function ListManager<T extends ListItem>({
   renderRow,
 }: {
   title: string;
-  items: T[];
+  items: T[] | undefined;
   onChange: (items: T[]) => void;
   blank: () => T;
   renderForm: (item: T, update: (delta: Partial<T>) => void) => React.ReactNode;
   renderRow: (item: T) => React.ReactNode;
 }) {
+  const safeItems = items ?? [];
   const [adding, setAdding] = useState(false);
   const [newItem, setNewItem] = useState<T | null>(null);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
@@ -193,7 +195,7 @@ function ListManager<T extends ListItem>({
 
   const confirmAdd = () => {
     if (!newItem) return;
-    onChange([...items, newItem]);
+    onChange([...safeItems, newItem]);
     setAdding(false);
     setNewItem(null);
   };
@@ -207,18 +209,18 @@ function ListManager<T extends ListItem>({
   const cancelEdit = () => setEditingIdx(null);
 
   const updateEdit = (idx: number, delta: Partial<T>) => {
-    const updated = items.map((it, i) => i === idx ? { ...it, ...delta } : it);
+    const updated = safeItems.map((it, i) => i === idx ? { ...it, ...delta } : it);
     onChange(updated);
   };
 
   const del = (idx: number) => {
     if (!window.confirm("Delete this item?")) return;
-    onChange(items.filter((_, i) => i !== idx));
+    onChange(safeItems.filter((_, i) => i !== idx));
     if (editingIdx === idx) setEditingIdx(null);
   };
 
   const move = (idx: number, dir: -1 | 1) => {
-    const arr = [...items];
+    const arr = [...safeItems];
     const target = idx + dir;
     if (target < 0 || target >= arr.length) return;
     [arr[idx], arr[target]] = [arr[target], arr[idx]];
@@ -246,17 +248,17 @@ function ListManager<T extends ListItem>({
         </div>
       )}
 
-      {items.length === 0 && (
+      {safeItems.length === 0 && (
         <p style={{ color: "#9ca3af", fontSize: 14, textAlign: "center", padding: "24px 0" }}>No items yet. Click &ldquo;+ Add New&rdquo; to create one.</p>
       )}
 
-      {items.map((item, idx) => (
+      {safeItems.map((item, idx) => (
         <div key={idx} style={{ border: "1px solid #e5e7eb", borderRadius: 10, marginBottom: 10, overflow: "hidden" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", background: "#f9fafb" }}>
             <div style={{ flex: 1, minWidth: 0 }}>{renderRow(item)}</div>
             <div style={{ display: "flex", gap: 6, flexShrink: 0, marginLeft: 12 }}>
               <button onClick={() => move(idx, -1)} disabled={idx === 0} style={{ ...S.btnSecondary, opacity: idx === 0 ? 0.4 : 1 }}>↑</button>
-              <button onClick={() => move(idx, 1)} disabled={idx === items.length - 1} style={{ ...S.btnSecondary, opacity: idx === items.length - 1 ? 0.4 : 1 }}>↓</button>
+              <button onClick={() => move(idx, 1)} disabled={idx === safeItems.length - 1} style={{ ...S.btnSecondary, opacity: idx === safeItems.length - 1 ? 0.4 : 1 }}>↓</button>
               <button onClick={() => editingIdx === idx ? cancelEdit() : startEdit(idx)} style={S.btnSecondary}>
                 {editingIdx === idx ? "Close" : "Edit"}
               </button>
@@ -303,6 +305,7 @@ function BrandTab({ config, patch }: EditorProps) {
         <FGrid>
           <F label="Agency Name" value={b.name} onChange={p("name")} />
           <F label="Tagline" value={b.tagline} onChange={p("tagline")} />
+          <F label="Logo Text" value={b.logoText ?? ""} onChange={(v) => patch({ brand: { ...b, logoText: v } })} />
           <F label="Email Address" value={b.email} onChange={p("email")} type="email" />
           <F label="Phone Number" value={b.phone} onChange={p("phone")} />
           <div style={{ gridColumn: "1/-1" }}>
@@ -370,10 +373,29 @@ function HeaderTab({ config, patch }: EditorProps) {
           </div>
         )}
         renderForm={(item, update) => (
-          <FGrid>
-            <F label="Label" value={item.label} onChange={(v) => update({ label: v })} />
-            <F label="Link (href)" value={item.href} onChange={(v) => update({ href: v })} />
-          </FGrid>
+          <>
+            <FGrid>
+              <F label="Label" value={item.label} onChange={(v) => update({ label: v })} />
+              <F label="Link (href)" value={item.href} onChange={(v) => update({ href: v })} />
+            </FGrid>
+            <F
+              label="Dropdown children (label|href per line; leave empty for no dropdown)"
+              value={(item.children ?? []).map((c) => `${c.label}|${c.href}`).join("\n")}
+              onChange={(v) => {
+                const children = v
+                  .split("\n")
+                  .map((line) => line.trim())
+                  .filter(Boolean)
+                  .map((line) => {
+                    const [label, href] = line.split("|");
+                    return { label: (label ?? "").trim() || "Item", href: (href ?? "").trim() || "#" };
+                  });
+                update({ children: children.length ? children : undefined });
+              }}
+              type="textarea"
+              rows={5}
+            />
+          </>
         )}
       />
     </>
@@ -381,61 +403,44 @@ function HeaderTab({ config, patch }: EditorProps) {
 }
 
 function HomeSectionsTab({ config, patch }: EditorProps) {
-  const sections = config.homeSections;
-
-  const move = (idx: number, dir: -1 | 1) => {
-    const arr = [...sections];
-    const target = idx + dir;
-    if (target < 0 || target >= arr.length) return;
-    [arr[idx], arr[target]] = [arr[target], arr[idx]];
-    patch({ homeSections: arr });
-  };
-
-  const toggle = (idx: number) => {
-    patch({ homeSections: sections.map((s, i) => i === idx ? { ...s, enabled: !s.enabled } : s) });
-  };
-
-  const addSection = () => {
-    const label = window.prompt("Section label:");
-    if (!label) return;
-    const id = label.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-    patch({ homeSections: [...sections, { id, label, enabled: true }] });
-  };
-
   return (
-    <Panel>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-        <h3 style={{ fontWeight: 700, fontSize: 16, color: "#111827" }}>Homepage Sections</h3>
-        <button onClick={addSection} style={S.btn}>+ Add Section</button>
-      </div>
-      <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 20 }}>Toggle visibility and reorder sections that appear on the homepage.</p>
-      {sections.map((sec: HomeSection, idx) => (
-        <div key={sec.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: "1px solid #f3f4f6" }}>
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <button onClick={() => move(idx, -1)} disabled={idx === 0} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 10, color: idx === 0 ? "#d1d5db" : "#6b7280", lineHeight: 1 }}>▲</button>
-              <button onClick={() => move(idx, 1)} disabled={idx === sections.length - 1} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 10, color: idx === sections.length - 1 ? "#d1d5db" : "#6b7280", lineHeight: 1 }}>▼</button>
-            </div>
-            <div>
-              <div style={{ fontWeight: 600, fontSize: 14, color: sec.enabled ? "#111827" : "#9ca3af" }}>{sec.label}</div>
-              <div style={{ fontSize: 12, color: "#9ca3af" }}>id: {sec.id}</div>
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-            <button
-              onClick={() => toggle(idx)}
-              style={{ width: 46, height: 25, borderRadius: 13, background: sec.enabled ? "#111827" : "#d1d5db", border: "none", cursor: "pointer", position: "relative", transition: "background 0.2s" }}
-            >
-              <span style={{ position: "absolute", top: 3, left: sec.enabled ? 23 : 3, width: 19, height: 19, background: "#fff", borderRadius: "50%", transition: "left 0.2s", display: "block" }} />
-            </button>
-            <button onClick={() => {
-              if (!window.confirm("Remove section?")) return;
-              patch({ homeSections: sections.filter((_, i) => i !== idx) });
-            }} style={{ ...S.btnDanger, padding: "4px 10px", fontSize: 11 }}>×</button>
-          </div>
+    <ListManager<HomeSection>
+      title="Homepage Sections"
+      items={config.homeSections}
+      onChange={(homeSections) => patch({ homeSections })}
+      blank={() => ({
+        id: `custom-${Date.now()}`,
+        label: "Custom Section",
+        enabled: true,
+        subtitle: "Custom",
+        title: "New Section",
+        content: "Add section content here.",
+      })}
+      renderRow={(sec) => (
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: sec.enabled ? "#22c55e" : "#d1d5db" }} />
+          <span style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>{sec.label}</span>
+          <span style={{ fontSize: 12, color: "#9ca3af" }}>id: {sec.id}</span>
         </div>
-      ))}
-    </Panel>
+      )}
+      renderForm={(sec, update) => (
+        <>
+          <FGrid>
+            <F label="ID" value={sec.id} onChange={(v) => update({ id: v })} />
+            <F label="Label (editor + menu)" value={sec.label} onChange={(v) => update({ label: v })} />
+            <F label="Subtitle (optional)" value={sec.subtitle ?? ""} onChange={(v) => update({ subtitle: v })} />
+            <div style={{ gridColumn: "1/-1" }}>
+              <F label="Title (optional)" value={sec.title ?? ""} onChange={(v) => update({ title: v })} />
+            </div>
+          </FGrid>
+          <F label="Content (for custom sections)" value={sec.content ?? ""} onChange={(v) => update({ content: v })} type="textarea" rows={6} />
+          <Toggle label="Enabled" checked={sec.enabled} onChange={(v) => update({ enabled: v })} />
+          <div style={{ marginTop: 10, fontSize: 12, color: "#6b7280", lineHeight: 1.5 }}>
+            Built-in section ids like <code>hero</code>, <code>services</code>, <code>portfolio</code> keep the original layout. Any unknown id renders as a custom section.
+          </div>
+        </>
+      )}
+    />
   );
 }
 
@@ -482,7 +487,7 @@ function ServicesTab({ config, patch }: EditorProps) {
         title: "New Service",
         description: "Service description goes here.",
         icon: "/templates/agency1/imgs/icon/service-icon-1.png",
-        image: "/templates/agency1/imgs/inner/service-details/service-3_01.jpg",
+        image: "/templates/agency1/imgs/service/service-3_01.jpg",
         slug: `new-service-${Date.now()}`,
       })}
       renderRow={(item) => (
@@ -630,8 +635,8 @@ function BlogTab({ config, patch }: EditorProps) {
   return (
     <ListManager<BlogPost>
       title="Blog Posts"
-      items={config.blog}
-      onChange={(blog) => patch({ blog })}
+      items={config.blogPosts}
+      onChange={(blogPosts) => patch({ blogPosts })}
       blank={() => ({
         id: Date.now(),
         slug: `new-post-${Date.now()}`,
@@ -680,9 +685,11 @@ function PagesTab({ config, patch }: EditorProps) {
       items={config.pages}
       onChange={(pages) => patch({ pages })}
       blank={() => ({
-        page: "New Page",
-        path: "/templates/agency-1/preview/new-page",
         slug: "new-page",
+        page: "New Page",
+        title: "New Page",
+        path: "/templates/agency-1/preview/new-page",
+        content: "Add your page content here.",
         enabled: true,
       })}
       renderRow={(item) => (
@@ -704,10 +711,12 @@ function PagesTab({ config, patch }: EditorProps) {
           <FGrid>
             <F label="Page Name" value={item.page} onChange={(v) => update({ page: v })} />
             <F label="Slug (URL path segment)" value={item.slug} onChange={(v) => update({ slug: v, path: `/templates/agency-1/preview/${v}` })} />
+            <F label="Page Title (H1)" value={item.title} onChange={(v) => update({ title: v })} />
             <div style={{ gridColumn: "1/-1" }}>
               <F label="Full Path" value={item.path} onChange={(v) => update({ path: v })} />
             </div>
           </FGrid>
+          <F label="Page Content" value={item.content} onChange={(v) => update({ content: v })} type="textarea" rows={7} />
           <Toggle label="Page Enabled" checked={item.enabled} onChange={(v) => update({ enabled: v })} />
         </>
       )}
@@ -716,22 +725,31 @@ function PagesTab({ config, patch }: EditorProps) {
 }
 
 function ContactTab({ config, patch }: EditorProps) {
-  const f = config.footer;
+  const c = config.contact;
   return (
     <>
-      <Panel title="Contact Details">
-        <F label="Office Address" value={f.address} onChange={(v) => patch({ footer: { ...f, address: v } })} />
+      <Panel title="Contact Page">
         <FGrid>
-          <F label="Email Address" value={f.email} onChange={(v) => patch({ footer: { ...f, email: v } })} type="email" />
-          <F label="Phone Number" value={f.phone} onChange={(v) => patch({ footer: { ...f, phone: v } })} />
+          <F label="Page Title" value={c.title} onChange={(v) => patch({ contact: { ...c, title: v } })} />
+          <F label="Subtitle" value={c.subtitle} onChange={(v) => patch({ contact: { ...c, subtitle: v } })} />
+        </FGrid>
+        <F label="Intro Text" value={c.intro} onChange={(v) => patch({ contact: { ...c, intro: v } })} type="textarea" rows={4} />
+      </Panel>
+      <Panel title="Contact Details">
+        <F label="Office Address" value={c.office} onChange={(v) => patch({ contact: { ...c, office: v } })} />
+        <FGrid>
+          <F label="Email Address" value={c.email} onChange={(v) => patch({ contact: { ...c, email: v } })} type="email" />
+          <F label="Phone Number" value={c.phone} onChange={(v) => patch({ contact: { ...c, phone: v } })} />
+          <F label="Working Hours" value={c.hours} onChange={(v) => patch({ contact: { ...c, hours: v } })} />
         </FGrid>
       </Panel>
-      <Panel title="Contact Page Text">
-        <F label="Page Title" value="Let's Start a Conversation" onChange={() => {}} />
-        <F label="Intro Text" value="Tell us about your project and we'll get back to you within 24 hours. No sales pressure — just an honest conversation about what AI can do for your business." onChange={() => {}} type="textarea" />
-        <div style={{ background: "#fef9c3", border: "1px solid #fde68a", borderRadius: 8, padding: "12px 16px", fontSize: 13, color: "#92400e", marginTop: 12 }}>
-          Contact page text changes will take effect on the next full deployment. Use the fields above to update stored config.
-        </div>
+      <Panel title="Social Links">
+        <FGrid cols={2}>
+          <F label="Twitter" value={c.socials.twitter} onChange={(v) => patch({ contact: { ...c, socials: { ...c.socials, twitter: v } } })} />
+          <F label="LinkedIn" value={c.socials.linkedin} onChange={(v) => patch({ contact: { ...c, socials: { ...c.socials, linkedin: v } } })} />
+          <F label="GitHub" value={c.socials.github} onChange={(v) => patch({ contact: { ...c, socials: { ...c.socials, github: v } } })} />
+          <F label="YouTube" value={c.socials.youtube} onChange={(v) => patch({ contact: { ...c, socials: { ...c.socials, youtube: v } } })} />
+        </FGrid>
       </Panel>
     </>
   );
@@ -758,6 +776,52 @@ function FooterTab({ config, patch }: EditorProps) {
           <F label="Vimeo URL" value={s.vimeo} onChange={(v) => patch({ footer: { ...f, social: { ...s, vimeo: v } } })} />
         </FGrid>
       </Panel>
+      {f.columns && (
+        <ListManager<FooterColumn>
+          title="Footer Columns"
+          items={f.columns}
+          onChange={(columns) => patch({ footer: { ...f, columns } })}
+          blank={() => ({ type: "contact", title: "New Column", value: "" })}
+          renderRow={(col) => (
+            <div style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>
+              {col.type === "contact" ? `Contact · ${col.title}` : `Links · ${col.title}`}
+            </div>
+          )}
+          renderForm={(col, update) => (
+            <>
+              <FGrid>
+                <F label="Type (contact/link)" value={col.type} onChange={(v) => update({ type: v === "link" ? "link" : "contact" } as never)} />
+                <F label="Title" value={col.title} onChange={(v) => update({ title: v } as never)} />
+              </FGrid>
+              {col.type === "contact" ? (
+                <FGrid>
+                  <F label="Value" value={(col as any).value} onChange={(v) => update({ value: v } as never)} />
+                  <F label="Href (optional)" value={(col as any).href ?? ""} onChange={(v) => update({ href: v || undefined } as never)} />
+                </FGrid>
+              ) : (
+                <F
+                  label="Links (label|href per line)"
+                  value={((col as any).items ?? []).map((it: any) => `${it.label}|${it.href}`).join("\n")}
+                  onChange={(v) =>
+                    update({
+                      items: v
+                        .split("\n")
+                        .map((line) => line.trim())
+                        .filter(Boolean)
+                        .map((line) => {
+                          const [label, href] = line.split("|");
+                          return { label: (label ?? "").trim() || "Link", href: (href ?? "").trim() || "#" };
+                        }),
+                    } as never)
+                  }
+                  type="textarea"
+                  rows={6}
+                />
+              )}
+            </>
+          )}
+        />
+      )}
     </>
   );
 }
@@ -778,7 +842,29 @@ export default function Agency1Admin() {
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(AGENCY1_STORAGE_KEY);
-      if (raw) setConfig(JSON.parse(raw) as Agency1Config);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<Agency1Config>;
+        setConfig({
+          ...AGENCY1_DEFAULTS,
+          ...parsed,
+          brand: { ...AGENCY1_DEFAULTS.brand, ...(parsed.brand ?? {}) },
+          theme: { ...AGENCY1_DEFAULTS.theme, ...(parsed.theme ?? {}) },
+          header: { ...AGENCY1_DEFAULTS.header, ...(parsed.header ?? {}) },
+          hero: { ...AGENCY1_DEFAULTS.hero, ...(parsed.hero ?? {}) },
+          footer: { ...AGENCY1_DEFAULTS.footer, ...(parsed.footer ?? {}) },
+          contact: { ...AGENCY1_DEFAULTS.contact, ...(parsed.contact ?? {}) },
+          blogPosts: (parsed.blogPosts ?? parsed.blog ?? AGENCY1_DEFAULTS.blogPosts) as Agency1Config["blogPosts"],
+          pages: (parsed.pages ?? AGENCY1_DEFAULTS.pages) as Agency1Config["pages"],
+          services: (parsed.services ?? AGENCY1_DEFAULTS.services) as Agency1Config["services"],
+          portfolio: (parsed.portfolio ?? AGENCY1_DEFAULTS.portfolio) as Agency1Config["portfolio"],
+          testimonials: (parsed.testimonials ?? AGENCY1_DEFAULTS.testimonials) as Agency1Config["testimonials"],
+          team: (parsed.team ?? AGENCY1_DEFAULTS.team) as Agency1Config["team"],
+          homeSections: (parsed.homeSections ?? AGENCY1_DEFAULTS.homeSections) as Agency1Config["homeSections"],
+          navItems: (parsed.navItems ?? AGENCY1_DEFAULTS.navItems) as Agency1Config["navItems"],
+          workProcess: (parsed.workProcess ?? AGENCY1_DEFAULTS.workProcess) as Agency1Config["workProcess"],
+          faqs: (parsed.faqs ?? AGENCY1_DEFAULTS.faqs) as Agency1Config["faqs"],
+        });
+      }
     } catch {
       window.localStorage.removeItem(AGENCY1_STORAGE_KEY);
     }
@@ -879,21 +965,43 @@ export default function Agency1Admin() {
           </div>
         </div>
 
-        {/* Content area */}
-        <div style={{ flex: 1, padding: "32px 32px 64px", maxWidth: 900 }}>
-          {activeTab === "brand" && <BrandTab config={config} patch={patch} />}
-          {activeTab === "theme" && <ThemeTab config={config} patch={patch} />}
-          {activeTab === "header" && <HeaderTab config={config} patch={patch} />}
-          {activeTab === "home" && <HomeSectionsTab config={config} patch={patch} />}
-          {activeTab === "hero" && <HeroTab config={config} patch={patch} />}
-          {activeTab === "services" && <ServicesTab config={config} patch={patch} />}
-          {activeTab === "portfolio" && <PortfolioTab config={config} patch={patch} />}
-          {activeTab === "testimonials" && <TestimonialsTab config={config} patch={patch} />}
-          {activeTab === "team" && <TeamTab config={config} patch={patch} />}
-          {activeTab === "blog" && <BlogTab config={config} patch={patch} />}
-          {activeTab === "pages" && <PagesTab config={config} patch={patch} />}
-          {activeTab === "contact" && <ContactTab config={config} patch={patch} />}
-          {activeTab === "footer" && <FooterTab config={config} patch={patch} />}
+        {/* Split panel: editor + live preview */}
+        <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
+          <div style={{ flex: "0 0 min(900px, 100%)", padding: "32px 32px 64px", overflow: "auto" }}>
+            {activeTab === "brand" && <BrandTab config={config} patch={patch} />}
+            {activeTab === "theme" && <ThemeTab config={config} patch={patch} />}
+            {activeTab === "header" && <HeaderTab config={config} patch={patch} />}
+            {activeTab === "home" && <HomeSectionsTab config={config} patch={patch} />}
+            {activeTab === "hero" && <HeroTab config={config} patch={patch} />}
+            {activeTab === "services" && <ServicesTab config={config} patch={patch} />}
+            {activeTab === "portfolio" && <PortfolioTab config={config} patch={patch} />}
+            {activeTab === "testimonials" && <TestimonialsTab config={config} patch={patch} />}
+            {activeTab === "team" && <TeamTab config={config} patch={patch} />}
+            {activeTab === "blog" && <BlogTab config={config} patch={patch} />}
+            {activeTab === "pages" && <PagesTab config={config} patch={patch} />}
+            {activeTab === "contact" && <ContactTab config={config} patch={patch} />}
+            {activeTab === "footer" && <FooterTab config={config} patch={patch} />}
+          </div>
+          <div
+            style={{
+              flex: 1,
+              borderLeft: "1px solid #e5e7eb",
+              background: "#0b0f19",
+              minWidth: 420,
+              display: "block",
+            }}
+          >
+            <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+              <div style={{ padding: "10px 14px", borderBottom: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.75)", fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                Live Preview
+              </div>
+              <iframe
+                title="Agency 1 preview"
+                src="/templates/agency-1/preview"
+                style={{ flex: 1, width: "100%", border: "none", background: "#fff" }}
+              />
+            </div>
+          </div>
         </div>
       </main>
     </div>

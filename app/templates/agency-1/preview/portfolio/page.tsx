@@ -6,14 +6,14 @@ import Link from "next/link";
 import Agency1Header from "@/components/templates/agency1/header/Agency1Header";
 import Agency1Footer from "@/components/templates/agency1/footer/Agency1Footer";
 import Agency1Breadcrumb from "@/components/templates/agency1/inner/Agency1Breadcrumb";
-import { agency1Portfolio } from "@/lib/agency1/data";
-
-const categories = ["All", ...Array.from(new Set(agency1Portfolio.map((p) => p.category)))];
+import { useAgency1 } from "@/lib/agency1/context";
 
 export default function Agency1PortfolioPage() {
+  const { config } = useAgency1();
+  const categories = ["All", ...Array.from(new Set(config.portfolio.map((p) => p.category)))];
   const [active, setActive] = useState("All");
 
-  const filtered = active === "All" ? agency1Portfolio : agency1Portfolio.filter((p) => p.category === active);
+  const filtered = active === "All" ? config.portfolio : config.portfolio.filter((p) => p.category === active);
 
   return (
     <>

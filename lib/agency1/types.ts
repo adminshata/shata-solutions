@@ -70,9 +70,11 @@ export interface BlogPost {
 }
 
 export interface PageItem {
-  page: string;
-  path: string;
   slug: string;
+  page: string;
+  title: string;
+  path: string;
+  content: string;
   enabled: boolean;
 }
 
@@ -92,6 +94,9 @@ export interface HomeSection {
   id: string;
   label: string;
   enabled: boolean;
+  title?: string;
+  subtitle?: string;
+  content?: string;
 }
 
 export interface Agency1Config {
@@ -107,6 +112,7 @@ export interface Agency1Config {
     projectsCount: string;
     teamCount: string;
     awardsCount: string;
+    logoText?: string;
   };
   theme: {
     accentColor: string;
@@ -114,6 +120,8 @@ export interface Agency1Config {
     darkColor: string;
     textColor: string;
     secondaryTextColor: string;
+    radius?: number;
+    fontFamily?: string;
   };
   header: {
     stickyHeader: boolean;
@@ -138,8 +146,27 @@ export interface Agency1Config {
   portfolio: PortfolioItem[];
   testimonials: TestimonialItem[];
   team: TeamMember[];
-  blog: BlogPost[];
+  blogPosts: BlogPost[];
+  /** @deprecated legacy key */
+  blog?: BlogPost[];
   pages: PageItem[];
+  workProcess: WorkProcessStep[];
+  faqs: FAQItem[];
+  contact: {
+    title: string;
+    subtitle: string;
+    intro: string;
+    office: string;
+    email: string;
+    phone: string;
+    hours: string;
+    socials: {
+      twitter: string;
+      linkedin: string;
+      github: string;
+      youtube: string;
+    };
+  };
   footer: {
     tagline: string;
     copyright: string;
@@ -154,5 +181,10 @@ export interface Agency1Config {
       youtube: string;
       vimeo: string;
     };
+    columns?: FooterColumn[];
   };
 }
+
+export type FooterColumn =
+  | { type: "contact"; title: string; value: string; href?: string }
+  | { type: "link"; title: string; items: { label: string; href: string }[] };

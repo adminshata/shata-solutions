@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Agency1Provider } from "@/lib/agency1/context";
+import Agency1DebugImages from "@/components/templates/agency1/Agency1DebugImages";
 
 export const metadata: Metadata = {
   title: "Shata Agency One – AI Agency & Intelligent Solutions",
@@ -40,13 +42,28 @@ export default function Agency1Layout({
           visibility: visible !important;
           max-width: none;
         }
+        /* Trexa CSS hides some images by default until hover/JS. Force visible for agency-1 preview. */
+        main img,
+        img[data-nimg] {
+          opacity: 1 !important;
+          visibility: visible !important;
+        }
+        .value__title img,
+        .value__thumb img {
+          opacity: 1 !important;
+          visibility: visible !important;
+          transform: none !important;
+        }
         /* Ensure fill images behave correctly */
         img[style*="position: absolute"],
         img[style*="position:absolute"] {
           object-fit: cover;
         }
       `}</style>
-      {children}
+      <Agency1Provider>
+        {children}
+        <Agency1DebugImages />
+      </Agency1Provider>
     </>
   );
 }

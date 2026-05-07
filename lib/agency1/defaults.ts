@@ -15,6 +15,7 @@ export const AGENCY1_DEFAULTS: Agency1Config = {
     projectsCount: "500+",
     teamCount: "50+",
     awardsCount: "30+",
+    logoText: "Shata.Agency",
   },
   theme: {
     accentColor: "#F14F44",
@@ -22,6 +23,8 @@ export const AGENCY1_DEFAULTS: Agency1Config = {
     darkColor: "#101010",
     textColor: "#101010",
     secondaryTextColor: "#666666",
+    radius: 16,
+    fontFamily: "Instrument Sans",
   },
   header: {
     stickyHeader: true,
@@ -299,7 +302,7 @@ export const AGENCY1_DEFAULTS: Agency1Config = {
       social: { twitter: "#", linkedin: "#", github: "#" },
     },
   ],
-  blog: [
+  blogPosts: [
     {
       id: 1,
       slug: "ai-future-of-technology",
@@ -373,16 +376,110 @@ export const AGENCY1_DEFAULTS: Agency1Config = {
       content: "Most AI strategies fail not because of bad technology but because of misaligned expectations.",
     },
   ],
+  // Legacy compatibility (older components) — keep in sync with blogPosts
+  blog: [],
   pages: [
-    { page: "Home", path: "/templates/agency-1/preview", slug: "", enabled: true },
-    { page: "About", path: "/templates/agency-1/preview/about", slug: "about", enabled: true },
-    { page: "Services", path: "/templates/agency-1/preview/services", slug: "services", enabled: true },
-    { page: "Portfolio", path: "/templates/agency-1/preview/portfolio", slug: "portfolio", enabled: true },
-    { page: "Blog", path: "/templates/agency-1/preview/blog", slug: "blog", enabled: true },
-    { page: "Team", path: "/templates/agency-1/preview/team", slug: "team", enabled: true },
-    { page: "Contact", path: "/templates/agency-1/preview/contact", slug: "contact", enabled: true },
-    { page: "FAQ", path: "/templates/agency-1/preview/faq", slug: "faq", enabled: true },
+    { page: "Home", title: "Home", content: "", path: "/templates/agency-1/preview", slug: "", enabled: true },
+    { page: "About", title: "About", content: "", path: "/templates/agency-1/preview/about", slug: "about", enabled: true },
+    { page: "Services", title: "Services", content: "", path: "/templates/agency-1/preview/services", slug: "services", enabled: true },
+    { page: "Portfolio", title: "Portfolio", content: "", path: "/templates/agency-1/preview/portfolio", slug: "portfolio", enabled: true },
+    { page: "Blog", title: "Blog", content: "", path: "/templates/agency-1/preview/blog", slug: "blog", enabled: true },
+    { page: "Team", title: "Team", content: "", path: "/templates/agency-1/preview/team", slug: "team", enabled: true },
+    { page: "Contact", title: "Contact", content: "", path: "/templates/agency-1/preview/contact", slug: "contact", enabled: true },
+    { page: "FAQ", title: "FAQ", content: "", path: "/templates/agency-1/preview/faq", slug: "faq", enabled: true },
   ],
+  workProcess: [
+    {
+      step: "STEP 01",
+      title: "Discover & Align Goals",
+      description:
+        "We start every engagement with a deep discovery session — mapping your business goals, data landscape, and AI readiness to define the right problem to solve.",
+    },
+    {
+      step: "STEP 02",
+      title: "Analyze Data & Choose Models",
+      description:
+        "Our data scientists audit your data, identify gaps, and select the most appropriate models and architectures for your specific use case and performance targets.",
+    },
+    {
+      step: "STEP 03",
+      title: "Develop Custom AI Solutions",
+      description:
+        "We build, fine-tune, and validate your AI system through iterative sprints — keeping you informed at every stage with demos and performance metrics.",
+    },
+    {
+      step: "STEP 04",
+      title: "Test, Deploy & Optimize",
+      description:
+        "Before launch, every model is rigorously tested against real-world edge cases. Post-launch, we monitor performance and continuously optimize for long-term results.",
+    },
+  ],
+  faqs: [
+    {
+      id: 1,
+      question: "What types of businesses do you work with?",
+      answer:
+        "We work with businesses of all sizes — from fast-growing startups to enterprise organizations. Our AI solutions are scoped to your specific goals, whether you need a single model or a full AI transformation strategy.",
+    },
+    {
+      id: 2,
+      question: "How long does a typical AI project take?",
+      answer:
+        "Timelines vary by scope. A focused ML proof-of-concept can take 4–6 weeks. A full custom AI platform typically requires 3–6 months. We define clear milestones in our discovery phase so you always know what to expect.",
+    },
+    {
+      id: 3,
+      question: "Do you offer ongoing maintenance and support after launch?",
+      answer:
+        "Yes. We offer retainer-based maintenance plans that include model monitoring, performance reporting, retraining schedules, and access to our engineering team for ongoing improvements.",
+    },
+    {
+      id: 4,
+      question: "Can you integrate AI into our existing systems and software?",
+      answer:
+        "Absolutely. We specialize in integrating AI models into existing workflows, CRMs, ERPs, and data platforms via APIs and microservices. We avoid disrupting what already works well.",
+    },
+    {
+      id: 5,
+      question: "What industries do you have experience in?",
+      answer:
+        "We have deep experience in healthcare, e-commerce, logistics, finance, manufacturing, and SaaS. Our cross-industry perspective often surfaces AI opportunities that domain-specific teams miss.",
+    },
+    {
+      id: 6,
+      question: "How do you price your services?",
+      answer:
+        "We offer project-based, retainer, and outcome-based pricing models. After a discovery session, we provide a detailed proposal with clear deliverables and pricing. No hidden fees.",
+    },
+    {
+      id: 7,
+      question: "Is my data safe with your team?",
+      answer:
+        "Data security is foundational to everything we do. We sign NDAs before any data sharing, follow SOC 2 practices, and can work within your existing data governance frameworks. We never use client data to train models without explicit permission.",
+    },
+    {
+      id: 8,
+      question: "Do you offer a free consultation?",
+      answer:
+        "Yes. We offer a complimentary 45-minute discovery call to understand your goals, challenges, and AI readiness. From there, we provide an honest assessment and a proposed approach.",
+    },
+  ],
+  contact: {
+    title: "Contact Us",
+    subtitle: "Get In Touch",
+    intro:
+      "Tell us about your project and we'll get back to you within 24 hours. No sales pressure — just an honest conversation about what AI can do for your business.",
+    office: "25 Elm Drive, Riverside, TX",
+    email: "hello@shataagencyone.com",
+    phone: "+1 (762) 768 0763",
+    hours: "Mon–Fri, 9am–6pm CT",
+    socials: {
+      twitter: "#",
+      linkedin: "#",
+      github: "#",
+      youtube: "#",
+    },
+  },
   footer: {
     tagline: "Collaborate with our creative team to make your project shine with unmatched intelligence.",
     copyright: "Copyright © Shata Solutions 2025. All rights reserved.",
@@ -397,5 +494,14 @@ export const AGENCY1_DEFAULTS: Agency1Config = {
       youtube: "#",
       vimeo: "#",
     },
+    columns: [
+      { type: "contact", title: "Our address", value: "25 Elm Drive, Riverside, TX" },
+      { type: "contact", title: "Send a message", value: "hello@shataagencyone.com", href: "mailto:hello@shataagencyone.com" },
+      { type: "contact", title: "Call our office", value: "+1 (762) 768 0763", href: "tel:+17627680763" },
+      { type: "link", title: "Quick links", items: [{ label: "Our Services", href: "/templates/agency-1/preview/services" }] },
+    ],
   },
 };
+
+// Keep legacy key in sync for older consumers.
+AGENCY1_DEFAULTS.blog = AGENCY1_DEFAULTS.blogPosts;

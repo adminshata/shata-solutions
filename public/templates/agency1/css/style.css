@@ -1,12 +1,8 @@
 @charset "UTF-8";
 /*-----------------------------------------------------------------------------------
 
-  Trexa – AI Agency & Technology Figma Template
-  Author: themewolfs 
-  Description: Trexa Ai agency is a cutting-edge Figma template built for AI-driven businesses and technology companies. With its clean, modern design, it’s ideal for AI agencies, tech consultants, data science specialists, machine learning startups, AI developers, and any organization working in the world of artificial intelligence and advanced technologies.
-  Developer: Masirul Islam & Rana Ahmed
-  Design Source: https://themeforest.net/user/themewolfs
-  Version: 1.0
+  Shata Agency One — AI Agency & Intelligent Solutions
+  Theme pack: Agency 1 (adapted for Shata Solutions)
 
 -----------------------------------------------------------------------------------
 
@@ -1462,7 +1458,7 @@ section {
   cursor: pointer;
   text-align: left;
   color: var(--white);
-  background-image: url(../imgs/writer/go-top.webp);
+  background-image: url(../imgs/icon/falk-arrow.svg);
   background-position: right center;
   background-repeat: no-repeat;
   right: 16%;
@@ -16881,7 +16877,7 @@ footer.footer-5-area {
 .about-area7__visual-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255, 120, 100, 0.25), rgba(20, 10, 60, 0.5)), url("assets/img/server-room.jpg") center/cover no-repeat;
+  background: linear-gradient(180deg, rgba(255, 120, 100, 0.25), rgba(20, 10, 60, 0.5)), url("../imgs/bg/fact-bg-01.jpg") center/cover no-repeat;
 }
 
 .stats-card {

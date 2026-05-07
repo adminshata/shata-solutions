@@ -5,8 +5,10 @@ import Image from "next/image";
 import Agency1Header from "@/components/templates/agency1/header/Agency1Header";
 import Agency1Footer from "@/components/templates/agency1/footer/Agency1Footer";
 import Agency1Breadcrumb from "@/components/templates/agency1/inner/Agency1Breadcrumb";
+import { useAgency1 } from "@/lib/agency1/context";
 
 export default function Agency1ContactPage() {
+  const { config } = useAgency1();
   const [form, setForm] = useState({ name: "", email: "", phone: "", service: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
 
@@ -20,8 +22,8 @@ export default function Agency1ContactPage() {
       <Agency1Header />
       <main>
         <Agency1Breadcrumb
-          title="Contact Us"
-          subtitle="Get In Touch"
+          title={config.contact.title}
+          subtitle={config.contact.subtitle}
           bg="/templates/agency1/imgs/inner/contact/contact-bg.jpg"
         />
 
@@ -31,11 +33,10 @@ export default function Agency1ContactPage() {
               {/* Form */}
               <div className="col-xl-7">
                 <h2 style={{ fontSize: "clamp(28px,3.5vw,48px)", fontWeight: 800, marginBottom: 12 }}>
-                  Let&apos;s Start a Conversation
+                  {config.contact.title === "Contact Us" ? "Let’s Start a Conversation" : config.contact.title}
                 </h2>
                 <p style={{ color: "#666", lineHeight: 1.7, marginBottom: 40 }}>
-                  Tell us about your project and we&apos;ll get back to you within 24 hours.
-                  No sales pressure — just an honest conversation about what AI can do for your business.
+                  {config.contact.intro}
                 </p>
 
                 {submitted ? (
@@ -135,10 +136,10 @@ export default function Agency1ContactPage() {
                   <h3 style={{ fontWeight: 700, fontSize: 24, marginBottom: 32 }}>Contact Information</h3>
 
                   {[
-                    { icon: "fa-solid fa-location-dot", label: "Our Office", value: "25 Elm Drive, Riverside, TX" },
-                    { icon: "fa-solid fa-envelope", label: "Email Us", value: "hello@shataagencyone.com" },
-                    { icon: "fa-solid fa-phone", label: "Call Us", value: "+1 (762) 768 0763" },
-                    { icon: "fa-solid fa-clock", label: "Working Hours", value: "Mon–Fri, 9am–6pm CT" },
+                    { icon: "fa-solid fa-location-dot", label: "Our Office", value: config.contact.office },
+                    { icon: "fa-solid fa-envelope", label: "Email Us", value: config.contact.email },
+                    { icon: "fa-solid fa-phone", label: "Call Us", value: config.contact.phone },
+                    { icon: "fa-solid fa-clock", label: "Working Hours", value: config.contact.hours },
                   ].map((item) => (
                     <div key={item.label} style={{ display: "flex", gap: 20, marginBottom: 28 }}>
                       <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -154,7 +155,12 @@ export default function Agency1ContactPage() {
                   <div style={{ marginTop: 40, paddingTop: 32, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
                     <h4 style={{ fontWeight: 700, marginBottom: 16 }}>Follow Us</h4>
                     <div style={{ display: "flex", gap: 12 }}>
-                      {[{ icon: "fab fa-twitter", href: "#" }, { icon: "fab fa-linkedin-in", href: "#" }, { icon: "fab fa-github", href: "#" }, { icon: "fab fa-youtube", href: "#" }].map((s) => (
+                      {[
+                        { icon: "fab fa-twitter", href: config.contact.socials.twitter },
+                        { icon: "fab fa-linkedin-in", href: config.contact.socials.linkedin },
+                        { icon: "fab fa-github", href: config.contact.socials.github },
+                        { icon: "fab fa-youtube", href: config.contact.socials.youtube },
+                      ].map((s) => (
                         <a key={s.icon} href={s.href}
                           style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
                           <i className={s.icon} />

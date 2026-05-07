@@ -1,9 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import Agency1Header from "@/components/templates/agency1/header/Agency1Header";
 import Agency1Footer from "@/components/templates/agency1/footer/Agency1Footer";
 import Agency1Breadcrumb from "@/components/templates/agency1/inner/Agency1Breadcrumb";
-import { agency1Services } from "@/lib/agency1/data";
+import { useAgency1 } from "@/lib/agency1/context";
 
 const ArrowSVG = () => (
   <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -17,6 +19,7 @@ const ArrowSVG = () => (
 );
 
 export default function Agency1ServicesPage() {
+  const { config } = useAgency1();
   return (
     <>
       <Agency1Header />
@@ -39,7 +42,7 @@ export default function Agency1ServicesPage() {
               </div>
 
               <div className="row mb-minus-30">
-                {agency1Services.map((svc) => (
+                {config.services.map((svc) => (
                   <div key={svc.id} className="col-lg-6 col-xxl-4">
                     <div className="service-section__wrap">
                       <div className="logo">

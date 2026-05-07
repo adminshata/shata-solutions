@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Agency1Header from "@/components/templates/agency1/header/Agency1Header";
 import Agency1Footer from "@/components/templates/agency1/footer/Agency1Footer";
-import { agency1Testimonials } from "@/lib/agency1/data";
+import { useAgency1 } from "@/lib/agency1/context";
 
 const values = [
   { num: "01.", title: "Human-Centered Innovation", thumb: "/templates/agency1/imgs/inner/about/value/value-thumb1.jpg", desc: "We build AI that serves people first. Every system we design prioritizes usability, accessibility, and real human benefit over technical novelty." },
@@ -38,6 +38,7 @@ const brandLogos = [
 ];
 
 export default function Agency1AboutPage() {
+  const { config } = useAgency1();
   const [activeValue, setActiveValue] = useState(0);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
 
@@ -186,26 +187,26 @@ export default function Agency1AboutPage() {
                     <QuoteSVG5 />
                   </div>
                   <p className="testimonial-5__desc">
-                    {agency1Testimonials[testimonialIdx].quote}
+                    {config.testimonials[testimonialIdx]?.quote ?? ""}
                   </p>
                   <div className="testimonial-5__author">
                     <div className="testimonial-5__thumb">
                       <Image
-                        src={agency1Testimonials[testimonialIdx].avatar}
-                        alt={agency1Testimonials[testimonialIdx].author}
+                        src={config.testimonials[testimonialIdx]?.avatar ?? "/templates/agency1/imgs/testimonials/testimonials-author-img-1.png"}
+                        alt={config.testimonials[testimonialIdx]?.author ?? "Author"}
                         width={56}
                         height={56}
                       />
                     </div>
                     <h5 className="testimonial-5__name">
-                      {agency1Testimonials[testimonialIdx].author}, {agency1Testimonials[testimonialIdx].role}
+                      {config.testimonials[testimonialIdx]?.author ?? "—"}, {config.testimonials[testimonialIdx]?.role ?? ""}
                     </h5>
                   </div>
                 </div>
                 <div className="testimonial-5__arrow">
                   <button
                     className="testimonial-5__swiper-button-prev"
-                    onClick={() => setTestimonialIdx((i) => (i === 0 ? agency1Testimonials.length - 1 : i - 1))}
+                    onClick={() => setTestimonialIdx((i) => (i === 0 ? Math.max(config.testimonials.length - 1, 0) : i - 1))}
                     aria-label="Previous testimonial"
                     style={{ background: "none", border: "1px solid #ccc", borderRadius: "50%", width: 44, height: 44, cursor: "pointer", marginRight: 8 }}
                   >
@@ -213,7 +214,7 @@ export default function Agency1AboutPage() {
                   </button>
                   <button
                     className="testimonial-5__swiper-button-next"
-                    onClick={() => setTestimonialIdx((i) => (i === agency1Testimonials.length - 1 ? 0 : i + 1))}
+                    onClick={() => setTestimonialIdx((i) => (i === Math.max(config.testimonials.length - 1, 0) ? 0 : i + 1))}
                     aria-label="Next testimonial"
                     style={{ background: "none", border: "1px solid #ccc", borderRadius: "50%", width: 44, height: 44, cursor: "pointer" }}
                   >

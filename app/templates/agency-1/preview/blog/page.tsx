@@ -1,11 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import Agency1Header from "@/components/templates/agency1/header/Agency1Header";
 import Agency1Footer from "@/components/templates/agency1/footer/Agency1Footer";
 import Agency1Breadcrumb from "@/components/templates/agency1/inner/Agency1Breadcrumb";
-import { agency1Blog } from "@/lib/agency1/data";
+import { useAgency1 } from "@/lib/agency1/context";
 
 export default function Agency1BlogPage() {
+  const { config } = useAgency1();
+  const posts = config.blogPosts;
   return (
     <>
       <Agency1Header />
@@ -22,7 +26,7 @@ export default function Agency1BlogPage() {
             </div>
 
             <div className="row mb-minus-30">
-              {agency1Blog.map((post, i) => (
+              {posts.map((post, i) => (
                 <div key={post.id} className={i === 0 ? "col-xl-12" : "col-md-6 col-xl-4"}>
                   <div className="blog__item" style={{ marginBottom: 30, background: "#fff", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
                     <div className="blog__media rr-ov-hidden" style={{ position: "relative", height: i === 0 ? 440 : 260 }}>

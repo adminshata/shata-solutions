@@ -3,13 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  agency1Services,
-  agency1Portfolio,
-  agency1Testimonials,
-  agency1WorkProcess,
-  agency1Blog,
-} from "@/lib/agency1/data";
+import { useAgency1 } from "@/lib/agency1/context";
 
 /* ── About Section ──────────────────────────────────────────── */
 const aboutItems = [
@@ -89,7 +83,8 @@ const ArrowSVG = () => (
 );
 
 export function Agency1Services() {
-  const displayed = agency1Services.slice(0, 3);
+  const { config } = useAgency1();
+  const displayed = config.services.slice(0, 3);
   return (
     <section className="service-section">
       <div className="service-section__wrapper rr-bg-gray section-spacing">
@@ -146,6 +141,7 @@ export function Agency1Services() {
 
 /* ── Work Process Section ───────────────────────────────────── */
 export function Agency1WorkProcess() {
+  const { config } = useAgency1();
   return (
     <section
       className="work-section bg-img"
@@ -188,7 +184,7 @@ export function Agency1WorkProcess() {
             <div className="col-xl-1" />
             <div className="col-xl-5">
               <div className="work-section__item-box">
-                {agency1WorkProcess.map((step) => (
+                {config.workProcess.map((step) => (
                   <div key={step.step} className="work-section__item">
                     <div className="work-section__number"><span>{step.step}</span></div>
                     <div className="work-section__content">
@@ -219,7 +215,8 @@ const ArrowWhiteSVG = () => (
 );
 
 export function Agency1Portfolio() {
-  const featured = agency1Portfolio.slice(0, 4);
+  const { config } = useAgency1();
+  const featured = config.portfolio.slice(0, 4);
   const images = [
     "/templates/agency1/imgs/project/project-img-1.jpg",
     "/templates/agency1/imgs/project/project-img-2.jpg",
@@ -239,11 +236,11 @@ export function Agency1Portfolio() {
           {/* image-card alternating */}
           {featured.map((proj, i) => (
             i % 2 === 0 ? (
-              <>
-                <div key={`img-${proj.id}`} className="project-section__thumb rr-ov-hidden" style={{ position: "relative", minHeight: 360 }}>
+              <div key={proj.id} style={{ display: "contents" }}>
+                <div className="project-section__thumb rr-ov-hidden" style={{ position: "relative", minHeight: 360 }}>
                   <Image src={images[Math.floor(i / 2) % images.length]} alt={proj.title} fill style={{ objectFit: "cover" }} />
                 </div>
-                <div key={proj.id} className="project-section__card">
+                <div className="project-section__card">
                   <div className="icon">
                     <Link className="project-btn" href={`/templates/agency-1/preview/portfolio/${proj.slug}`}>
                       <ArrowWhiteSVG />
@@ -256,7 +253,7 @@ export function Agency1Portfolio() {
                     <span className="date">{proj.year}</span>
                   </div>
                 </div>
-              </>
+              </div>
             ) : (
               <div key={proj.id} className="project-section__card">
                 <div className="icon">
@@ -281,6 +278,7 @@ export function Agency1Portfolio() {
 
 /* ── Video CTA Section ──────────────────────────────────────── */
 export function Agency1VideoSection() {
+  const { config } = useAgency1();
   const [videoOpen, setVideoOpen] = useState(false);
 
   return (
@@ -358,7 +356,7 @@ export function Agency1VideoSection() {
           onClick={() => setVideoOpen(false)}
         >
           <div style={{ width: "min(800px,90vw)", aspectRatio: "16/9", position: "relative" }} onClick={(e) => e.stopPropagation()}>
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/8oON21G1Bqg?autoplay=1" allow="autoplay; encrypted-media" allowFullScreen style={{ border: "none", borderRadius: 12 }} />
+            <iframe width="100%" height="100%" src={config.hero.videoUrl} allow="autoplay; encrypted-media" allowFullScreen style={{ border: "none", borderRadius: 12 }} />
             <button onClick={() => setVideoOpen(false)} style={{ position: "absolute", top: -40, right: 0, background: "none", border: "none", color: "white", fontSize: 28, cursor: "pointer" }}>
               <i className="fas fa-times" />
             </button>
@@ -377,6 +375,7 @@ const QuoteSVG = () => (
 );
 
 export function Agency1Testimonials() {
+  const { config } = useAgency1();
   return (
     <section className="testimonials-section pin-area-3">
       <div className="testimonials-section-wrapper section-spacing-top">
@@ -389,7 +388,7 @@ export function Agency1Testimonials() {
             </h3>
           </div>
           <div className="testimonials-wrapper-box">
-            {agency1Testimonials.map((t) => (
+            {config.testimonials.map((t) => (
               <div key={t.id} className="testimonials-item">
                 <div className="icon"><QuoteSVG /></div>
                 <div className="testimonials-content">
@@ -525,8 +524,9 @@ export function Agency1Brands() {
 
 /* ── Blog Section ───────────────────────────────────────────── */
 export function Agency1Blog() {
+  const { config } = useAgency1();
   const [current, setCurrent] = useState(0);
-  const displayed = agency1Blog.slice(0, 4);
+  const displayed = config.blogPosts.slice(0, 4);
 
   return (
     <section className="blog">
@@ -587,6 +587,28 @@ export function Agency1Blog() {
             </div>
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+export function Agency1CustomHomeSection({
+  section,
+}: {
+  section: { id: string; label: string; title?: string; subtitle?: string; content?: string };
+}) {
+  return (
+    <section className="rr-bg-gray section-spacing">
+      <div className="container rr-container-1800">
+        <div className="section-heading" style={{ marginBottom: 24 }}>
+          {section.subtitle && <p style={{ color: "#999", textTransform: "uppercase", letterSpacing: 2, marginBottom: 10 }}>{section.subtitle}</p>}
+          <h3 className="title">{section.title || section.label}</h3>
+        </div>
+        {section.content && (
+          <p style={{ color: "#666", lineHeight: 1.8, maxWidth: 900 }}>
+            {section.content}
+          </p>
+        )}
       </div>
     </section>
   );

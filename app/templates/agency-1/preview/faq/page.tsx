@@ -4,10 +4,11 @@ import { useState } from "react";
 import Agency1Header from "@/components/templates/agency1/header/Agency1Header";
 import Agency1Footer from "@/components/templates/agency1/footer/Agency1Footer";
 import Agency1Breadcrumb from "@/components/templates/agency1/inner/Agency1Breadcrumb";
-import { agency1FAQs } from "@/lib/agency1/data";
+import { useAgency1 } from "@/lib/agency1/context";
 import Link from "next/link";
 
 export default function Agency1FAQPage() {
+  const { config } = useAgency1();
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
@@ -28,7 +29,7 @@ export default function Agency1FAQPage() {
             <div className="row">
               <div className="col-xl-8">
                 <div>
-                  {agency1FAQs.map((faq, i) => (
+                  {config.faqs.map((faq, i) => (
                     <div
                       key={faq.id}
                       style={{

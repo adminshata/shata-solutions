@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { agency1Nav } from "@/lib/agency1/data";
+import { useAgency1 } from "@/lib/agency1/context";
 
-function Agency1Logo({ dark = true }: { dark?: boolean }) {
+function Agency1Logo({ dark = true, text }: { dark?: boolean; text: string }) {
+  const parts = text.split(".");
   return (
     <span style={{
       fontFamily: "'Instrument Sans', sans-serif",
@@ -14,12 +15,15 @@ function Agency1Logo({ dark = true }: { dark?: boolean }) {
       color: dark ? "#101010" : "#ffffff",
       lineHeight: 1,
     }}>
-      Shata<span style={{ color: "#F14F44" }}>.</span>Agency
+      {parts[0] || text}
+      {parts.length > 1 && <span style={{ color: "#F14F44" }}>.</span>}
+      {parts.length > 1 ? parts.slice(1).join(".") : null}
     </span>
   );
 }
 
 export default function Agency1Header() {
+  const { config } = useAgency1();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sticky, setSticky] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -44,7 +48,7 @@ export default function Agency1Header() {
             <div className="offset-widget offset-header">
               <div className="offset-logo">
                 <Link href="/templates/agency-1/preview">
-                  <Agency1Logo dark={true} />
+                  <Agency1Logo dark={true} text={config.brand.logoText ?? "Shata.Agency"} />
                 </Link>
               </div>
               <button
@@ -56,10 +60,10 @@ export default function Agency1Header() {
               </button>
             </div>
             <div className="offset-button">
-              <Link href="/templates/agency-1/preview/contact" className="rr-btn">
+              <Link href={config.header.ctaLink} className="rr-btn">
                 <span className="btn-wrap">
-                  <span className="text-one">Let&apos;s Talk</span>
-                  <span className="text-two">Let&apos;s Talk</span>
+                  <span className="text-one">{config.header.ctaLabel}</span>
+                  <span className="text-two">{config.header.ctaLabel}</span>
                 </span>
               </Link>
             </div>
@@ -68,18 +72,18 @@ export default function Agency1Header() {
               <div className="contact-meta">
                 <div className="contact-item">
                   <span className="icon"><i className="fa-solid fa-location-dot" /></span>
-                  <span className="text">25 Elm Drive, Riverside, TX</span>
+                  <span className="text">{config.header.address}</span>
                 </div>
                 <div className="contact-item">
                   <span className="icon"><i className="fa-solid fa-envelope" /></span>
                   <span className="text">
-                    <a href="mailto:hello@shataagencyone.com">hello@shataagencyone.com</a>
+                    <a href={`mailto:${config.header.email}`}>{config.header.email}</a>
                   </span>
                 </div>
                 <div className="contact-item">
                   <span className="icon"><i className="fa-solid fa-phone" /></span>
                   <span className="text">
-                    <a href="tel:+17627680763">+1 (762) 768 0763</a>
+                    <a href={`tel:${config.header.phone}`}>{config.header.phone}</a>
                   </span>
                 </div>
               </div>
@@ -93,7 +97,7 @@ export default function Agency1Header() {
                     Home
                   </Link>
                 </li>
-                {agency1Nav.map((item) => (
+                {config.navItems.map((item) => (
                   <li key={item.label}>
                     <Link href={item.href} onClick={() => setSidebarOpen(false)}
                       style={{ display: "block", padding: "10px 0", fontWeight: 600 }}>
@@ -127,13 +131,13 @@ export default function Agency1Header() {
       )}
 
       {/* Header */}
-      <header className={`header-area${sticky ? " sticky" : ""}`}>
+      <header className={`header-area${config.header.stickyHeader && sticky ? " sticky" : ""}`}>
         <div className="header-main">
           <div className="container rr-container-1800">
             <div className="header-area__inner">
               <div className="header__logo">
                 <Link href="/templates/agency-1/preview">
-                  <Agency1Logo dark={true} />
+                  <Agency1Logo dark={true} text={config.brand.logoText ?? "Shata.Agency"} />
                 </Link>
               </div>
 
@@ -149,17 +153,10 @@ export default function Agency1Header() {
                       {openDropdown === "home" && (
                         <ul className="dp-menu column-2" style={{ display: "block" }}>
                           <li><Link href="/templates/agency-1/preview">AI Agency</Link></li>
-                          <li><Link href="/templates/agency-2/preview">AI Robotics</Link></li>
-                          <li><Link href="/templates/agency-3/preview">IT Solution</Link></li>
-                          <li><Link href="/templates/agency-4/preview">Software Agency</Link></li>
-                          <li><Link href="/templates/agency-5/preview">Marketing Agency</Link></li>
-                          <li><Link href="/templates/agency-6/preview">Cyber Security</Link></li>
-                          <li><Link href="/templates/agency-7/preview">SEO Agency</Link></li>
-                          <li><Link href="/templates/agency-8/preview">SaaS & Startup</Link></li>
                         </ul>
                       )}
                     </li>
-                    {agency1Nav.map((item) => (
+                    {config.navItems.map((item) => (
                       <li
                         key={item.label}
                         className={item.children ? "menu-item-has-children" : ""}
@@ -183,10 +180,12 @@ export default function Agency1Header() {
               </div>
 
               <div className="header-right">
-                <Link href="/templates/agency-1/preview/contact" className="rr-btn-border">
-                  <span className="text">GET IN TOUCH</span>
-                  <span className="icon"><i className="fa-regular fa-arrow-right" /></span>
-                </Link>
+                {config.header.showGetInTouchBtn && (
+                  <Link href={config.header.ctaLink} className="rr-btn-border">
+                    <span className="text">{config.header.ctaLabel}</span>
+                    <span className="icon"><i className="fa-regular fa-arrow-right" /></span>
+                  </Link>
+                )}
                 <div className="header__navicon d-xl-none">
                   <div className="side-toggle">
                     <button

@@ -3,14 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-const heroSlides = [
-  "/templates/agency1/imgs/hero/hero-img-1.png",
-  "/templates/agency1/imgs/hero/hero-img-2.png",
-  "/templates/agency1/imgs/hero/hero-img-3.png",
-];
+import { useAgency1 } from "@/lib/agency1/context";
 
 export default function Agency1Hero() {
+  const { config } = useAgency1();
+  const heroSlides = config.hero.slides.map((s) => s.image).filter(Boolean);
   const [current, setCurrent] = useState(0);
   const [videoOpen, setVideoOpen] = useState(false);
 
@@ -24,8 +21,8 @@ export default function Agency1Hero() {
           <div className="hero-section__inner">
             <div className="hero-section__box">
               <div className="number">
-                <h3>7</h3>
-                <h4>Years of AI Excellence</h4>
+                <h3>{config.hero.yearsBadge}</h3>
+                <h4>{config.hero.yearsBadgeLabel}</h4>
               </div>
               <div className="hero-section__client">
                 <div className="media">
@@ -35,15 +32,20 @@ export default function Agency1Hero() {
                   <Image src="/templates/agency1/imgs/hero/client-img-4.png" alt="client" width={40} height={40} />
                 </div>
                 <div className="hero-section__text">
-                  <h4>More than 25K <br />clients reviews</h4>
+                  <h4>{config.hero.clientsLabel.split("\n").map((line, i) => (
+                    <span key={i}>{line}{i === 0 ? <br /> : null}</span>
+                  ))}</h4>
                 </div>
               </div>
             </div>
             <div className="hero-section__content">
               <h2 className="title">
-                Unlock the ultimate <br />
-                power of AI, in your <br />
-                real life
+                {config.hero.title.split("\n").map((line, idx) => (
+                  <span key={idx}>
+                    {line}
+                    <br />
+                  </span>
+                ))}
               </h2>
             </div>
           </div>
@@ -55,7 +57,7 @@ export default function Agency1Hero() {
                   <div className="hero-slider-active" style={{ position: "relative", overflow: "hidden", borderRadius: 16 }}>
                     <div style={{ position: "relative", minHeight: 480 }}>
                       <Image
-                        src={heroSlides[current]}
+                        src={heroSlides[Math.min(current, Math.max(heroSlides.length - 1, 0))] || "/templates/agency1/imgs/hero/hero-img-1.png"}
                         alt="AI Hero"
                         fill
                         style={{ objectFit: "cover" }}
@@ -77,10 +79,10 @@ export default function Agency1Hero() {
                     </div>
                   </div>
                   <div className="arrow">
-                    <button className="rr-button-next rr-button" onClick={next} aria-label="Next slide">
+                    <button className="rr-button-next rr-button" onClick={next} aria-label="Next slide" disabled={heroSlides.length <= 1}>
                       <i className="far fa-chevron-right" />
                     </button>
-                    <button className="rr-button-prev rr-button rr-button-2" onClick={prev} aria-label="Previous slide">
+                    <button className="rr-button-prev rr-button rr-button-2" onClick={prev} aria-label="Previous slide" disabled={heroSlides.length <= 1}>
                       <i className="far fa-chevron-left" />
                     </button>
                   </div>
@@ -114,7 +116,7 @@ export default function Agency1Hero() {
                 </div>
                 <div
                   className="hero-section__card card-2"
-                  style={{ backgroundImage: "url(/templates/agency1/imgs/hero/hero-img-3.png)", backgroundSize: "cover", backgroundPosition: "center" }}
+                  style={{ backgroundImage: `url(${heroSlides[2] || "/templates/agency1/imgs/hero/hero-img-3.png"})`, backgroundSize: "cover", backgroundPosition: "center" }}
                 >
                   <div className="sub-title">
                     <span />
@@ -159,7 +161,7 @@ export default function Agency1Hero() {
             <iframe
               width="100%"
               height="100%"
-              src="https://www.youtube.com/embed/8oON21G1Bqg?autoplay=1"
+              src={config.hero.videoUrl}
               allow="autoplay; encrypted-media"
               allowFullScreen
               style={{ border: "none", borderRadius: 12 }}

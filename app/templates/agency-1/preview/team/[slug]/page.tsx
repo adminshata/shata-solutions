@@ -1,33 +1,42 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { useParams } from "next/navigation";
 import Agency1Header from "@/components/templates/agency1/header/Agency1Header";
 import Agency1Footer from "@/components/templates/agency1/footer/Agency1Footer";
 import Agency1Breadcrumb from "@/components/templates/agency1/inner/Agency1Breadcrumb";
-import { agency1Team } from "@/lib/agency1/data";
-
-export function generateStaticParams() {
-  return agency1Team.map((m) => ({ slug: m.slug }));
-}
+import { useAgency1 } from "@/lib/agency1/context";
 
 export default function Agency1TeamDetailsPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const member = agency1Team.find((m) => m.slug === params.slug);
-  if (!member) notFound();
-
-  const others = agency1Team.filter((m) => m.slug !== params.slug).slice(0, 3);
+}: { params: { slug: string } }) {
+  const { config } = useAgency1();
+  const routeParams = useParams<{ slug: string }>();
+  const slug = routeParams?.slug ?? "";
+  const member = config.team.find((m) => m.slug === slug);
+  const others = config.team.filter((m) => m.slug !== slug).slice(0, 3);
 
   return (
     <>
       <Agency1Header />
       <main>
-        <Agency1Breadcrumb title={member.name} subtitle={member.role} />
+        <Agency1Breadcrumb title={member?.name ?? "Not found"} subtitle={member?.role ?? "Team"} />
 
         <section className="section-spacing">
           <div className="container rr-container-1800">
+            {!member ? (
+              <div style={{ background: "#fff", borderRadius: 16, padding: 32 }}>
+                <h2 style={{ fontWeight: 800, marginBottom: 12 }}>Team member not found</h2>
+                <p style={{ color: "#666", lineHeight: 1.7 }}>
+                  This profile doesn&apos;t exist. Return to the team list.
+                </p>
+                <div style={{ marginTop: 20 }}>
+                  <Link href="/templates/agency-1/preview/team" style={{ color: "#F14F44", fontWeight: 700 }}>
+                    ← Back to Team
+                  </Link>
+                </div>
+              </div>
+            ) : (
             <div className="row gy-5">
               <div className="col-xl-4">
                 <div style={{ position: "relative", height: 520, borderRadius: 20, overflow: "hidden", marginBottom: 24 }}>
@@ -80,6 +89,7 @@ export default function Agency1TeamDetailsPage({
                 </Link>
               </div>
             </div>
+            )}
 
             {/* Other team members */}
             <div style={{ marginTop: 80 }}>
