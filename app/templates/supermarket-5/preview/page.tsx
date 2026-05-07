@@ -1,46 +1,29 @@
 "use client";
 
-import { SiteShell } from "@/components/templates/supermarket5/layout/SiteShell";
-import { Header } from "@/components/templates/supermarket5/layout/Header";
-import { Footer } from "@/components/templates/supermarket5/layout/Footer";
-import { CartDrawer } from "@/components/templates/supermarket5/layout/CartDrawer";
+import HeaderFive from "@/components/templates/supermarket5/header/HeaderFive";
+import FooterThree from "@/components/templates/supermarket5/footer/FooterThree";
 import {
-  BannerSlider,
-  CategoryQuickLinks,
-  FeaturesRow,
-  FeaturedProducts,
-  DiscountProducts,
-  WeeklyBestSelling,
-  TrendingProducts,
-  BlogPosts,
-} from "@/components/templates/supermarket5/sections/HomeSections";
-import { useSite } from "@/lib/supermarket5/context";
+  BannerFive,
+  BestSellingWrap,
+  BlogFive,
+  BestDiscount,
+  FeatureCategory,
+  RecentlyAddedTwo,
+  ShortService,
+} from "@/components/templates/supermarket5/home-five/HomeFiveSections";
 
-export default function SupermarketHomePage() {
-  const config = useSite();
-  const sectionMap: Record<string, React.ReactNode> = {
-    features: <FeaturesRow />,
-    featured: <FeaturedProducts />,
-    discount: <DiscountProducts />,
-    weekly: <WeeklyBestSelling />,
-    trending: <TrendingProducts />,
-    blog: <BlogPosts />,
-  };
-
+export default function Supermarket5HomePage() {
   return (
-    <SiteShell>
-      <Header />
-      <main>
-        <BannerSlider />
-        <CategoryQuickLinks />
-        {config.sections
-          .filter((s) => s.active)
-          .map((s) => (
-            <div key={s.id}>{sectionMap[s.id] ?? null}</div>
-          ))}
-      </main>
-      <Footer />
-      <CartDrawer />
-    </SiteShell>
+    <div className="index-five">
+      <HeaderFive />
+      <BannerFive />
+      <FeatureCategory />
+      <BestDiscount />
+      <BestSellingWrap />
+      <RecentlyAddedTwo />
+      <BlogFive />
+      <ShortService />
+      <FooterThree />
+    </div>
   );
 }
