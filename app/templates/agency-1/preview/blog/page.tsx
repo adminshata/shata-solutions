@@ -28,7 +28,7 @@ export default function Agency1BlogPage() {
             <div className="row mb-minus-30">
               {posts.map((post, i) => (
                 <div key={post.id} className={i === 0 ? "col-xl-12" : "col-md-6 col-xl-4"}>
-                  <div className="blog__item" style={{ marginBottom: 30, background: "#fff", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
+                  <div className="blog__item" style={{ display: "block", marginBottom: 30, background: "#fff", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
                     <div className="blog__media rr-ov-hidden" style={{ position: "relative", height: i === 0 ? 440 : 260 }}>
                       <Link href={`/templates/agency-1/preview/blog/${post.slug}`}>
                         <Image src={post.image} alt={post.title} fill style={{ objectFit: "cover" }} />

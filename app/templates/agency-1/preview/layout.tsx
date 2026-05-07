@@ -42,7 +42,7 @@ export default function Agency1Layout({
           visibility: visible !important;
           max-width: none;
         }
-        /* Trexa CSS hides some images by default until hover/JS. Force visible for agency-1 preview. */
+        /* The source template hides some images by default until hover/JS. Force visible for agency-1 preview. */
         main img,
         img[data-nimg] {
           opacity: 1 !important;
