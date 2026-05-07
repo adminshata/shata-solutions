@@ -6,7 +6,7 @@ export function Container({ children, className = "" }: { children: ReactNode; c
 }
 
 const BADGE_STYLES: Record<string, string> = {
-  sale: "bg-red-500 text-white",
+  sale: "bg-red-600 text-white",
   new: "bg-[#1D6CE3] text-white",
   hot: "bg-orange-500 text-white",
   organic: "bg-emerald-600 text-white",

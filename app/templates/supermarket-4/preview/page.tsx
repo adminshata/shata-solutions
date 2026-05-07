@@ -1,46 +1,33 @@
 "use client";
 
-import { SiteShell } from "@/components/templates/supermarket4/layout/SiteShell";
-import { Header } from "@/components/templates/supermarket4/layout/Header";
-import { Footer } from "@/components/templates/supermarket4/layout/Footer";
-import { CartDrawer } from "@/components/templates/supermarket4/layout/CartDrawer";
+import HeaderFour from "@/components/templates/supermarket4/header/HeaderFour";
+import FooterOne from "@/components/templates/supermarket4/footer/FooterOne";
 import {
-  BannerSlider,
-  CategoryQuickLinks,
-  FeaturesRow,
-  FeaturedProducts,
-  DiscountProducts,
-  WeeklyBestSelling,
-  TrendingProducts,
-  BlogPosts,
-} from "@/components/templates/supermarket4/sections/HomeSections";
-import { useSite } from "@/lib/supermarket4/context";
+  BannerFour,
+  BestSellingWrap,
+  BlogFour,
+  FeatureCategory,
+  FeatureDiscount,
+  LessDiscount,
+  LessDiscountTwo,
+  RecentlyAdded,
+  ShortService,
+} from "@/components/templates/supermarket4/home-four/HomeFourSections";
 
-export default function SupermarketHomePage() {
-  const config = useSite();
-  const sectionMap: Record<string, React.ReactNode> = {
-    features: <FeaturesRow />,
-    featured: <FeaturedProducts />,
-    discount: <DiscountProducts />,
-    weekly: <WeeklyBestSelling />,
-    trending: <TrendingProducts />,
-    blog: <BlogPosts />,
-  };
-
+export default function Supermarket4HomePage() {
   return (
-    <SiteShell>
-      <Header />
-      <main>
-        <BannerSlider />
-        <CategoryQuickLinks />
-        {config.sections
-          .filter((s) => s.active)
-          .map((s) => (
-            <div key={s.id}>{sectionMap[s.id] ?? null}</div>
-          ))}
-      </main>
-      <Footer />
-      <CartDrawer />
-    </SiteShell>
+    <div className="index-bg-gray">
+      <HeaderFour />
+      <BannerFour />
+      <FeatureCategory />
+      <BestSellingWrap />
+      <FeatureDiscount />
+      <LessDiscount />
+      <LessDiscountTwo />
+      <RecentlyAdded />
+      <BlogFour />
+      <ShortService />
+      <FooterOne />
+    </div>
   );
 }

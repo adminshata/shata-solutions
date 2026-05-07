@@ -2,13 +2,13 @@
 
 import type { ItemsManagerSchema } from "@/components/templates/shared/items-manager";
 import { ensureUniqueHandle, makeId, slugify } from "@/components/templates/shared/items-manager";
-import type { Product, SiteConfig } from "./types";
+import type { SiteConfig, StoreProduct } from "./types";
 import { formatPrice } from "./utils";
 
 export function buildProductsSchema(args: {
   config: SiteConfig;
   imagePool: string[];
-}): ItemsManagerSchema<Product> {
+}): ItemsManagerSchema<StoreProduct> {
   const { config, imagePool } = args;
 
   return {
@@ -17,7 +17,7 @@ export function buildProductsSchema(args: {
       entityPlural: "products",
       addLabel: "Add product",
       emptyTitle: "No products yet.",
-      emptyCopy: "Add your first product. You can change it any time.",
+      emptyCopy: "Add your first OrangeMart product.",
     },
     fields: {
       category: true,
@@ -29,97 +29,99 @@ export function buildProductsSchema(args: {
       featured: true,
       active: true,
     },
-    categories: config.categories.map((c) => ({ handle: c.handle, label: c.name })),
+    categories: config.categories.map((category) => ({
+      handle: category.handle,
+      label: category.name,
+    })),
     badgeOptions: [
-      { value: "", label: "— None —" },
-      { value: "new", label: "New" },
+      { value: "", label: "None" },
       { value: "sale", label: "Sale" },
+      { value: "new", label: "New" },
       { value: "hot", label: "Hot" },
       { value: "organic", label: "Organic" },
     ],
     imagePool,
     createNew: () => {
-      const id = makeId("prod");
       const name = "New product";
       return {
-        id,
+        id: makeId("prod"),
         handle: ensureUniqueHandle(slugify(name), config.products),
         name,
         shortDescription: "",
         description: "",
         category: config.categories[0]?.handle ?? "",
-        price: 0,
         images: [],
+        badge: null,
         featured: false,
         active: true,
-        badge: null,
+        price: 0,
         unit: "each",
+        stock: 0,
+        rating: 4.8,
       };
     },
-    formatPriceForList: (p) => formatPrice(p.price),
-    renderExtras: (p, patch) => <ProductExtrasFields product={p} patch={patch} />,
-  };
-}
-
-function ProductExtrasFields({
-  product,
-  patch,
-}: {
-  product: Product;
-  patch: (delta: Partial<Product>) => void;
-}) {
-  return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Compare-at price (USD)" hint="Original price; renders as crossed-out.">
+    formatPriceForList: (product) => formatPrice(product.price),
+    renderExtras: (product, patch) => (
+      <div className="grid gap-4 md:grid-cols-2">
+        <Field label="Compare price">
           <input
             type="number"
+            min={0}
             step="0.01"
             value={product.compareAtPrice ? (product.compareAtPrice / 100).toString() : ""}
-            onChange={(e) => {
-              const raw = e.target.value;
-              if (raw === "") patch({ compareAtPrice: undefined });
-              else patch({ compareAtPrice: Math.round(Number(raw) * 100) });
+            onChange={(event) => {
+              const raw = event.target.value;
+              patch({ compareAtPrice: raw === "" ? undefined : Math.round(Number(raw) * 100) });
             }}
-            placeholder="—"
-            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-[#EA580C]"
+            className={inputCls}
           />
         </Field>
-
-        <Field label="Unit" hint='e.g. "kg", "500g", "each"'>
+        <Field label="Unit">
           <input
-            type="text"
             value={product.unit ?? ""}
-            onChange={(e) => patch({ unit: e.target.value || undefined })}
-            placeholder="each"
-            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-[#EA580C]"
+            onChange={(event) => patch({ unit: event.target.value || undefined })}
+            className={inputCls}
           />
         </Field>
-
-        <Field label="Stock" hint="Optional inventory count.">
+        <Field label="Stock">
           <input
             type="number"
             min={0}
             value={product.stock ?? ""}
-            onChange={(e) => {
-              const raw = e.target.value;
+            onChange={(event) => {
+              const raw = event.target.value;
               patch({ stock: raw === "" ? undefined : Math.max(0, Number(raw)) });
             }}
-            placeholder="—"
-            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white outline-none focus:border-[#EA580C]"
+            className={inputCls}
+          />
+        </Field>
+        <Field label="Rating">
+          <input
+            type="number"
+            min={0}
+            max={5}
+            step={0.1}
+            value={product.rating ?? ""}
+            onChange={(event) => {
+              const raw = event.target.value;
+              patch({ rating: raw === "" ? undefined : Math.min(5, Math.max(0, Number(raw))) });
+            }}
+            className={inputCls}
           />
         </Field>
       </div>
-    </div>
-  );
+    ),
+  };
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+const inputCls =
+  "w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-base text-white outline-none focus:border-[#F97316]";
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-white/55">{label}</span>
-      <span className="mt-1 block">{children}</span>
-      {hint && <span className="mt-1 block text-[10px] text-white/40">{hint}</span>}
+      <span className="mb-1 block text-sm font-semibold text-white/75">{label}</span>
+      {children}
     </label>
   );
 }

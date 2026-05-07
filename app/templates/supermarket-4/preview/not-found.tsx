@@ -23,13 +23,13 @@ export default function NotFound() {
             <Link
               href={BASE_PATH}
               className="rounded px-6 py-3 text-sm font-bold text-white"
-              style={{ background: "#EA580C" }}
+              style={{ background: "#F97316" }}
             >
               Go Home
             </Link>
             <Link
               href={`${BASE_PATH}/shop`}
-              className="rounded border border-gray-300 px-6 py-3 text-sm font-bold text-gray-700 hover:border-[#EA580C] hover:text-[#EA580C] transition-colors"
+              className="rounded border border-gray-300 px-6 py-3 text-sm font-bold text-gray-700 hover:border-[#F97316] hover:text-[#F97316] transition-colors"
             >
               Browse Shop
             </Link>

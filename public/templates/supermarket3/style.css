@@ -54,7 +54,7 @@
   --color-heading-1: #2C3C28;
   --color-white: #fff;
   --color-success: #3EB75E;
-  --color-danger: #DC2626;
+  --color-danger: #1D6CE3;
   --color-warning: #FF8F3C;
   --color-info: #1BA2DB;
   --color-facebook: #3B5997;
@@ -21804,7 +21804,7 @@ body.modal-open {
 }
 
 .bottom-content-deals .single-progress-area-incard .progress .progress-bar {
-  background: #DC2626;
+  background: #1D6CE3;
 }
 
 .counter-area-main-wrapper {
@@ -24738,7 +24738,7 @@ body.modal-open {
 }
 
 .single-vendor-area .title span.closed {
-  background: #DC2626;
+  background: #1D6CE3;
 }
 
 .single-vendor-area .stars-area {

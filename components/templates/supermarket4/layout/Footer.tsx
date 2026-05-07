@@ -13,20 +13,20 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* Col 1: About */}
           <div>
-            <h3 className="text-lg font-bold mb-4" style={{ color: "#EA580C" }}>{config.logo.text}</h3>
+            <h3 className="text-lg font-bold mb-4" style={{ color: "#F97316" }}>{config.logo.text}</h3>
             <p className="text-sm text-gray-600 mb-4 leading-relaxed">
               Your neighborhood fresh grocery store. We bring quality produce, meats, and everyday essentials right to your table.
             </p>
             <div className="space-y-2">
               <div className="flex items-start gap-2 text-sm text-gray-600">
-                <svg className="h-4 w-4 mt-0.5 shrink-0 text-[#EA580C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <svg className="h-4 w-4 mt-0.5 shrink-0 text-[#F97316]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.29 6.29l1.42-1.42a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                 </svg>
                 {config.contact.phone}
               </div>
               {config.contact.phone2 && (
                 <div className="flex items-start gap-2 text-sm text-gray-600">
-                  <svg className="h-4 w-4 mt-0.5 shrink-0 text-[#EA580C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <svg className="h-4 w-4 mt-0.5 shrink-0 text-[#F97316]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.29 6.29l1.42-1.42a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                   </svg>
                   {config.contact.phone2}
@@ -34,7 +34,7 @@ export function Footer() {
               )}
               {config.contact.hours && (
                 <div className="flex items-start gap-2 text-sm text-gray-600">
-                  <svg className="h-4 w-4 mt-0.5 shrink-0 text-[#EA580C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <svg className="h-4 w-4 mt-0.5 shrink-0 text-[#F97316]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                     <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
                   </svg>
                   {config.contact.hours}
@@ -49,7 +49,7 @@ export function Footer() {
             <ul className="space-y-2">
               {["Delivery Info", "Privacy Policy", "Terms & Conditions", "Customer Support", "Careers"].map((item) => (
                 <li key={item}>
-                  <Link href="#" className="text-sm text-gray-600 hover:text-[#EA580C] transition-colors flex items-center gap-1">
+                  <Link href="#" className="text-sm text-gray-600 hover:text-[#F97316] transition-colors flex items-center gap-1">
                     <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                       <path d="M9 18l6-6-6-6" />
                     </svg>
@@ -68,7 +68,7 @@ export function Footer() {
                 <li key={cat.id}>
                   <Link
                     href={`${BASE_PATH}/categories/${cat.handle}`}
-                    className="text-sm text-gray-600 hover:text-[#EA580C] transition-colors flex items-center gap-1"
+                    className="text-sm text-gray-600 hover:text-[#F97316] transition-colors flex items-center gap-1"
                   >
                     <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                       <path d="M9 18l6-6-6-6" />
@@ -88,12 +88,12 @@ export function Footer() {
               <input
                 type="email"
                 placeholder="Your email..."
-                className="flex-1 rounded border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[#EA580C]"
+                className="flex-1 rounded border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[#F97316]"
               />
               <button
                 type="submit"
                 className="rounded px-3 py-2 text-white text-sm font-semibold shrink-0"
-                style={{ background: "#EA580C" }}
+                style={{ background: "#F97316" }}
               >
                 Subscribe
               </button>
@@ -117,7 +117,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:border-[#EA580C] hover:text-[#EA580C] transition-colors"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:border-[#F97316] hover:text-[#F97316] transition-colors"
                 >
                   <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                     {s.icon}

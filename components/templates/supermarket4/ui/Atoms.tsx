@@ -6,8 +6,8 @@ export function Container({ children, className = "" }: { children: ReactNode; c
 }
 
 const BADGE_STYLES: Record<string, string> = {
-  sale: "bg-red-500 text-white",
-  new: "bg-[#EA580C] text-white",
+  sale: "bg-red-600 text-white",
+  new: "bg-[#F97316] text-white",
   hot: "bg-orange-500 text-white",
   organic: "bg-emerald-600 text-white",
 };
@@ -52,7 +52,7 @@ export function Quantity({
       <button
         type="button"
         onClick={() => onChange(Math.max(0, value - 1))}
-        className="px-2.5 py-1 text-sm font-bold text-[#EA580C] hover:bg-[#f3f4f6]"
+        className="px-2.5 py-1 text-sm font-bold text-[#F97316] hover:bg-[#f3f4f6]"
       >
         −
       </button>
@@ -60,7 +60,7 @@ export function Quantity({
       <button
         type="button"
         onClick={() => onChange(value + 1)}
-        className="px-2.5 py-1 text-sm font-bold text-[#EA580C] hover:bg-[#f3f4f6]"
+        className="px-2.5 py-1 text-sm font-bold text-[#F97316] hover:bg-[#f3f4f6]"
       >
         +
       </button>

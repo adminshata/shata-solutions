@@ -71,7 +71,7 @@ export function FeaturesRow() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {FEATURES.map((f) => (
             <div key={f.title} className="flex flex-col items-center text-center gap-2 p-4">
-              <div className="text-[#EA580C]">{f.icon}</div>
+              <div className="text-[#F97316]">{f.icon}</div>
               <h3 className="text-sm font-bold text-gray-800">{f.title}</h3>
               <p className="text-xs text-gray-500">{f.copy}</p>
             </div>
@@ -124,7 +124,7 @@ export function BannerSlider() {
           <Link
             href={slide.href}
             className="inline-block rounded px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-105"
-            style={{ background: "#EA580C" }}
+            style={{ background: "#F97316" }}
           >
             {slide.cta} →
           </Link>
@@ -160,13 +160,13 @@ export function CategoryQuickLinks() {
             <Link
               key={cat.id}
               href={`${BASE_PATH}/categories/${cat.handle}`}
-              className="flex flex-col items-center gap-2 py-4 px-2 hover:bg-[#EA580C]/5 transition-colors"
+              className="flex flex-col items-center gap-2 py-4 px-2 hover:bg-[#F97316]/5 transition-colors"
             >
               <div className="relative h-10 w-10 rounded-full overflow-hidden bg-gray-100">
                 {cat.image ? (
                   <Image src={cat.image} alt={cat.name} fill className="object-cover" sizes="40px" unoptimized />
                 ) : (
-                  <div className="h-full w-full bg-[#EA580C]/20 flex items-center justify-center text-[#EA580C] text-xs font-bold">
+                  <div className="h-full w-full bg-[#F97316]/20 flex items-center justify-center text-[#F97316] text-xs font-bold">
                     {cat.name[0]}
                   </div>
                 )}
@@ -193,7 +193,7 @@ export function FeaturedProducts() {
       <div className="container mx-auto px-4">
         <div className="flex items-end justify-between mb-6">
           <SectionTitle title="Featured Products" subtitle="Hand-picked for you" />
-          <Link href={`${BASE_PATH}/shop`} className="text-sm font-semibold hover:underline" style={{ color: "#EA580C" }}>
+          <Link href={`${BASE_PATH}/shop`} className="text-sm font-semibold hover:underline" style={{ color: "#F97316" }}>
             View All →
           </Link>
         </div>
@@ -220,7 +220,7 @@ export function DiscountProducts() {
       <div className="container mx-auto px-4">
         <div className="flex items-end justify-between mb-6">
           <SectionTitle title="Up to 30% Off" subtitle="Limited time discount products" />
-          <Link href={`${BASE_PATH}/shop`} className="text-sm font-semibold hover:underline" style={{ color: "#EA580C" }}>
+          <Link href={`${BASE_PATH}/shop`} className="text-sm font-semibold hover:underline" style={{ color: "#F97316" }}>
             View All →
           </Link>
         </div>
@@ -258,7 +258,7 @@ export function WeeklyBestSelling() {
                 className="rounded-full border px-4 py-1.5 text-xs font-semibold transition-colors"
                 style={
                   activeCat === cat.handle
-                    ? { background: "#EA580C", color: "#fff", borderColor: "#EA580C" }
+                    ? { background: "#F97316", color: "#fff", borderColor: "#F97316" }
                     : { background: "transparent", color: "#6b7280", borderColor: "#e5e7eb" }
                 }
               >
@@ -291,7 +291,7 @@ export function TrendingProducts() {
       <div className="container mx-auto px-4">
         <div className="flex items-end justify-between mb-6">
           <SectionTitle title="Trending Products" subtitle="Most loved by customers" />
-          <Link href={`${BASE_PATH}/shop`} className="text-sm font-semibold hover:underline" style={{ color: "#EA580C" }}>
+          <Link href={`${BASE_PATH}/shop`} className="text-sm font-semibold hover:underline" style={{ color: "#F97316" }}>
             View All →
           </Link>
         </div>
@@ -345,7 +345,7 @@ export function BlogPosts() {
       <div className="container mx-auto px-4">
         <div className="flex items-end justify-between mb-6">
           <SectionTitle title="From Our Blog" subtitle="Tips, recipes, and grocery guides" />
-          <Link href="#" className="text-sm font-semibold hover:underline" style={{ color: "#EA580C" }}>
+          <Link href="#" className="text-sm font-semibold hover:underline" style={{ color: "#F97316" }}>
             All Articles →
           </Link>
         </div>
@@ -362,7 +362,7 @@ export function BlogPosts() {
                   unoptimized
                 />
                 <div className="absolute top-3 left-3">
-                  <span className="rounded px-2 py-1 text-[10px] font-bold text-white" style={{ background: "#EA580C" }}>
+                  <span className="rounded px-2 py-1 text-[10px] font-bold text-white" style={{ background: "#F97316" }}>
                     {post.category}
                   </span>
                 </div>
@@ -371,7 +371,7 @@ export function BlogPosts() {
                 <div className="text-[11px] text-gray-400 mb-1">{post.date}</div>
                 <h3 className="text-sm font-bold text-gray-800 mb-2 line-clamp-2 leading-snug">{post.title}</h3>
                 <p className="text-xs text-gray-500 line-clamp-2 mb-3">{post.excerpt}</p>
-                <Link href="#" className="text-xs font-bold hover:underline" style={{ color: "#EA580C" }}>
+                <Link href="#" className="text-xs font-bold hover:underline" style={{ color: "#F97316" }}>
                   Read More →
                 </Link>
               </div>

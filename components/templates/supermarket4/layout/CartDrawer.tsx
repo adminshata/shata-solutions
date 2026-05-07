@@ -68,7 +68,7 @@ export function CartDrawer() {
                 href={`${BASE_PATH}/shop`}
                 onClick={cart.closeDrawer}
                 className="rounded px-5 py-2.5 text-sm font-semibold text-white"
-                style={{ background: "#EA580C" }}
+                style={{ background: "#F97316" }}
               >
                 Browse the shop
               </Link>
@@ -96,7 +96,7 @@ export function CartDrawer() {
                         <Link
                           href={`${BASE_PATH}/shop/${product.handle}`}
                           onClick={cart.closeDrawer}
-                          className="text-sm font-semibold text-gray-800 hover:text-[#EA580C] line-clamp-2"
+                          className="text-sm font-semibold text-gray-800 hover:text-[#F97316] line-clamp-2"
                         >
                           {product.name}
                         </Link>
@@ -115,7 +115,7 @@ export function CartDrawer() {
                       )}
                       <div className="flex items-center justify-between mt-1">
                         <Quantity value={line.quantity} onChange={(q) => cart.update(sig, q)} />
-                        <span className="text-sm font-bold" style={{ color: "#EA580C" }}>
+                        <span className="text-sm font-bold" style={{ color: "#F97316" }}>
                           {formatPrice(product.price * line.quantity)}
                         </span>
                       </div>
@@ -140,14 +140,14 @@ export function CartDrawer() {
                 href={`${BASE_PATH}/checkout`}
                 onClick={cart.closeDrawer}
                 className="block w-full rounded py-3 text-center text-sm font-bold text-white"
-                style={{ background: "#EA580C" }}
+                style={{ background: "#F97316" }}
               >
                 Checkout →
               </Link>
               <Link
                 href={`${BASE_PATH}/cart`}
                 onClick={cart.closeDrawer}
-                className="block w-full rounded border border-gray-200 bg-white py-2.5 text-center text-sm font-semibold text-gray-700 hover:border-[#EA580C] hover:text-[#EA580C] transition-colors"
+                className="block w-full rounded border border-gray-200 bg-white py-2.5 text-center text-sm font-semibold text-gray-700 hover:border-[#F97316] hover:text-[#F97316] transition-colors"
               >
                 View Cart
               </Link>

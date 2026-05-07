@@ -4,12 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/lib/supermarket4/context";
 import { formatPrice, lineSignature } from "@/lib/supermarket4/utils";
-import type { Product } from "@/lib/supermarket4/types";
+import type { StoreProduct } from "@/lib/supermarket4/types";
 import { Badge } from "../ui/Atoms";
 
 const BASE_PATH = "/templates/supermarket-4/preview";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product }: { product: StoreProduct }) {
   const cart = useCart();
   const sig = lineSignature(product.id);
   const inCart = cart.cart.lines.find((l) => lineSignature(l.productId) === sig);
@@ -53,7 +53,7 @@ export function ProductCard({ product }: { product: Product }) {
             <button
               type="button"
               onClick={handleAdd}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md text-[#EA580C] hover:bg-[#EA580C] hover:text-white transition-colors"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-md text-[#F97316] hover:bg-[#F97316] hover:text-white transition-colors"
               title="Add to cart"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -82,7 +82,7 @@ export function ProductCard({ product }: { product: Product }) {
         )}
         <Link
           href={`${BASE_PATH}/shop/${product.handle}`}
-          className="block text-sm font-semibold text-gray-800 hover:text-[#EA580C] line-clamp-2 leading-snug"
+          className="block text-sm font-semibold text-gray-800 hover:text-[#F97316] line-clamp-2 leading-snug"
         >
           {product.name}
         </Link>
@@ -90,7 +90,7 @@ export function ProductCard({ product }: { product: Product }) {
           <div className="text-[11px] text-gray-400 mt-0.5">{product.unit}</div>
         )}
         <div className="mt-2 flex items-center gap-2">
-          <span className="text-base font-bold" style={{ color: "#EA580C" }}>
+          <span className="text-base font-bold" style={{ color: "#F97316" }}>
             {formatPrice(product.price)}
           </span>
           {product.compareAtPrice && (
@@ -109,8 +109,8 @@ export function ProductCard({ product }: { product: Product }) {
           className="w-full rounded border py-2 text-xs font-bold uppercase tracking-wider transition-colors"
           style={
             inCart
-              ? { background: "#EA580C", color: "#fff", borderColor: "#EA580C" }
-              : { background: "transparent", color: "#EA580C", borderColor: "#EA580C" }
+              ? { background: "#F97316", color: "#fff", borderColor: "#F97316" }
+              : { background: "transparent", color: "#F97316", borderColor: "#F97316" }
           }
         >
           {inCart ? `In cart (${inCart.quantity})` : "+ Add to Cart"}

@@ -1,151 +1,49 @@
 "use client";
-
-import Image from "next/image";
+import HeaderTwo from "@/components/templates/supermarket4/header/HeaderTwo";
+import FooterTwo from "@/components/templates/supermarket4/footer/FooterTwo";
+import BackToTop from "@/components/templates/supermarket4/common/BackToTop";
 import Link from "next/link";
-import { SiteShell } from "@/components/templates/supermarket4/layout/SiteShell";
-import { Header } from "@/components/templates/supermarket4/layout/Header";
-import { Footer } from "@/components/templates/supermarket4/layout/Footer";
-import { CartDrawer } from "@/components/templates/supermarket4/layout/CartDrawer";
-import { useSite } from "@/lib/supermarket4/context";
-
 const BASE_PATH = "/templates/supermarket-4/preview";
-const BASE_IMG = "/templates/supermarket4";
-
-const STATS = [
-  { label: "Products", value: "5,000+" },
-  { label: "Happy Customers", value: "120K+" },
-  { label: "Store Locations", value: "48" },
-  { label: "Years in Business", value: "15+" },
-];
-
-const TEAM = [
-  { name: "Sarah Johnson", role: "Founder & CEO", img: `${BASE_IMG}/feature/01.jpg` },
-  { name: "Michael Chen", role: "Head of Operations", img: `${BASE_IMG}/feature/02.jpg` },
-  { name: "Emma Williams", role: "Head of Purchasing", img: `${BASE_IMG}/feature/03.jpg` },
-];
-
-export default function AboutPage() {
-  const config = useSite();
+export default function Page() {
   return (
-    <SiteShell>
-      <Header />
-      <main style={{ background: "#F3F4F6" }}>
-        {/* Banner */}
-        <div style={{ background: "#EA580C" }} className="py-10">
-          <div className="container mx-auto px-4">
-            <nav className="flex items-center gap-1 text-xs text-white/70 mb-2">
-              <Link href={BASE_PATH} className="hover:text-white">Home</Link>
-              <span>/</span>
-              <span className="text-white font-medium">About</span>
-            </nav>
-            <h1 className="text-3xl font-extrabold text-white">About {config.name}</h1>
+    <div className="demo-one">
+      <HeaderTwo />
+      <div className="rts-navigation-area-breadcrumb bg_light-1">
+        <div className="container"><div className="row"><div className="col-lg-12">
+          <div className="navigator-breadcrumb-wrapper">
+            <Link href={BASE_PATH}>Home</Link>
+            <i className="fa-regular fa-chevron-right" />
+            <a className="current" href="#">About Us</a>
+          </div>
+        </div></div></div>
+      </div>
+      <div className="rts-section-gap">
+        <div className="container">
+          <div className="row g-5 align-items-center">
+            <div className="col-lg-6">
+              <img src="/templates/supermarket4/banner/01.webp" alt="about" style={{ width: '100%', borderRadius: 12 }} />
+            </div>
+            <div className="col-lg-6">
+              <span style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: 14 }}>About OrangeMart</span>
+              <h2 style={{ marginBottom: 20 }}>Fresh Groceries Delivered to Your Door</h2>
+              <p style={{ color: '#666', lineHeight: 1.8, marginBottom: 20 }}>OrangeMart is your premium online grocery destination, bringing the freshest produce, finest meats, and everyday essentials right to your doorstep. Founded with a vision to make healthy eating accessible, we partner with local farms and trusted vendors.</p>
+              <p style={{ color: '#666', lineHeight: 1.8, marginBottom: 32 }}>We believe in quality, freshness, and convenience. Our team works around the clock to ensure your orders are picked fresh and delivered on time.</p>
+              <div className="row g-4">
+                {[{num:"10+",label:"Years Experience"},{num:"500+",label:"Products"},{num:"50K+",label:"Happy Customers"},{num:"200+",label:"Vendors"}].map((s,i) => (
+                  <div key={i} className="col-6">
+                    <div style={{ textAlign: 'center', padding: 20, background: '#f9fafb', borderRadius: 8 }}>
+                      <h3 style={{ color: 'var(--color-primary)', margin: '0 0 4px' }}>{s.num}</h3>
+                      <p style={{ margin: 0, color: '#666', fontSize: 13 }}>{s.label}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Intro */}
-        <section className="py-14">
-          <div className="container mx-auto px-4">
-            <div className="grid gap-10 lg:grid-cols-2 items-center">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-[#EA580C]">Our Story</span>
-                <h2 className="mt-2 text-3xl font-extrabold text-gray-800">
-                  Bringing Fresh Quality to Your Table
-                </h2>
-                <p className="mt-4 text-gray-600 leading-relaxed">
-                  {config.name} was founded with a simple mission: deliver the freshest produce, meats, and everyday
-                  essentials at the best prices. We source directly from local farms and trusted suppliers to ensure
-                  every product on our shelves meets the highest quality standards.
-                </p>
-                <p className="mt-3 text-gray-600 leading-relaxed">
-                  From our first store in Fresh City to our growing network of locations, we have always put our
-                  customers first. Our team works tirelessly to ensure your shopping experience is seamless, whether
-                  in-store or online.
-                </p>
-                <Link
-                  href={`${BASE_PATH}/shop`}
-                  className="mt-6 inline-flex items-center gap-2 rounded px-5 py-2.5 text-sm font-bold text-white"
-                  style={{ background: "#EA580C" }}
-                >
-                  Shop Now
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              </div>
-              <div className="relative h-72 md:h-96 rounded overflow-hidden">
-                <Image
-                  src={`${BASE_IMG}/banner/01.jpg`}
-                  alt="Our store"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width:1024px) 100vw, 50vw"
-                  unoptimized
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Stats */}
-        <section className="py-10 bg-white border-y border-gray-200">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-              {STATS.map((s) => (
-                <div key={s.label} className="text-center">
-                  <div className="text-4xl font-extrabold" style={{ color: "#EA580C" }}>{s.value}</div>
-                  <div className="mt-1 text-sm text-gray-500">{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Team */}
-        <section className="py-14">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-8">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#EA580C]">Our People</span>
-              <h2 className="mt-2 text-2xl font-extrabold text-gray-800">Meet the Team</h2>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-3 max-w-3xl mx-auto">
-              {TEAM.map((m) => (
-                <div key={m.name} className="bg-white rounded border border-gray-100 text-center p-4 hover:shadow-md transition-shadow">
-                  <div className="relative h-32 w-32 rounded-full overflow-hidden mx-auto mb-3 bg-gray-100">
-                    <Image src={m.img} alt={m.name} fill className="object-cover" sizes="128px" unoptimized />
-                  </div>
-                  <div className="font-bold text-gray-800">{m.name}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{m.role}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Features */}
-        <section className="py-14 bg-white border-t border-gray-100">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-extrabold text-gray-800">Why Shop With Us?</h2>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                { title: "Fresh Daily", copy: "Products sourced and stocked every morning from local farms.", icon: "🌿" },
-                { title: "Best Prices", copy: "We guarantee competitive pricing on every single product.", icon: "💰" },
-                { title: "Fast Delivery", copy: "Free delivery on orders over $50, same-day options available.", icon: "🚚" },
-                { title: "Quality Assured", copy: "Every product meets our strict quality and freshness standards.", icon: "✅" },
-              ].map((f) => (
-                <div key={f.title} className="border border-gray-100 rounded p-5 text-center hover:border-[#EA580C]/30 hover:shadow-sm transition-all">
-                  <div className="text-3xl mb-3">{f.icon}</div>
-                  <h3 className="font-bold text-gray-800 mb-1">{f.title}</h3>
-                  <p className="text-xs text-gray-500 leading-relaxed">{f.copy}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
-      <Footer />
-      <CartDrawer />
-    </SiteShell>
+      </div>
+      <FooterTwo />
+      <BackToTop />
+    </div>
   );
 }

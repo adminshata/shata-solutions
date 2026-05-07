@@ -54,7 +54,7 @@
   --color-heading-1: #2C3C28;
   --color-white: #fff;
   --color-success: #3EB75E;
-  --color-danger: #DC2626;
+  --color-danger: #F97316;
   --color-warning: #FF8F3C;
   --color-info: #1BA2DB;
   --color-facebook: #3B5997;
@@ -17225,11 +17225,11 @@ li.with-megamenu:hover .rts-megamenu {
   padding: 2px;
 }
 
-.home-blue .progress-wrap svg.progress-circle path {
+.home-orange .progress-wrap svg.progress-circle path {
   stroke: var(--color-primary-2);
 }
 
-.home-blue .progress-wrap::after {
+.home-orange .progress-wrap::after {
   border-color: var(--color-primary-2);
   box-shadow: 0px 3px 20px 6px rgba(7, 66, 233, 0.3215686275);
   color: var(--color-primary-2);
@@ -20390,55 +20390,55 @@ li.with-megamenu:hover .rts-megamenu {
   }
 }
 
-.bg_blue-footer {
+.bg_orange-footer {
   background: #25332C;
 }
 
-.bg_blue-footer .single-footer-wized .footer-title {
+.bg_orange-footer .single-footer-wized .footer-title {
   color: #fff;
 }
 
-.bg_blue-footer .single-footer-wized .call-area .info span {
+.bg_orange-footer .single-footer-wized .call-area .info span {
   color: #C5CBC8;
 }
 
-.bg_blue-footer .single-footer-wized .call-area .icon {
+.bg_orange-footer .single-footer-wized .call-area .icon {
   background: #fff;
 }
 
-.bg_blue-footer .single-footer-wized .opening-hour .single p span {
+.bg_orange-footer .single-footer-wized .opening-hour .single p span {
   color: #C5CBC8;
 }
 
-.bg_blue-footer .single-footer-wized .footer-nav ul li a {
+.bg_orange-footer .single-footer-wized .footer-nav ul li a {
   color: #C5CBC8;
 }
 
-.bg_blue-footer .single-footer-wized p.disc-news-letter {
+.bg_orange-footer .single-footer-wized p.disc-news-letter {
   color: #C5CBC8;
 }
 
-.bg_blue-footer .single-footer-wized p.dsic {
+.bg_orange-footer .single-footer-wized p.dsic {
   color: #C5CBC8;
 }
 
-.bg_blue-footer .social-and-payment-area-wrapper {
+.bg_orange-footer .social-and-payment-area-wrapper {
   border-top: 1px solid #3A443F;
 }
 
-.bg_blue-footer .social-one-wrapper span {
+.bg_orange-footer .social-one-wrapper span {
   color: #fff;
 }
 
-.bg_blue-footer .single-footer-wized .opening-hour .single p {
+.bg_orange-footer .single-footer-wized .opening-hour .single p {
   color: #74787C !important;
 }
 
-.bg_blue-footer .social-and-payment-area-wrapper .payment-access span {
+.bg_orange-footer .social-and-payment-area-wrapper .payment-access span {
   color: #fff;
 }
 
-.bg_blue-footer .single-footer-wized .footersubscribe-form input {
+.bg_orange-footer .single-footer-wized .footersubscribe-form input {
   color: #fff;
 }
 
@@ -21804,7 +21804,7 @@ body.modal-open {
 }
 
 .bottom-content-deals .single-progress-area-incard .progress .progress-bar {
-  background: #DC2626;
+  background: #F97316;
 }
 
 .counter-area-main-wrapper {
@@ -24738,7 +24738,7 @@ body.modal-open {
 }
 
 .single-vendor-area .title span.closed {
-  background: #DC2626;
+  background: #F97316;
 }
 
 .single-vendor-area .stars-area {
@@ -26375,7 +26375,7 @@ header.header-three .sub-dropdown .submenu.third-lvl.base {
   background: #000;
 }
 
-.rts-product-details-section .details-product-area .action-item2 .color-item2 .color.blue {
+.rts-product-details-section .details-product-area .action-item2 .color-item2 .color.orange {
   background: #0084ff;
 }
 

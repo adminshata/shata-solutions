@@ -50,7 +50,7 @@ export function Header() {
     <header className={`w-full z-50 ${sticky ? "sticky top-0 shadow-md" : ""}`} style={{ background: "#fff" }}>
       {/* Layer 1 — Top bar */}
       {config.announcement.active && (
-        <div style={{ background: "#EA580C" }} className="text-white">
+        <div style={{ background: "#F97316" }} className="text-white">
           <div className="container mx-auto px-4 py-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-3 flex-wrap justify-center">
               <span className="font-medium">Get up to 30% off on your first $150 purchase</span>
@@ -81,7 +81,7 @@ export function Header() {
           {/* Left */}
           <div className="hidden lg:flex items-center gap-4 text-xs text-gray-500 flex-none">
             <span className="flex items-center gap-1">
-              <svg className="h-4 w-4 text-[#EA580C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <svg className="h-4 w-4 text-[#F97316]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path d="M1 3h15v13H1z" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
               </svg>
               Free delivery over $50
@@ -90,7 +90,7 @@ export function Header() {
 
           {/* Logo */}
           <Link href={BASE_PATH} className="flex-1 lg:flex-none flex justify-center lg:justify-start">
-            <span className="text-2xl font-extrabold tracking-tight" style={{ color: "#EA580C" }}>
+            <span className="text-2xl font-extrabold tracking-tight" style={{ color: "#F97316" }}>
               {config.logo.text}
             </span>
           </Link>
@@ -101,12 +101,12 @@ export function Header() {
               <input
                 type="text"
                 placeholder="Search for products..."
-                className="w-full rounded border border-gray-200 bg-gray-50 py-2.5 pl-4 pr-12 text-sm outline-none focus:border-[#EA580C] focus:ring-1 focus:ring-[#EA580C]"
+                className="w-full rounded border border-gray-200 bg-gray-50 py-2.5 pl-4 pr-12 text-sm outline-none focus:border-[#F97316] focus:ring-1 focus:ring-[#F97316]"
               />
               <button
                 type="button"
                 className="absolute inset-y-0 right-0 flex items-center justify-center rounded-r px-4 text-white"
-                style={{ background: "#EA580C" }}
+                style={{ background: "#F97316" }}
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <circle cx="11" cy="11" r="7" /><path d="m20 20-3-3" />
@@ -128,7 +128,7 @@ export function Header() {
             </button>
 
             {/* Wishlist */}
-            <button type="button" className="relative p-2 text-gray-600 hover:text-[#EA580C] transition-colors">
+            <button type="button" className="relative p-2 text-gray-600 hover:text-[#F97316] transition-colors">
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
               </svg>
@@ -138,7 +138,7 @@ export function Header() {
             <button
               type="button"
               onClick={() => cart.openDrawer()}
-              className="relative flex items-center gap-2 rounded border border-[#EA580C] px-3 py-2 text-sm font-semibold text-[#EA580C] hover:bg-[#EA580C] hover:text-white transition-colors"
+              className="relative flex items-center gap-2 rounded border border-[#F97316] px-3 py-2 text-sm font-semibold text-[#F97316] hover:bg-[#F97316] hover:text-white transition-colors"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
                 <path d="M6 6h15l-1.5 9H7.5z" /><circle cx="9" cy="20" r="1.5" /><circle cx="18" cy="20" r="1.5" /><path d="M6 6L4 2H2" />
@@ -161,7 +161,7 @@ export function Header() {
             autoFocus
             type="text"
             placeholder="Search for products..."
-            className="w-full rounded border border-gray-200 bg-gray-50 py-2.5 px-4 text-sm outline-none focus:border-[#EA580C]"
+            className="w-full rounded border border-gray-200 bg-gray-50 py-2.5 px-4 text-sm outline-none focus:border-[#F97316]"
           />
         </div>
       )}
@@ -176,7 +176,7 @@ export function Header() {
               onMouseEnter={() => setCatOpen(true)}
               onMouseLeave={() => setCatOpen(false)}
               className="flex items-center gap-2 px-4 py-3 text-sm font-semibold text-white"
-              style={{ background: "#EA580C" }}
+              style={{ background: "#F97316" }}
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
@@ -197,7 +197,7 @@ export function Header() {
                   <Link
                     key={cat.id}
                     href={`${BASE_PATH}/categories/${cat.handle}`}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#EA580C]/10 hover:text-[#EA580C]"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#F97316]/10 hover:text-[#F97316]"
                   >
                     {cat.name}
                   </Link>
@@ -217,7 +217,7 @@ export function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-3 text-sm font-medium text-gray-700 hover:text-[#EA580C] transition-colors"
+                className="px-4 py-3 text-sm font-medium text-gray-700 hover:text-[#F97316] transition-colors"
               >
                 {link.label}
               </Link>
@@ -243,7 +243,7 @@ export function Header() {
           <div className="fixed inset-0 z-40 bg-black/40" onClick={() => setMobileOpen(false)} />
           <aside className="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl flex flex-col">
             <div className="flex items-center justify-between p-4 border-b">
-              <span className="text-lg font-bold" style={{ color: "#EA580C" }}>{config.logo.text}</span>
+              <span className="text-lg font-bold" style={{ color: "#F97316" }}>{config.logo.text}</span>
               <button type="button" onClick={() => setMobileOpen(false)} className="p-1 text-gray-500">✕</button>
             </div>
             <nav className="flex-1 overflow-y-auto p-4 space-y-1">
@@ -257,7 +257,7 @@ export function Header() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block px-3 py-2.5 rounded text-sm font-medium text-gray-700 hover:bg-[#EA580C]/10 hover:text-[#EA580C]"
+                  className="block px-3 py-2.5 rounded text-sm font-medium text-gray-700 hover:bg-[#F97316]/10 hover:text-[#F97316]"
                 >
                   {link.label}
                 </Link>
@@ -269,7 +269,7 @@ export function Header() {
                     key={cat.id}
                     href={`${BASE_PATH}/categories/${cat.handle}`}
                     onClick={() => setMobileOpen(false)}
-                    className="block px-3 py-2 text-sm text-gray-600 hover:text-[#EA580C]"
+                    className="block px-3 py-2 text-sm text-gray-600 hover:text-[#F97316]"
                   >
                     {cat.name}
                   </Link>

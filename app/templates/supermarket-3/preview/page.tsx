@@ -1,46 +1,31 @@
 "use client";
 
-import { SiteShell } from "@/components/templates/supermarket3/layout/SiteShell";
-import { Header } from "@/components/templates/supermarket3/layout/Header";
-import { Footer } from "@/components/templates/supermarket3/layout/Footer";
-import { CartDrawer } from "@/components/templates/supermarket3/layout/CartDrawer";
+import HeaderThree from "@/components/templates/supermarket3/header/HeaderThree";
+import FooterTwo from "@/components/templates/supermarket3/footer/FooterTwo";
 import {
-  BannerSlider,
-  CategoryQuickLinks,
-  FeaturesRow,
-  FeaturedProducts,
-  DiscountProducts,
-  WeeklyBestSelling,
-  TrendingProducts,
-  BlogPosts,
-} from "@/components/templates/supermarket3/sections/HomeSections";
-import { useSite } from "@/lib/supermarket3/context";
+  BannerThree,
+  BlogThree,
+  BuyingProcess,
+  CategoryTop,
+  FeatureCategory,
+  PopularProduct,
+  WeeklySellFour,
+  WeeklySellThree,
+} from "@/components/templates/supermarket3/home-three/HomeThreeSections";
 
-export default function SupermarketHomePage() {
-  const config = useSite();
-  const sectionMap: Record<string, React.ReactNode> = {
-    features: <FeaturesRow />,
-    featured: <FeaturedProducts />,
-    discount: <DiscountProducts />,
-    weekly: <WeeklyBestSelling />,
-    trending: <TrendingProducts />,
-    blog: <BlogPosts />,
-  };
-
+export default function Supermarket3HomePage() {
   return (
-    <SiteShell>
-      <Header />
-      <main>
-        <BannerSlider />
-        <CategoryQuickLinks />
-        {config.sections
-          .filter((s) => s.active)
-          .map((s) => (
-            <div key={s.id}>{sectionMap[s.id] ?? null}</div>
-          ))}
-      </main>
-      <Footer />
-      <CartDrawer />
-    </SiteShell>
+    <div className="demo-one">
+      <HeaderThree />
+      <BuyingProcess />
+      <BannerThree />
+      <FeatureCategory />
+      <CategoryTop />
+      <PopularProduct />
+      <WeeklySellThree />
+      <WeeklySellFour />
+      <BlogThree />
+      <FooterTwo />
+    </div>
   );
 }
