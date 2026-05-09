@@ -13,38 +13,6 @@ export default function StaticAgencyFrame({ agencyNumber, page, title }: StaticA
   const cleanupRef = useRef<() => void>(() => {});
   const [frameHeight, setFrameHeight] = useState(9000);
 
-  const unlockPreviewScroll = useCallback(() => {
-    const doc = frameRef.current?.contentDocument;
-
-    if (!doc || doc.getElementById("shata-agency-preview-scroll-fix")) {
-      return;
-    }
-
-    const style = doc.createElement("style");
-    style.id = "shata-agency-preview-scroll-fix";
-    style.textContent = `
-      html,
-      body {
-        height: auto !important;
-        min-height: 100% !important;
-        overflow: visible !important;
-      }
-
-      body {
-        position: static !important;
-      }
-
-      #smooth-wrapper,
-      #smooth-content {
-        height: auto !important;
-        min-height: 100vh !important;
-        overflow: visible !important;
-        transform: none !important;
-      }
-    `;
-    doc.head.appendChild(style);
-  }, []);
-
   const updateFrameHeight = useCallback(() => {
     const frame = frameRef.current;
     const doc = frame?.contentDocument;
@@ -77,7 +45,6 @@ export default function StaticAgencyFrame({ agencyNumber, page, title }: StaticA
 
   const handleLoad = useCallback(() => {
     cleanupRef.current();
-    unlockPreviewScroll();
     updateFrameHeight();
 
     const frameWindow = frameRef.current?.contentWindow;
@@ -107,7 +74,7 @@ export default function StaticAgencyFrame({ agencyNumber, page, title }: StaticA
       window.clearInterval(interval);
       window.clearTimeout(timeout);
     };
-  }, [unlockPreviewScroll, updateFrameHeight]);
+  }, [updateFrameHeight]);
 
   useEffect(() => () => cleanupRef.current(), []);
 

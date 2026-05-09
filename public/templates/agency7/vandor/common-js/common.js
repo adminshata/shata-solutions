@@ -57,7 +57,7 @@
     var device_width = window.screen.width;
 
     if (device_width > 767) {
-        if (document.querySelector("#has_smooth").classList.contains("has-smooth")) {
+        var _hs = document.querySelector("#has_smooth"); if (_hs) _hs.classList.remove("has-smooth"); if (false) {
             const smoother = ScrollSmoother.create({
                 // smooth: 0.9,
                 smooth: 4,
