@@ -22,7 +22,7 @@ export default function Agency1FAQPage() {
             <div className="section-heading" style={{ marginBottom: 56 }}>
               <h3 className="title">
                 Everything You Need to Know <br />
-                About Working with Shata Agency One
+                About Working with Shata AI Agency
               </h3>
             </div>
 

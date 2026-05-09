@@ -34,7 +34,7 @@ export default function Agency1Footer() {
         <div className="footer-widget-wrapper">
           <div className="footer-widget-wrapper__top-content">
             <div className="footer-widget-wrapper__icon">
-              <FooterLogo text={config.brand.logoText ?? "Shata.Agency"} />
+              <FooterLogo text={config.brand.logoText ?? "Shata AI Agency"} />
             </div>
             <h3 className="title">
               {f.tagline.split("\n").map((line, i) => (

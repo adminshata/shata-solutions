@@ -64,7 +64,7 @@ export default function Agency1AboutPage() {
               </div>
             </div>
             <h1 className="breadcrumb1__title">
-              We are Shata Agency One — an AI agency and <br />
+              We are Shata AI Agency — an AI agency and <br />
               innovative technology company based <br />
               in Riverside, TX.
             </h1>

@@ -1,0 +1,58 @@
+.agency3-text-logo {
+  display: inline-flex;
+  align-items: center;
+  max-width: 230px;
+  min-height: 42px;
+  color: #111111;
+  font-family: "Plus Jakarta Sans", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+}
+
+.header-area-2 .agency3-text-logo,
+.header-3 .agency3-text-logo,
+.footer-area .agency3-text-logo,
+footer .agency3-text-logo {
+  color: #ffffff;
+}
+
+.offset-logo .agency3-text-logo,
+.footer-area8__logo .agency3-text-logo,
+.footer__logo .agency3-text-logo {
+  color: #111111;
+}
+
+.loader-wrap {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#smooth-wrapper,
+#smooth-content,
+main {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
+main,
+main section,
+.wow,
+.fade-anim,
+.rr-title-anim-2,
+.rr-title-anim-2 * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.header__logo a,
+.offset-logo a {
+  display: inline-flex;
+  align-items: center;
+}

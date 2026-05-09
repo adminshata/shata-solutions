@@ -1,0 +1,68 @@
+.agency2-text-logo {
+  display: inline-flex;
+  align-items: center;
+  max-width: 220px;
+  min-height: 42px;
+  color: #111111;
+  font-family: "Plus Jakarta Sans", Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+}
+
+.loader-wrap {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#smooth-wrapper,
+#smooth-content {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
+main,
+main section,
+.wow,
+.fade-anim,
+.rr-title-anim-2,
+.rr-title-anim-2 * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+main {
+  transform: none !important;
+}
+
+.offset-logo .agency2-text-logo,
+.footer-area8__logo .agency2-text-logo,
+.footer__logo .agency2-text-logo {
+  color: #111111;
+}
+
+.header-area-2 .agency2-text-logo,
+.footer-area .agency2-text-logo,
+footer .agency2-text-logo {
+  color: #ffffff;
+}
+
+.header__logo a,
+.offset-logo a {
+  display: inline-flex;
+  align-items: center;
+}
+
+iframe.agency2-preview-frame {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  border: 0;
+  background: #050505;
+}

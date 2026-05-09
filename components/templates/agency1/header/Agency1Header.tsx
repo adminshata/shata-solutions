@@ -48,7 +48,7 @@ export default function Agency1Header() {
             <div className="offset-widget offset-header">
               <div className="offset-logo">
                 <Link href="/templates/agency-1/preview">
-                  <Agency1Logo dark={true} text={config.brand.logoText ?? "Shata.Agency"} />
+                  <Agency1Logo dark={true} text={config.brand.logoText ?? "Shata AI Agency"} />
                 </Link>
               </div>
               <button
@@ -137,24 +137,15 @@ export default function Agency1Header() {
             <div className="header-area__inner">
               <div className="header__logo">
                 <Link href="/templates/agency-1/preview">
-                  <Agency1Logo dark={true} text={config.brand.logoText ?? "Shata.Agency"} />
+                  <Agency1Logo dark={true} text={config.brand.logoText ?? "Shata AI Agency"} />
                 </Link>
               </div>
 
               <div className="header__nav">
                 <nav className="main-menu">
                   <ul>
-                    <li
-                      className="menu-item-has-children"
-                      onMouseEnter={() => setOpenDropdown("home")}
-                      onMouseLeave={() => setOpenDropdown(null)}
-                    >
+                    <li>
                       <Link href="/templates/agency-1/preview">Home</Link>
-                      {openDropdown === "home" && (
-                        <ul className="dp-menu column-2" style={{ display: "block" }}>
-                          <li><Link href="/templates/agency-1/preview">AI Agency</Link></li>
-                        </ul>
-                      )}
                     </li>
                     {config.navItems.map((item) => (
                       <li

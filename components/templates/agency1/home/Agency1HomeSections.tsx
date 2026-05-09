@@ -383,7 +383,7 @@ export function Agency1Testimonials() {
           <div className="section-heading pin-element_3">
             <h3 className="title">
               User Stories: Hear What Others Love About <br />
-              Our Shata Agency One and How It Transformed <br />
+              Our Shata AI Agency and How It Transformed <br />
               Their Business
             </h3>
           </div>

@@ -82,7 +82,7 @@ export default function Agency1BlogDetailsPage() {
                         <div style={{ fontSize: 12, color: "#999", marginBottom: 4 }}>Written by</div>
                         <h4 style={{ fontWeight: 700, marginBottom: 8 }}>{post.author}</h4>
                         <p style={{ color: "#666", fontSize: 14, lineHeight: 1.7 }}>
-                          AI specialist at Shata Agency One. Writes about machine learning, AI strategy, and the
+                          AI specialist at Shata AI Agency. Writes about machine learning, AI strategy, and the
                           future of intelligent automation.
                         </p>
                       </div>

@@ -1,7 +1,7 @@
 export const agency1Brand = {
-  name: "Shata Agency One",
+  name: "Shata AI Agency",
   tagline: "AI Agency & Intelligent Solutions",
-  email: "hello@shataagencyone.com",
+  email: "hello@shataaiagency.com",
   phone: "+1 (762) 768 0763",
   address: "25 Elm Drive, Riverside, TX",
   logo: "",
@@ -182,7 +182,7 @@ export const agency1Testimonials = [
   {
     id: 1,
     quote:
-      "Shata Agency One helped us streamline our operations with AI. The team delivered faster than expected and the ROI was clear within the first quarter.",
+      "Shata AI Agency helped us streamline our operations with AI. The team delivered faster than expected and the ROI was clear within the first quarter.",
     author: "Jonathan Kim",
     role: "CEO, NovaTech Solutions",
     avatar: "/templates/agency1/imgs/testimonials/testimonials-author-img-1.png",

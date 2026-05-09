@@ -3,9 +3,9 @@ import { Agency1Provider } from "@/lib/agency1/context";
 import Agency1DebugImages from "@/components/templates/agency1/Agency1DebugImages";
 
 export const metadata: Metadata = {
-  title: "Shata Agency One – AI Agency & Intelligent Solutions",
+  title: "Shata AI Agency – AI Agency & Intelligent Solutions",
   description:
-    "Shata Agency One is a premium AI agency delivering custom AI solutions, machine learning, NLP, and automation for forward-thinking businesses.",
+    "Shata AI Agency is a premium AI agency delivering custom AI solutions, machine learning, NLP, and automation for forward-thinking businesses.",
 };
 
 export default function Agency1Layout({

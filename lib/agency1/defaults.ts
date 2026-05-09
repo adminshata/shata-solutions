@@ -4,9 +4,9 @@ export const AGENCY1_STORAGE_KEY = "agency1_draft_config";
 
 export const AGENCY1_DEFAULTS: Agency1Config = {
   brand: {
-    name: "Shata Agency One",
+    name: "Shata AI Agency",
     tagline: "AI Agency & Intelligent Solutions",
-    email: "hello@shataagencyone.com",
+    email: "hello@shataaiagency.com",
     phone: "+1 (762) 768 0763",
     address: "25 Elm Drive, Riverside, TX",
     founded: "2018",
@@ -15,7 +15,7 @@ export const AGENCY1_DEFAULTS: Agency1Config = {
     projectsCount: "500+",
     teamCount: "50+",
     awardsCount: "30+",
-    logoText: "Shata.Agency",
+    logoText: "Shata AI Agency",
   },
   theme: {
     accentColor: "#F14F44",
@@ -32,7 +32,7 @@ export const AGENCY1_DEFAULTS: Agency1Config = {
     ctaLabel: "GET IN TOUCH",
     ctaLink: "/templates/agency-1/preview/contact",
     address: "25 Elm Drive, Riverside, TX",
-    email: "hello@shataagencyone.com",
+    email: "hello@shataaiagency.com",
     phone: "+1 (762) 768 0763",
   },
   hero: {
@@ -212,7 +212,7 @@ export const AGENCY1_DEFAULTS: Agency1Config = {
   testimonials: [
     {
       id: 1,
-      quote: "Shata Agency One helped us streamline our operations with AI. The team delivered faster than expected and the ROI was clear within the first quarter.",
+      quote: "Shata AI Agency helped us streamline our operations with AI. The team delivered faster than expected and the ROI was clear within the first quarter.",
       author: "Jonathan Kim",
       role: "CEO, NovaTech Solutions",
       avatar: "/templates/agency1/imgs/testimonials/testimonials-author-img-1.png",
@@ -470,7 +470,7 @@ export const AGENCY1_DEFAULTS: Agency1Config = {
     intro:
       "Tell us about your project and we'll get back to you within 24 hours. No sales pressure — just an honest conversation about what AI can do for your business.",
     office: "25 Elm Drive, Riverside, TX",
-    email: "hello@shataagencyone.com",
+    email: "hello@shataaiagency.com",
     phone: "+1 (762) 768 0763",
     hours: "Mon–Fri, 9am–6pm CT",
     socials: {
@@ -485,7 +485,7 @@ export const AGENCY1_DEFAULTS: Agency1Config = {
     copyright: "Copyright © Shata Solutions 2025. All rights reserved.",
     marqueeText: "Work with us – Let's Chat –",
     address: "25 Elm Drive, Riverside, TX",
-    email: "hello@shataagencyone.com",
+    email: "hello@shataaiagency.com",
     phone: "+1 (762) 768 0763",
     social: {
       facebook: "#",
@@ -496,7 +496,7 @@ export const AGENCY1_DEFAULTS: Agency1Config = {
     },
     columns: [
       { type: "contact", title: "Our address", value: "25 Elm Drive, Riverside, TX" },
-      { type: "contact", title: "Send a message", value: "hello@shataagencyone.com", href: "mailto:hello@shataagencyone.com" },
+      { type: "contact", title: "Send a message", value: "hello@shataaiagency.com", href: "mailto:hello@shataaiagency.com" },
       { type: "contact", title: "Call our office", value: "+1 (762) 768 0763", href: "tel:+17627680763" },
       { type: "link", title: "Quick links", items: [{ label: "Our Services", href: "/templates/agency-1/preview/services" }] },
     ],

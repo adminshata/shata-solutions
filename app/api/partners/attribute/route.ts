@@ -64,9 +64,9 @@ export async function POST(req: Request) {
   }
 
   // bump partner.lifetime_referrals
-  await db.rpc("increment_partner_referrals", { p_partner_id: partnerId }).catch(() => {
+  try { await db.rpc("increment_partner_referrals", { p_partner_id: partnerId }); } catch {
     // fallback if RPC doesn't exist: no-op
-  });
+  }
 
   return NextResponse.json({ ok: true, attributed: true, referralId: data.id });
 }

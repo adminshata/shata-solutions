@@ -166,6 +166,7 @@ const plans = [
       "Launch support",
     ],
     cta: "Start store setup",
+    featured: false,
   },
   {
     name: "Growth Engine",
@@ -193,6 +194,7 @@ const plans = [
       "Priority commerce support",
     ],
     cta: "Request architecture plan",
+    featured: false,
   },
 ] as const;
 
