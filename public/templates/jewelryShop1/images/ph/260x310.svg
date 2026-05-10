@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="310" viewBox="0 0 260 310">
+  <rect width="260" height="310" fill="#faf8f4"/>
+  
+  <g transform="translate(130,136)">
+  <!-- band -->
+  <ellipse cx="0" cy="0" rx="57.2" ry="20.02" fill="none" stroke="#c9a96e" stroke-width="10.296"/>
+  <ellipse cx="0" cy="0" rx="57.2" ry="20.02" fill="none" stroke="#e8d5b0" stroke-width="2.8600000000000003" opacity="0.6"/>
+  <!-- prong setting -->
+  <rect x="-16.016000000000002" y="-18.304000000000002" width="32.032000000000004" height="18.876" rx="4.8048" fill="#c9a96e" stroke="#a07840" stroke-width="1"/>
+  <!-- diamond -->
+  <polygon points="0,-27.2272 17.16,-12.012 0,-3.3176000000000005 -17.16,-12.012" fill="#d8eef7" stroke="#90c8e0" stroke-width="1.5"/>
+  <polygon points="0,-27.2272 17.16,-12.012 0,-13.0988" fill="#90c8e0" opacity="0.5"/>
+  <line x1="0" y1="-27.2272" x2="0" y2="-3.3176000000000005" stroke="white" stroke-width="0.8" opacity="0.6"/>
+</g>
+  <!-- subtle grid pattern -->
+  <line x1="0" y1="210" x2="260" y2="210" stroke="#c9a96e" stroke-width="0.5" opacity="0.15"/>
+  <!-- product info -->
+  <text x="130" y="235" font-family="Georgia,serif" font-size="10" font-weight="300" fill="#c9a96e" text-anchor="middle" letter-spacing="2">RING</text>
+  <text x="130" y="260" font-family="Georgia,serif" font-size="13" font-weight="400" fill="#2a1f1a" text-anchor="middle" letter-spacing="2">Diamond Ring</text>
+  <text x="130" y="279" font-family="Georgia,serif" font-size="9" font-weight="300" fill="#8b6530" text-anchor="middle" letter-spacing="2">18K Gold • 0.5ct</text>
+  <text x="130" y="297" font-family="Georgia,serif" font-size="11" font-weight="600" fill="#2a1f1a" text-anchor="middle" letter-spacing="2">$1,280</text>
+
+</svg>

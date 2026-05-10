@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="330" viewBox="0 0 390 330">
+  <rect width="390" height="330" fill="#ede8e0"/>
+  
+  <rect width="390" height="330" fill="#ede8e0"/>
+  <g transform="translate(195,123)">
+    
+  <!-- string -->
+  <path d="M-99,0 L-97,-10 L-89,-19 L-77,-28 L-62,-35 L-43,-40 L-22,-43 L-0,-45 L22,-43 L43,-40 L62,-35 L77,-28 L89,-19 L97,-10 L99,-0" fill="none" stroke="#a07840" stroke-width="1" opacity="0.4"/>
+  <circle cx="-99.0" cy="0.0" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-100.8" cy="-1.7" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-96.5" cy="-9.9" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-98.3" cy="-11.7" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-89.2" cy="-19.3" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-90.9" cy="-21.1" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-77.4" cy="-27.8" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-79.2" cy="-29.5" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-61.7" cy="-34.8" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-63.5" cy="-36.6" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-43.0" cy="-40.1" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-44.7" cy="-41.9" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-22.0" cy="-43.4" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-23.8" cy="-45.2" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-0.0" cy="-44.6" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-1.8" cy="-46.3" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="22.0" cy="-43.4" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="20.3" cy="-45.2" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="43.0" cy="-40.1" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="41.2" cy="-41.9" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="61.7" cy="-34.8" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="60.0" cy="-36.6" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="77.4" cy="-27.8" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="75.7" cy="-29.5" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="89.2" cy="-19.3" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="87.4" cy="-21.1" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="96.5" cy="-9.9" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="94.8" cy="-11.7" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="99.0" cy="-0.0" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="97.2" cy="-1.8" r="2.4499999999999997" fill="white" opacity="0.5"/>
+  <!-- clasp -->
+  <rect x="-6" y="37.62" width="12" height="9" rx="3" fill="#c9a96e" stroke="#a07840" stroke-width="1"/>
+
+  </g>
+  <text x="195" y="270" font-family="Georgia,serif" font-size="23" font-weight="400" fill="#2a1f1a" text-anchor="middle" letter-spacing="2">THE LOOKBOOK</text>
+  <text x="195" y="303" font-family="Georgia,serif" font-size="15" font-weight="300" fill="#c9a96e" text-anchor="middle" letter-spacing="2">Spring / Summer 2024</text>
+
+</svg>

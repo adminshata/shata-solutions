@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="310" viewBox="0 0 260 310">
+  <rect width="260" height="310" fill="#faf8f4"/>
+  
+  <g transform="translate(130,130)"><path d="M-42.900000000000006,-39.0 Q-27.300000000000004,-50.7 -23.400000000000006,-35.1" fill="none" stroke="#c9a96e" stroke-width="3.9000000000000004" stroke-linecap="round"/><line x1="-42.900000000000006" y1="-34.32" x2="-42.900000000000006" y2="-11.7" stroke="#c9a96e" stroke-width="4.68"/><polygon points="-42.900000000000006,-11.7 -28.860000000000007,-1.7159999999999975 -42.900000000000006,13.260000000000002 -56.940000000000005,-1.7159999999999975" fill="#d8eef7" stroke="#90c8e0" stroke-width="1.5"/><polygon points="-42.900000000000006,-11.7 -28.860000000000007,-1.7159999999999975 -42.900000000000006,0.7800000000000011" fill="#90c8e0" opacity="0.45"/><path d="M42.900000000000006,-39.0 Q58.50000000000001,-50.7 62.400000000000006,-35.1" fill="none" stroke="#c9a96e" stroke-width="3.9000000000000004" stroke-linecap="round"/><line x1="42.900000000000006" y1="-34.32" x2="42.900000000000006" y2="-11.7" stroke="#c9a96e" stroke-width="4.68"/><polygon points="42.900000000000006,-11.7 56.940000000000005,-1.7159999999999975 42.900000000000006,13.260000000000002 28.860000000000007,-1.7159999999999975" fill="#d8eef7" stroke="#90c8e0" stroke-width="1.5"/><polygon points="42.900000000000006,-11.7 56.940000000000005,-1.7159999999999975 42.900000000000006,0.7800000000000011" fill="#90c8e0" opacity="0.45"/></g>
+  <!-- subtle grid pattern -->
+  <line x1="0" y1="210" x2="260" y2="210" stroke="#c9a96e" stroke-width="0.5" opacity="0.15"/>
+  <!-- product info -->
+  <text x="130" y="235" font-family="Georgia,serif" font-size="10" font-weight="300" fill="#c9a96e" text-anchor="middle" letter-spacing="2">EARRINGS</text>
+  <text x="130" y="260" font-family="Georgia,serif" font-size="13" font-weight="400" fill="#2a1f1a" text-anchor="middle" letter-spacing="2">Drop Earrings</text>
+  <text x="130" y="279" font-family="Georgia,serif" font-size="9" font-weight="300" fill="#8b6530" text-anchor="middle" letter-spacing="2">18K Gold • Diamond</text>
+  <text x="130" y="297" font-family="Georgia,serif" font-size="11" font-weight="600" fill="#2a1f1a" text-anchor="middle" letter-spacing="2">$1,650</text>
+
+</svg>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="485" viewBox="0 0 1140 485">
+  <rect width="1140" height="485" fill="#1a1514"/>
+  
+  <!-- dark gradient feel -->
+  <rect width="1140" height="485" fill="#1a1514"/>
+  <rect width="1140" height="485" fill="url(#hg)"/>
+  <defs>
+    <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2a1f0a" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#0a0806" stop-opacity="0.95"/>
+    </linearGradient>
+  </defs>
+  <!-- decorative large ring -->
+  <circle cx="820.8" cy="242.5" r="149.38" fill="none" stroke="#c9a96e" stroke-width="6.402" opacity="0.18"/>
+  <circle cx="820.8" cy="242.5" r="117.37000000000002" fill="none" stroke="#c9a96e" stroke-width="2.6675000000000004" opacity="0.12"/>
+  <!-- main ring illustration -->
+  <g transform="translate(820.8,242.5) scale(1.8)">
+    <ellipse cx="0" cy="0" rx="58.68500000000001" ry="21.340000000000003" fill="none" stroke="#c9a96e" stroke-width="14.938000000000002"/>
+    <ellipse cx="0" cy="0" rx="58.68500000000001" ry="21.340000000000003" fill="none" stroke="#e8d5b0" stroke-width="4.268" opacity="0.5"/>
+    <rect x="-19.206" y="-40.546" width="38.412" height="29.876000000000005" rx="6.402" fill="#c9a96e" stroke="#a07840" stroke-width="1"/>
+    <polygon points="0,-58.68500000000001 23.474,-12.804 0,16.005 -23.474,-12.804" fill="#d8eef7" stroke="#90c8e0" stroke-width="1.5"/>
+    <polygon points="0,-58.68500000000001 23.474,-12.804 0,-6.402" fill="#90c8e0" opacity="0.5"/>
+  </g>
+  <!-- left side text -->
+  <text x="342.0" y="184.3" font-family="Georgia,serif" font-size="25" font-weight="300" fill="#e8d5b0" text-anchor="middle" letter-spacing="2">SHATA JEWELRY</text>
+  <text x="342.0" y="232.8" font-family="Georgia,serif" font-size="43" font-weight="400" fill="white" text-anchor="middle" letter-spacing="2">New Collection</text>
+  <text x="342.0" y="281.3" font-family="Georgia,serif" font-size="31" font-weight="300" fill="#c9a96e" text-anchor="middle" letter-spacing="2">2 0 2 4</text>
+  <line x1="136.79999999999998" y1="310.4" x2="547.1999999999999" y2="310.4" stroke="#c9a96e" stroke-width="1" opacity="0.5"/>
+  <text x="342.0" y="349.2" font-family="Georgia,serif" font-size="13" font-weight="400" fill="#c9a96e" text-anchor="middle" letter-spacing="2">SHOP THE COLLECTION</text>
+  <rect x="199.5" y="351.625" width="285.0" height="1" fill="#c9a96e" opacity="0.5"/>
+
+</svg>

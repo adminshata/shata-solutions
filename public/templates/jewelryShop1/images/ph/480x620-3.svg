@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="620" viewBox="0 0 480 620">
+  <rect width="480" height="620" fill="#faf8f4"/>
+  
+  <g transform="translate(240,254)">
+  <!-- string -->
+  <path d="M-120,0 L-117,-12 L-108,-23 L-94,-34 L-75,-42 L-52,-49 L-27,-53 L-0,-54 L27,-53 L52,-49 L75,-42 L94,-34 L108,-23 L117,-12 L120,-0" fill="none" stroke="#a07840" stroke-width="1" opacity="0.4"/>
+  <circle cx="-120.0" cy="0.0" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-121.8" cy="-1.7" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-117.0" cy="-12.0" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-118.7" cy="-13.8" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-108.1" cy="-23.4" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-109.9" cy="-25.2" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-93.8" cy="-33.7" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-95.6" cy="-35.4" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-74.8" cy="-42.2" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-76.6" cy="-44.0" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-52.1" cy="-48.7" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-53.8" cy="-50.4" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-26.7" cy="-52.6" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-28.5" cy="-54.4" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="-0.0" cy="-54.0" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="-1.8" cy="-55.8" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="26.7" cy="-52.6" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="25.0" cy="-54.4" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="52.1" cy="-48.7" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="50.3" cy="-50.4" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="74.8" cy="-42.2" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="73.1" cy="-44.0" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="93.8" cy="-33.7" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="92.1" cy="-35.4" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="108.1" cy="-23.4" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="106.4" cy="-25.2" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="117.0" cy="-12.0" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="115.2" cy="-13.8" r="2.4499999999999997" fill="white" opacity="0.5"/><circle cx="120.0" cy="-0.0" r="7" fill="#f8f3ee" stroke="#e0d0b8" stroke-width="1.5"/><circle cx="118.2" cy="-1.8" r="2.4499999999999997" fill="white" opacity="0.5"/>
+  <!-- clasp -->
+  <rect x="-6" y="45.6" width="12" height="9" rx="3" fill="#c9a96e" stroke="#a07840" stroke-width="1"/>
+</g>
+  <!-- subtle grid pattern -->
+  <line x1="0" y1="421" x2="480" y2="421" stroke="#c9a96e" stroke-width="0.5" opacity="0.15"/>
+  <!-- product info -->
+  <text x="240" y="471" font-family="Georgia,serif" font-size="20" font-weight="300" fill="#c9a96e" text-anchor="middle" letter-spacing="2">NECKLACE</text>
+  <text x="240" y="520" font-family="Georgia,serif" font-size="24" font-weight="400" fill="#2a1f1a" text-anchor="middle" letter-spacing="2">Pearl Necklace</text>
+  <text x="240" y="558" font-family="Georgia,serif" font-size="18" font-weight="300" fill="#8b6530" text-anchor="middle" letter-spacing="2">Freshwater Pearls</text>
+  <text x="240" y="595" font-family="Georgia,serif" font-size="21" font-weight="600" fill="#2a1f1a" text-anchor="middle" letter-spacing="2">$750</text>
+
+</svg>

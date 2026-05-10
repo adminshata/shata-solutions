@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="620" viewBox="0 0 480 620">
+  <rect width="480" height="620" fill="#faf8f4"/>
+  
+  <g transform="translate(240,263)">
+  <!-- outer bangle -->
+  <ellipse cx="0" cy="0" rx="105.6" ry="42.24" fill="none" stroke="#c9a96e" stroke-width="14.784"/>
+  <!-- inner highlight -->
+  <ellipse cx="0" cy="0" rx="105.6" ry="42.24" fill="none" stroke="#e8d5b0" stroke-width="4.224" opacity="0.7"/>
+  <!-- clasp -->
+  <rect x="-7.392" y="36.959999999999994" width="14.784" height="12.671999999999999" rx="3.1679999999999997" fill="#c9a96e" stroke="#a07840" stroke-width="1"/>
+  <!-- gem on top -->
+  <circle cx="0" cy="-40.128" r="11.616" fill="#d8eef7" stroke="#90c8e0" stroke-width="1.5"/>
+  <circle cx="0" cy="-40.128" r="6.335999999999999" fill="white" opacity="0.6"/>
+</g>
+  <!-- subtle grid pattern -->
+  <line x1="0" y1="421" x2="480" y2="421" stroke="#c9a96e" stroke-width="0.5" opacity="0.15"/>
+  <!-- product info -->
+  <text x="240" y="471" font-family="Georgia,serif" font-size="20" font-weight="300" fill="#c9a96e" text-anchor="middle" letter-spacing="2">BRACELET</text>
+  <text x="240" y="520" font-family="Georgia,serif" font-size="24" font-weight="400" fill="#2a1f1a" text-anchor="middle" letter-spacing="2">Gold Bangle</text>
+  <text x="240" y="558" font-family="Georgia,serif" font-size="18" font-weight="300" fill="#8b6530" text-anchor="middle" letter-spacing="2">18K Yellow Gold</text>
+  <text x="240" y="595" font-family="Georgia,serif" font-size="21" font-weight="600" fill="#2a1f1a" text-anchor="middle" letter-spacing="2">$2,100</text>
+
+</svg>

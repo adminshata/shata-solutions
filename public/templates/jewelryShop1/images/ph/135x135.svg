@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="135" height="135" viewBox="0 0 135 135">
+  <rect width="135" height="135" fill="#f2ede6"/>
+  <g transform="translate(67,67)">
+  <!-- band -->
+  <ellipse cx="0" cy="0" rx="37.800000000000004" ry="13.23" fill="none" stroke="#c9a96e" stroke-width="6.804"/>
+  <ellipse cx="0" cy="0" rx="37.800000000000004" ry="13.23" fill="none" stroke="#e8d5b0" stroke-width="1.8900000000000003" opacity="0.6"/>
+  <!-- prong setting -->
+  <rect x="-10.584000000000001" y="-12.096000000000002" width="21.168000000000003" height="12.474" rx="3.1752000000000002" fill="#c9a96e" stroke="#a07840" stroke-width="1"/>
+  <!-- diamond -->
+  <polygon points="0,-17.992800000000003 11.340000000000002,-7.938000000000001 0,-2.1923999999999992 -11.340000000000002,-7.938000000000001" fill="#d8eef7" stroke="#90c8e0" stroke-width="1.5"/>
+  <polygon points="0,-17.992800000000003 11.340000000000002,-7.938000000000001 0,-8.6562" fill="#90c8e0" opacity="0.5"/>
+  <line x1="0" y1="-17.992800000000003" x2="0" y2="-2.1923999999999992" stroke="white" stroke-width="0.8" opacity="0.6"/>
+</g><rect x="0" y="0" width="135" height="135" fill="none" stroke="#c9a96e" stroke-width="1" opacity="0.3"/>
+</svg>

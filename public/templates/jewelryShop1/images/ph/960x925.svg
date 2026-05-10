@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="925" viewBox="0 0 960 925">
+  <rect width="960" height="925" fill="#faf8f4"/>
+  
+  <g transform="translate(480,406)">
+  <!-- band -->
+  <ellipse cx="0" cy="0" rx="240.5" ry="84.175" fill="none" stroke="#c9a96e" stroke-width="43.29"/>
+  <ellipse cx="0" cy="0" rx="240.5" ry="84.175" fill="none" stroke="#e8d5b0" stroke-width="12.025" opacity="0.6"/>
+  <!-- prong setting -->
+  <rect x="-67.34" y="-76.96000000000001" width="134.68" height="79.36500000000001" rx="20.202" fill="#c9a96e" stroke="#a07840" stroke-width="1"/>
+  <!-- diamond -->
+  <polygon points="0,-114.47800000000001 72.14999999999999,-50.505 0,-13.948999999999998 -72.14999999999999,-50.505" fill="#d8eef7" stroke="#90c8e0" stroke-width="1.5"/>
+  <polygon points="0,-114.47800000000001 72.14999999999999,-50.505 0,-55.0745" fill="#90c8e0" opacity="0.5"/>
+  <line x1="0" y1="-114.47800000000001" x2="0" y2="-13.948999999999998" stroke="white" stroke-width="0.8" opacity="0.6"/>
+</g>
+  <line x1="0" y1="647" x2="960" y2="647" stroke="#c9a96e" stroke-width="0.5" opacity="0.12"/>
+  <text x="480" y="712" font-family="Georgia,serif" font-size="30" font-weight="400" fill="#2a1f1a" text-anchor="middle" letter-spacing="2">Diamond Solitaire Ring</text>
+  <text x="480" y="786" font-family="Georgia,serif" font-size="21" font-weight="300" fill="#8b6530" text-anchor="middle" letter-spacing="2">SKU: SHJ-R-001 | 18K Gold</text>
+  <text x="480" y="860" font-family="Georgia,serif" font-size="19" font-weight="300" fill="#c9a96e" text-anchor="middle" letter-spacing="2">SHATA JEWELRY</text>
+
+</svg>

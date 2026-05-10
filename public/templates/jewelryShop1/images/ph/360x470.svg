@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="470" viewBox="0 0 360 470">
+  <rect width="360" height="470" fill="#f0ebe3"/>
+  
+  <rect width="360" height="470" fill="#f0ebe3"/>
+  <!-- decorative border -->
+  <rect x="21" y="28" width="316" height="413" fill="none" stroke="#c9a96e" stroke-width="1" opacity="0.4"/>
+  <!-- jewelry motif center -->
+  <g transform="translate(180,176)">
+    <path d="M-63.36000000000001,-57.6 Q-40.32000000000001,-74.88000000000001 -34.56,-51.84" fill="none" stroke="#c9a96e" stroke-width="5.760000000000001" stroke-linecap="round"/><line x1="-63.36000000000001" y1="-50.688" x2="-63.36000000000001" y2="-17.28" stroke="#c9a96e" stroke-width="6.912"/><polygon points="-63.36000000000001,-17.28 -42.62400000000001,-2.534399999999998 -63.36000000000001,19.584000000000003 -84.096,-2.534399999999998" fill="#d8eef7" stroke="#90c8e0" stroke-width="1.5"/><polygon points="-63.36000000000001,-17.28 -42.62400000000001,-2.534399999999998 -63.36000000000001,1.152000000000001" fill="#90c8e0" opacity="0.45"/><path d="M63.36000000000001,-57.6 Q86.4,-74.88000000000001 92.16000000000001,-51.84" fill="none" stroke="#c9a96e" stroke-width="5.760000000000001" stroke-linecap="round"/><line x1="63.36000000000001" y1="-50.688" x2="63.36000000000001" y2="-17.28" stroke="#c9a96e" stroke-width="6.912"/><polygon points="63.36000000000001,-17.28 84.096,-2.534399999999998 63.36000000000001,19.584000000000003 42.62400000000001,-2.534399999999998" fill="#d8eef7" stroke="#90c8e0" stroke-width="1.5"/><polygon points="63.36000000000001,-17.28 84.096,-2.534399999999998 63.36000000000001,1.152000000000001" fill="#90c8e0" opacity="0.45"/>
+  </g>
+  <text x="180" y="385" font-family="Georgia,serif" font-size="17" font-weight="400" fill="#2a1f1a" text-anchor="middle" letter-spacing="2">OUR CRAFTSMEN</text>
+  <text x="180" y="427" font-family="Georgia,serif" font-size="12" font-weight="300" fill="#c9a96e" text-anchor="middle" letter-spacing="2">Artisan Jewelry Makers</text>
+
+</svg>
