@@ -344,7 +344,7 @@ function HeroTab({
       ...hero,
       slides: [
         ...hero.slides,
-        { id: `s${Date.now()}`, heading: "New Slide", image: "http://placehold.it/440x660" },
+        { id: `s${Date.now()}`, heading: "New Slide", image: "/templates/jewelryShop1/images/ph/440x660.jpg" },
       ],
     });
   };
@@ -455,7 +455,7 @@ function CategoriesTab({
         id: `c${Date.now()}`,
         name: "New Category",
         slug: "new-category",
-        image: "http://placehold.it/480x320",
+        image: "/templates/jewelryShop1/images/ph/480x620.jpg",
         count: 0,
       },
     ]);
@@ -535,7 +535,7 @@ function ProductsTab({
         slug: "new-product",
         price: 100,
         originalPrice: 100,
-        image: "http://placehold.it/480x620",
+        image: "/templates/jewelryShop1/images/ph/480x620.jpg",
         category: "rings",
         featured: false,
         inStock: true,
@@ -655,7 +655,7 @@ function TestimonialsTab({
         id: `t${Date.now()}`,
         name: "New Customer",
         text: "A wonderful experience.",
-        image: "http://placehold.it/135x135",
+        image: "/templates/jewelryShop1/images/ph/135x135.jpg",
       },
     ]);
   };
@@ -726,7 +726,7 @@ function BlogTab({
         title: "New Post",
         excerpt: "",
         content: "",
-        image: "http://placehold.it/770x400",
+        image: "/templates/jewelryShop1/images/ph/770x400.jpg",
         date: "May 9, 2025",
         author: "Shata Jewelry",
         category: "News",
@@ -807,7 +807,7 @@ function InstagramTab({
   };
 
   const addImg = () => {
-    update("instagram", [...images, "http://placehold.it/95x70"]);
+    update("instagram", [...images, "/templates/jewelryShop1/images/ph/95x70.jpg"]);
   };
 
   const removeImg = (idx: number) => {
