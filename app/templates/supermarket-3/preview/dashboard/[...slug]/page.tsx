@@ -16,8 +16,9 @@ const TITLES: Record<string, string> = {
   registration: "Registration",
 };
 
-export default function DashboardFallbackPage({ params }: { params: { slug: string[] } }) {
-  const slug = params.slug.join("/");
+export default async function DashboardFallbackPage({ params }: { params: Promise<{ slug: string[] }> }) {
+  const { slug: slugArr } = await params;
+  const slug = slugArr.join("/");
   const title = TITLES[slug] ?? slug.split("-").map((part) => part[0]?.toUpperCase() + part.slice(1)).join(" ");
   return (
     <DashboardShell title={title} subtitle="Reference dashboard page restored for navigation completeness.">

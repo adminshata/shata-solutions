@@ -79,10 +79,6 @@ export default async function SpaSalon1TeamMemberPage({ params }: Props) {
                   src={member.image}
                   alt={member.name}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src =
-                      "/templates/spaSalon1/images/team-1.jpg";
-                  }}
                 />
               </div>
               {/* Social */}
@@ -177,10 +173,6 @@ export default async function SpaSalon1TeamMemberPage({ params }: Props) {
                     src={m.image}
                     alt={m.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src =
-                        "/templates/spaSalon1/images/team-1.jpg";
-                    }}
                   />
                 </div>
                 <div className="p-4 text-center">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Agency1Provider } from "@/lib/agency1/context";
 import Agency1DebugImages from "@/components/templates/agency1/Agency1DebugImages";
 
@@ -62,7 +63,7 @@ export default function Agency1Layout({
       `}</style>
       <Agency1Provider>
         {children}
-        <Agency1DebugImages />
+        <Suspense><Agency1DebugImages /></Suspense>
       </Agency1Provider>
     </>
   );

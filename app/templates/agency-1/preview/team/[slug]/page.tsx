@@ -8,8 +8,7 @@ import Agency1Footer from "@/components/templates/agency1/footer/Agency1Footer";
 import Agency1Breadcrumb from "@/components/templates/agency1/inner/Agency1Breadcrumb";
 import { useAgency1 } from "@/lib/agency1/context";
 
-export default function Agency1TeamDetailsPage({
-}: { params: { slug: string } }) {
+export default function Agency1TeamDetailsPage() {
   const { config } = useAgency1();
   const routeParams = useParams<{ slug: string }>();
   const slug = routeParams?.slug ?? "";

@@ -1,8 +1,9 @@
 import { ReferencePageShell } from "@/components/templates/supermarket4/pages/ReferencePageShell";
 import { POSTS } from "@/lib/supermarket4/defaults";
 
-export default function BlogDetailPage({ params }: { params: { slug: string } }) {
-  const post = POSTS.find((item) => item.slug === params.slug) ?? POSTS[0];
+export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = POSTS.find((item) => item.slug === slug) ?? POSTS[0];
   return (
     <ReferencePageShell title={post.title ?? "Blog detail"} subtitle={`${post.category} • ${post.publishedDate}`}>
       <article style={{ background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 8px 30px rgba(0,0,0,.06)" }}>

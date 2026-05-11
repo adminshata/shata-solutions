@@ -6,8 +6,10 @@ import ShopMain from "@/components/templates/supermarket3/shop/ShopMain";
 import { PRODUCTS } from "@/lib/supermarket3/defaults";
 import type { Product } from "@/lib/supermarket3/types";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 const BASE_PATH = "/templates/supermarket-3/preview";
-export default function Page({ params }: { params: { handle: string } }) {
+export default function Page() {
+  const params = useParams<{ handle: string }>();
   const vendorName = params.handle === "fresh-juice-bar" ? "Fresh Juice Bar" : params.handle.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
   const vendorDescription = params.handle === "fresh-juice-bar"
     ? "Cold-pressed juices, fruit cups, wellness drinks, and fresh produce prepared daily."

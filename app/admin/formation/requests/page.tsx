@@ -146,7 +146,7 @@ function SearchForm({ initialStatus, initialQuery }: { initialStatus: string; in
   );
 }
 
-export function StatusPill({ status }: { status: FormationStatus }) {
+function StatusPill({ status }: { status: FormationStatus }) {
   const dot = statusDotClass(status);
   const tone = statusToneClass(status);
   return (
@@ -157,7 +157,7 @@ export function StatusPill({ status }: { status: FormationStatus }) {
   );
 }
 
-export function statusDotClass(s: FormationStatus): string {
+function statusDotClass(s: FormationStatus): string {
   switch (s) {
     case "new":          return "bg-[#635bff]";
     case "reviewing":    return "bg-cyan-400";
@@ -171,7 +171,7 @@ export function statusDotClass(s: FormationStatus): string {
   }
 }
 
-export function statusToneClass(s: FormationStatus): string {
+function statusToneClass(s: FormationStatus): string {
   switch (s) {
     case "new":         return "border-[#635bff]/30 bg-[#635bff]/10 text-[#a3a0ff]";
     case "reviewing":   return "border-cyan-400/30 bg-cyan-400/10 text-cyan-200";

@@ -6,11 +6,13 @@ import { PRODUCTS } from "@/lib/supermarket2/defaults";
 import { useCart } from "@/lib/supermarket2/context";
 import { useWishlist } from "@/lib/supermarket2/context";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 
 const BASE_PATH = "/templates/supermarket-2/preview";
 
-export default function ProductDetailPage({ params }: { params: { handle: string } }) {
+export default function ProductDetailPage() {
+  const params = useParams<{ handle: string }>();
   const product = PRODUCTS.find(p => p.slug === params.handle) || PRODUCTS[0];
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();

@@ -6,10 +6,12 @@ import ShopMain from "@/components/templates/supermarket3/shop/ShopMain";
 import { PRODUCTS } from "@/lib/supermarket3/defaults";
 import type { Product } from "@/lib/supermarket3/types";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 const BASE_PATH = "/templates/supermarket-3/preview";
 
-export default function CategoryPage({ params }: { params: { handle: string } }) {
+export default function CategoryPage() {
+  const params = useParams<{ handle: string }>();
   return (
     <div className="demo-one">
       <HeaderTwo />
