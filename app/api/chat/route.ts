@@ -1,10 +1,24 @@
 import OpenAI from "openai";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+// Lazy Supabase client — never constructed at module import time.
+// Avoids "supabaseUrl is required" during Next.js "Collecting page data".
+let _supabase: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (_supabase) return _supabase;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    throw new Error(
+      "Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_URL and/or NEXT_PUBLIC_SUPABASE_ANON_KEY"
+    );
+  }
+  _supabase = createClient(url, key);
+  return _supabase;
+}
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -83,6 +97,7 @@ const saveLead = async (
   sessionId: string
 ) => {
   try {
+    const supabase = getSupabase();
     // 🔍 find existing lead by session
     const { data: existingLead, error } = await supabase
       .from("leads")
@@ -132,6 +147,7 @@ const saveLead = async (
 
 export async function POST(req: Request) {
   try {
+    const supabase = getSupabase();
     const { message, history = [], sessionId } = await req.json();
 
     if (!sessionId) {
