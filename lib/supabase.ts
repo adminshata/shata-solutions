@@ -1,31 +1,53 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+function getSupabasePublicEnv() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// Singleton browser client — used by app/dashboard and other client pages
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: { persistSession: true, autoRefreshToken: true },
-});
+  if (!url || !key) {
+    throw new Error(
+      "Missing Supabase env vars: NEXT_PUBLIC_SUPABASE_URL and/or NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    );
+  }
+
+  return { url, key };
+}
+
+function getSupabaseServiceEnv() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key) {
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+  }
+
+  return { url, key };
+}
 
 // Client (browser) — RLS enforced
 let _browser: SupabaseClient | null = null;
 export function supabaseBrowser(): SupabaseClient {
   if (!_browser) {
-    _browser = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    const { url, key } = getSupabasePublicEnv();
+    _browser = createClient(url, key, {
       auth: { persistSession: true, autoRefreshToken: true },
     });
   }
   return _browser;
 }
 
+// Singleton browser client — used by app/dashboard and other client pages.
+// Proxy keeps existing call sites working while avoiding createClient at import time.
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop, receiver) {
+    return Reflect.get(supabaseBrowser(), prop, receiver);
+  },
+});
+
 // Server (admin) — bypasses RLS. NEVER expose to client.
 export function supabaseAdmin(): SupabaseClient {
-  if (!SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set");
-  }
-  return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  const { url, key } = getSupabaseServiceEnv();
+  return createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }

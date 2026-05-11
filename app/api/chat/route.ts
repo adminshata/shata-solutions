@@ -20,9 +20,16 @@ function getSupabase(): SupabaseClient {
   return _supabase;
 }
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let _openai: OpenAI | null = null;
+function getOpenAI(): OpenAI {
+  if (_openai) return _openai;
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing OpenAI env var: OPENAI_API_KEY");
+  }
+  _openai = new OpenAI({ apiKey });
+  return _openai;
+}
 
 const MAKE_WEBHOOK = "https://hook.us2.make.com/ksqvtzcbif1143uiv1t0pvkno67dhsol";
 
@@ -302,6 +309,7 @@ export async function POST(req: Request) {
       }
     }
 
+    const openai = getOpenAI();
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
