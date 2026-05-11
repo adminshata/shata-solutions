@@ -151,7 +151,7 @@ function PipelineColumn({ status, count }: { status: FormationStatus; count: num
   );
 }
 
-export function statusDotClass(s: FormationStatus): string {
+function statusDotClass(s: FormationStatus): string {
   switch (s) {
     case "new":          return "bg-[#635bff]";
     case "reviewing":    return "bg-cyan-400";
