@@ -3,6 +3,8 @@ import { Raleway } from "next/font/google";
 import { Restaurant1Provider } from "@/lib/restaurant1/context";
 import { PreviewFrame } from "@/components/templates/restaurant1/layout/PreviewFrame";
 
+export const dynamic = "force-dynamic";
+
 const raleway = Raleway({
   subsets: ["latin"],
   variable: "--font-r1-body",

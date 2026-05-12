@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Supermarket3Provider } from "@/lib/supermarket3/context";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "BlueMart — Blue Grocery Deals",
   description: "Live preview of the BlueMart supermarket template by Shata Solutions.",

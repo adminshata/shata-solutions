@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { Montserrat, Raleway } from "next/font/google";
 import { PreviewFrame } from "@/components/templates/cafe1/layout/PreviewFrame";
 
+export const dynamic = "force-dynamic";
+
 const montserrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-c1-body",

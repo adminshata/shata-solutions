@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Supermarket4Provider } from "@/lib/supermarket4/context";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "OrangeMart — Orange Grocery Deals",
   description: "Live preview of the OrangeMart supermarket template by Shata Solutions.",

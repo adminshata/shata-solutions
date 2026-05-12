@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { JewelryShop1Provider } from "@/lib/jewelryShop1/context";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Shata Jewelry — Website Preview",
   description: "Preview of the Shata Jewelry e-commerce template.",

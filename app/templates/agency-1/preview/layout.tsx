@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { Agency1Provider } from "@/lib/agency1/context";
 import Agency1DebugImages from "@/components/templates/agency1/Agency1DebugImages";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Shata AI Agency – AI Agency & Intelligent Solutions",
   description:

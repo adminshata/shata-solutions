@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { StoreProvider } from "@/lib/shata-store/context";
 import { StoreShell } from "@/components/templates/shata-store/layout/StoreShell";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Shata Store — premium ecommerce template",
   description:

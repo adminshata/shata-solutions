@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Supermarket2Provider } from "@/lib/supermarket2/context";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "QuickMart — Fresh Grocery Deals",
   description: "Live preview of the QuickMart supermarket template by Shata Solutions.",

@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { StoreProvider } from "@/lib/shata-home/context";
 import { StoreShell } from "@/components/templates/shata-home/layout/StoreShell";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Shata Home — Premium Furniture & Decor Template",
   description:

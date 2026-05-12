@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Supermarket5Provider } from "@/lib/supermarket5/context";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "VividMart — Premium Grocery Deals",
   description: "Live preview of the VividMart supermarket template by Shata Solutions.",

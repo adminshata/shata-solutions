@@ -16,11 +16,3 @@ export default async function SpaSalon1SlugPage({ params }: Props) {
   const htmlPage = SLUG_MAP[slug] ?? "demo-1.html";
   return <SpaSalon1Frame page={htmlPage} title={`${slug} — Shata Spa & Salon`} />;
 }
-
-export async function generateStaticParams() {
-  return [
-    { slug: "faqs" },
-    { slug: "gift-cards" },
-    { slug: "terms" },
-  ];
-}

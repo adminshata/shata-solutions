@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Agency8Provider } from "../../../../lib/agency8/context";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Shata SaaS & Startups - Website Preview",
   description:

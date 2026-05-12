@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Agency6Provider } from "../../../../lib/agency6/context";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Shata SEO Agency - Website Preview",
   description:

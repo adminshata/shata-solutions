@@ -4,6 +4,8 @@ import { SiteShell } from "@/components/templates/shata-cafe/layout/SiteShell";
 import { SHATA_CAFE_DEFAULTS } from "@/lib/shata-cafe/defaults";
 import type { SiteConfig } from "@/lib/shata-cafe/types";
 
+export const dynamic = "force-dynamic";
+
 const BASE = "/templates/cafe1/preview";
 
 const CAFE1_CONFIG: SiteConfig = {

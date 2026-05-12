@@ -199,7 +199,3 @@ export default async function SpaSalon1TeamMemberPage({ params }: Props) {
     </div>
   );
 }
-
-export async function generateStaticParams() {
-  return defaultSpaSalon1Config.team.map((m) => ({ slug: m.slug }));
-}
