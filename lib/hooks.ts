@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { supabaseBrowser } from "./supabase";
-const supabase = supabaseBrowser();
 import { ELEVENLABS_VOICE_ID, MAKE_WEBHOOK_URL } from "./constants";
 import type { ChatMessage, CtaType } from "./types";
 
@@ -219,6 +218,7 @@ export async function saveLead(
   sessionId: string
 ) {
   try {
+    const supabase = supabaseBrowser();
     const { data: existing } = await supabase
       .from("leads")
       .select("id, email, phone")
