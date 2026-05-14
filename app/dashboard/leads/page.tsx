@@ -1,19 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
+export const dynamic = "force-dynamic";
 
-let _supabase: SupabaseClient | null = null;
-function getSupabase(): SupabaseClient {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-  }
-  return _supabase;
-}
+import { useEffect, useState } from "react";
+import { supabaseBrowser } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 interface Lead {
   id: string;
@@ -33,7 +24,7 @@ export default function LeadsPage() {
   useEffect(() => {
     fetchLeads();
 
-    const supabase = getSupabase();
+    const supabase = supabaseBrowser();
     const channel = supabase
       .channel("realtime-leads")
       .on(
@@ -51,12 +42,12 @@ export default function LeadsPage() {
       .subscribe();
 
     return () => {
-      getSupabase().removeChannel(channel);
+      supabaseBrowser().removeChannel(channel);
     };
   }, []);
 
   const fetchLeads = async () => {
-    const { data, error } = await getSupabase()
+    const { data, error } = await supabaseBrowser()
       .from("leads")
       .select("*")
       .order("created_at", { ascending: false });
@@ -88,14 +79,13 @@ export default function LeadsPage() {
     if (hoursAgo < 1) score += 20;
     else if (hoursAgo < 24) score += 10;
 
-    // 🧠 REAL AI BEHAVIOR FROM MESSAGES
     if (lead.messages && lead.messages.length > 0) {
       const fullText = lead.messages
         .map((m) => m.message.toLowerCase())
         .join(" ");
 
       if (fullText.includes("price") || fullText.includes("how much")) {
-        score += 20; // strong buying intent
+        score += 20;
       }
 
       if (fullText.includes("start") || fullText.includes("setup")) {
@@ -107,7 +97,7 @@ export default function LeadsPage() {
       }
 
       if (fullText.includes("just asking") || fullText.includes("info")) {
-        score -= 10; // low intent
+        score -= 10;
       }
     }
 

@@ -1,19 +1,10 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
-
-let _supabase: SupabaseClient | null = null;
-function getSupabase(): SupabaseClient {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-  }
-  return _supabase;
-}
+import { supabaseBrowser } from "@/lib/supabase";
 
 interface MessageItem {
   role: "user" | "assistant" | string;
@@ -54,7 +45,7 @@ export default function LeadDetailsPage() {
   }, [lead]);
 
   const fetchLead = async () => {
-    const { data, error } = await getSupabase()
+    const { data, error } = await supabaseBrowser()
       .from("leads")
       .select("*")
       .eq("id", id)
