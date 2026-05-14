@@ -2,12 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+let _supabase: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    _supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+  }
+  return _supabase;
+}
 
 interface MessageItem {
   role: "user" | "assistant" | string;
@@ -48,7 +54,7 @@ export default function LeadDetailsPage() {
   }, [lead]);
 
   const fetchLead = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from("leads")
       .select("*")
       .eq("id", id)

@@ -1,13 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+let _supabase: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    _supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+  }
+  return _supabase;
+}
 
 interface Lead {
   id: string;
@@ -27,6 +33,7 @@ export default function LeadsPage() {
   useEffect(() => {
     fetchLeads();
 
+    const supabase = getSupabase();
     const channel = supabase
       .channel("realtime-leads")
       .on(
@@ -44,12 +51,12 @@ export default function LeadsPage() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      getSupabase().removeChannel(channel);
     };
   }, []);
 
   const fetchLeads = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from("leads")
       .select("*")
       .order("created_at", { ascending: false });
