@@ -256,6 +256,7 @@ export async function POST(req: Request) {
         }
 
         // 🔥 use fallback if no direct match
+        let leadHandled = false;
         if (!existingLead?.id && fallbackLeadId) {
           const { error: fallbackUpdateError } = await supabase
             .from("leads")
@@ -271,10 +272,10 @@ export async function POST(req: Request) {
             console.error("Fallback update error:", fallbackUpdateError);
           }
 
-          return;
+          leadHandled = true;
         }
 
-        if (existingLead?.id) {
+        if (!leadHandled && existingLead?.id) {
           const { error: updateError } = await supabase
             .from("leads")
             .update({
@@ -288,7 +289,7 @@ export async function POST(req: Request) {
           if (updateError) {
             console.error("Supabase update error:", updateError);
           }
-        } else {
+        } else if (!leadHandled) {
           const { error: insertError } = await supabase
             .from("leads")
             .insert([
