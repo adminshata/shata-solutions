@@ -139,13 +139,55 @@ export default function SiteFooter({ isDark }: Props) {
           </div>
         </div>
 
+        {/* Legal company summary */}
         <div
-          className={`mt-14 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs ${
+          className={`mt-14 rounded-2xl border px-6 py-5 text-xs leading-relaxed ${
+            isDark
+              ? "border-white/10 bg-white/[0.03] text-white/40"
+              : "border-slate-200 bg-slate-100/60 text-slate-500"
+          }`}
+        >
+          <p className="mb-2">
+            <span className={`font-semibold ${isDark ? "text-white/70" : "text-slate-700"}`}>
+              Shata Global LLC
+            </span>{" "}
+            (operating as <span className={`font-semibold ${isDark ? "text-white/70" : "text-slate-700"}`}>Shata Solutions</span>) is a
+            U.S.-registered Limited Liability Company incorporated in the State of Wyoming. We provide digital services
+            including website development, AI automation, branding, SaaS solutions, website templates, and business
+            formation support. Business Email:{" "}
+            <a href="mailto:info@shatasolutions.com" className="hover:text-blue-500 transition-colors">
+              info@shatasolutions.com
+            </a>{" "}
+            · Office: 3845 University Ave, San Diego, CA 92105 · EIN available upon request.
+          </p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
+            {[
+              { label: "Privacy Policy", href: "/privacy" },
+              { label: "Terms of Service", href: "/terms" },
+              { label: "Refund Policy", href: "/refund" },
+              { label: "Compliance", href: "/compliance" },
+              { label: "Contact / Support", href: "mailto:support@shatasolutions.com" },
+            ].map(({ label, href }) => (
+              <a
+                key={label}
+                href={href}
+                className={`hover:text-blue-500 transition-colors ${
+                  isDark ? "text-white/40" : "text-slate-400"
+                }`}
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div
+          className={`mt-6 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs ${
             isDark ? "border-white/10 text-white/50" : "border-slate-200 text-slate-500"
           }`}
         >
           <p>
-            © {year} Shata Global LLC. All rights reserved. — Powered by Shata Global LLC, Wyoming & San Diego
+            © {year} Shata Global LLC. All rights reserved. — Wyoming & San Diego, USA
           </p>
           <p className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />

@@ -16,6 +16,7 @@ import Testimonials from "@/components/home/Testimonials";
 import FAQ from "@/components/home/FAQ";
 import LeadForm from "@/components/home/LeadForm";
 import CTA from "@/components/home/CTA";
+import BusinessInfo from "@/components/home/BusinessInfo";
 import SiteFooter from "@/components/home/SiteFooter";
 import AIChat from "@/components/home/AIChat";
 import ChatWidget from "@/components/home/ChatWidget";
@@ -92,6 +93,8 @@ export default function HomePage() {
         <FAQ isDark={isDark} />
 
         <LeadForm isDark={isDark} sessionId={sessionId} />
+
+        <BusinessInfo isDark={isDark} />
 
         <CTA openOnboarding={openOnboarding} />
       </main>

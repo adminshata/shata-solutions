@@ -16,6 +16,7 @@ import Timeline from "@/components/about/Timeline";
 import Team from "@/components/about/Team";
 import TrustAndSecurity from "@/components/about/TrustAndSecurity";
 import AboutCTA from "@/components/about/AboutCTA";
+import BusinessInfo from "@/components/home/BusinessInfo";
 
 import { useTheme, useSession, useCursorGlow } from "@/lib/hooks";
 import type { PlanId } from "@/lib/types";
@@ -67,6 +68,7 @@ export default function AboutPage() {
         <Timeline isDark={isDark} />
         <Team isDark={isDark} />
         <TrustAndSecurity isDark={isDark} />
+        <BusinessInfo isDark={isDark} />
         <AboutCTA isDark={isDark} openOnboarding={openOnboarding} />
       </main>
 
