@@ -251,7 +251,10 @@ export default function Pricing({ isDark, openOnboarding }: Props) {
             isDark ? "text-white/60" : "text-slate-500"
           }`}
         >
-          Need a custom plan? <a href="#contact" className="text-blue-500 hover:underline">Contact us</a>
+          Need a custom plan?{" "}
+          <a href="#contact" className="text-blue-500 hover:underline">Contact us</a>
+          {" · "}
+          <a href="/pricing" className="text-blue-500 hover:underline">View full service pricing guide →</a>
         </p>
       </div>
     </section>
