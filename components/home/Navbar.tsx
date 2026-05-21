@@ -293,7 +293,7 @@ export default function Navbar({
           </div>
 
           <Link href="/" className="px-1.5 py-1 hover:text-blue-500 transition whitespace-nowrap">Home</Link>
-          <a href="#pricing" className="px-1.5 py-1 hover:text-blue-500 transition whitespace-nowrap">Pricing</a>
+          <Link href="/pricing" className="px-1.5 py-1 hover:text-blue-500 transition whitespace-nowrap">Pricing</Link>
 
           <div
             className="relative"
@@ -434,7 +434,7 @@ export default function Navbar({
                 { href: "/services/marketing-plans", label: "Marketing Plans" },
                 { href: "/services/branding", label: "Branding" },
                 { href: "/services/global-business", label: "Global Business" },
-                { href: "#pricing", label: "Pricing" },
+                { href: "/pricing", label: "Pricing" },
               ].map((item, i) => (
                 <a
                   key={item.href}
