@@ -99,7 +99,7 @@ const CONTACT_FIELDS = [
 ];
 
 const ADDRESS_FIELDS = [
-  { label: "Office Address", value: "3845 University Ave, San Diego, CA 92105" },
+  { label: "Mailing Address", value: "3845 University Ave, San Diego, CA 92105" },
   { label: "Registered State", value: "Wyoming, United States" },
   { label: "Official Website", value: "shatasolutions.com" },
   { label: "Service Delivery", value: "100% Online, Cloud-Based" },
@@ -313,7 +313,7 @@ export default function BusinessInfo({ isDark }: Props) {
             icon={<MapPinIcon />}
             iconBg={isDark ? "bg-orange-500/15" : "bg-orange-50"}
             iconColor={isDark ? "text-orange-400" : "text-orange-600"}
-            title="Business Address"
+            title="Mailing Address"
             fields={ADDRESS_FIELDS}
           />
           <InfoCard

@@ -158,7 +158,7 @@ export default function SiteFooter({ isDark }: Props) {
             <a href="mailto:info@shatasolutions.com" className="hover:text-blue-500 transition-colors">
               info@shatasolutions.com
             </a>{" "}
-            · Office: 3845 University Ave, San Diego, CA 92105 · EIN available upon request.
+            · Mailing Address: 3845 University Ave, San Diego, CA 92105 · EIN available upon request.
           </p>
           <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
             {[
