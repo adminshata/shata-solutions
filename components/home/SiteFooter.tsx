@@ -129,11 +129,14 @@ export default function SiteFooter({ isDark }: Props) {
             </h4>
             <ul className="space-y-2 text-sm font-bold">
               <li><a href="#contact" className="hover:text-blue-500 transition hover:translate-x-1">Contact</a></li>
+              <li><a href="mailto:support@shatasolutions.com" className="hover:text-blue-500 transition hover:translate-x-1 text-xs font-normal">support@</a></li>
+              <li><a href="mailto:sales@shatasolutions.com" className="hover:text-blue-500 transition hover:translate-x-1 text-xs font-normal">sales@</a></li>
+              <li><a href="mailto:billing@shatasolutions.com" className="hover:text-blue-500 transition hover:translate-x-1 text-xs font-normal">billing@</a></li>
               <li>
-                <span className="text-xs">Wyoming HQ</span>
+                <span className="text-xs font-normal">Wyoming HQ</span>
               </li>
               <li>
-                <span className="text-xs">San Diego Office</span>
+                <span className="text-xs font-normal">San Diego Office</span>
               </li>
             </ul>
           </div>

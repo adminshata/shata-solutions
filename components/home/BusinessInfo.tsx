@@ -91,11 +91,12 @@ const SERVICES_FIELDS = [
 ];
 
 const CONTACT_FIELDS = [
-  { label: "Business Email", value: "info@shatasolutions.com" },
-  { label: "Support Email", value: "support@shatasolutions.com" },
+  { label: "General Inquiries", value: "info@shatasolutions.com" },
+  { label: "Customer Support", value: "support@shatasolutions.com" },
+  { label: "Sales Inquiries", value: "sales@shatasolutions.com" },
+  { label: "Billing & Payments", value: "billing@shatasolutions.com" },
   { label: "Phone", value: "+1 (619) 776-1222" },
   { label: "Support Hours", value: "Mon–Fri, 9 AM–6 PM EST" },
-  { label: "Response Time", value: "Within 24 hours guaranteed" },
 ];
 
 const ADDRESS_FIELDS = [
