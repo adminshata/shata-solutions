@@ -421,16 +421,26 @@ function PricingCard({
         </ul>
       </div>
 
-      <Link
-        href="/contact"
-        className={`mt-6 block text-center rounded-full py-2.5 text-sm font-semibold transition-all hover:scale-[1.02] ${
-          plan.featured
-            ? `${accentBg} ${accent} border ${accentBorder} hover:opacity-90`
-            : "border border-white/20 text-white hover:bg-white/[0.08]"
-        }`}
-      >
-        {plan.cta}
-      </Link>
+      <div className="mt-6 flex flex-col gap-2">
+        <Link
+          href="/contact"
+          className={`block text-center rounded-full py-2.5 text-sm font-semibold transition-all hover:scale-[1.02] ${
+            plan.featured
+              ? `${accentBg} ${accent} border ${accentBorder} hover:opacity-90`
+              : "border border-white/20 text-white hover:bg-white/[0.08]"
+          }`}
+        >
+          {plan.cta}
+        </Link>
+        {plan.price !== "Custom quote" && (
+          <Link
+            href="/checkout-demo"
+            className="block text-center rounded-full py-2 text-xs font-semibold text-blue-400 hover:text-blue-300 border border-blue-500/20 hover:border-blue-500/40 hover:bg-blue-500/10 transition-all"
+          >
+            Checkout Demo →
+          </Link>
+        )}
+      </div>
     </div>
   );
 }
@@ -532,6 +542,12 @@ export default function PricingPage() {
               className="px-7 py-3 bg-white text-black rounded-full text-sm font-semibold hover:bg-white/90 transition-colors"
             >
               Request a Free Quote
+            </Link>
+            <Link
+              href="/checkout-demo"
+              className="px-7 py-3 border border-blue-500/40 bg-blue-500/10 text-blue-400 rounded-full text-sm font-semibold hover:bg-blue-500/20 transition-colors"
+            >
+              Try Checkout Demo
             </Link>
             <Link
               href="/services"

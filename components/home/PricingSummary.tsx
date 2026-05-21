@@ -133,24 +133,36 @@ export default function PricingSummary({ isDark }: Props) {
           ))}
         </div>
 
-        {/* Footer note + link */}
+        {/* Footer note + links */}
         <div className="mt-10 text-center">
-          <p className={`text-xs mb-4 ${isDark ? "text-white/40" : "text-slate-400"}`}>
+          <p className={`text-xs mb-5 ${isDark ? "text-white/40" : "text-slate-400"}`}>
             Prices may vary. Government fees, domain, hosting, and third-party costs billed separately.
           </p>
-          <Link
-            href="/pricing"
-            className={`inline-flex items-center gap-2 rounded-full border px-6 py-2.5 text-sm font-semibold transition-all hover:scale-105 ${
-              isDark
-                ? "border-white/20 text-white hover:bg-white/[0.06]"
-                : "border-slate-300 text-slate-700 hover:bg-white"
-            }`}
-          >
-            View complete pricing guide
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/pricing"
+              className={`inline-flex items-center gap-2 rounded-full border px-6 py-2.5 text-sm font-semibold transition-all hover:scale-105 ${
+                isDark
+                  ? "border-white/20 text-white hover:bg-white/[0.06]"
+                  : "border-slate-300 text-slate-700 hover:bg-white"
+              }`}
+            >
+              View complete pricing guide
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+            <Link
+              href="/checkout-demo"
+              className={`inline-flex items-center gap-2 rounded-full border px-6 py-2.5 text-sm font-semibold transition-all hover:scale-105 ${
+                isDark
+                  ? "border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"
+                  : "border-blue-300 bg-blue-50 text-blue-600 hover:bg-blue-100"
+              }`}
+            >
+              Try Checkout Demo
+            </Link>
+          </div>
         </div>
       </div>
     </section>
