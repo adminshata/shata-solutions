@@ -12,7 +12,6 @@ import TechStats from "@/components/home/TechStats";
 import Integrations from "@/components/home/Integrations";
 import Services from "@/components/home/Services";
 import Pricing from "@/components/home/Pricing";
-import PricingSummary from "@/components/home/PricingSummary";
 import Testimonials from "@/components/home/Testimonials";
 import FAQ from "@/components/home/FAQ";
 import LeadForm from "@/components/home/LeadForm";
@@ -88,8 +87,6 @@ export default function HomePage() {
         <TechStats />
 
         <Pricing isDark={isDark} openOnboarding={openOnboarding} />
-
-        <PricingSummary isDark={isDark} />
 
         <Testimonials isDark={isDark} />
 
