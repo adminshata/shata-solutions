@@ -493,9 +493,16 @@ function FinalCTA({ industry }: { industry: WebsiteIndustry }) {
               <Link href="/contact?type=website-platform" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#635bff] to-cyan-400 px-8 py-3.5 text-sm font-semibold text-white shadow-[0_18px_50px_-12px_rgba(99,91,255,0.8)] transition hover:-translate-y-0.5">
                 {industry.ctaLabel} →
               </Link>
-              <Link href="/services/website-platform" className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.05] px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/[0.10]">
-                Explore all industries
-              </Link>
+              {industry.previewHref && (
+                <Link href={industry.previewHref} className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.05] px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/[0.10]">
+                  View live template →
+                </Link>
+              )}
+              {!industry.previewHref && (
+                <Link href="/services/website-platform" className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.05] px-8 py-3.5 text-sm font-semibold text-white backdrop-blur-xl transition hover:-translate-y-0.5 hover:bg-white/[0.10]">
+                  Explore all industries
+                </Link>
+              )}
             </div>
           </div>
         </div>

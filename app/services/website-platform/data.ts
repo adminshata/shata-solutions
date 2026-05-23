@@ -42,6 +42,7 @@ export type WebsiteIndustry = {
   conversionFlow: IndustryFlowStep[];
   trustSignals: IndustryTrust[];
   ctaLabel: string;
+  previewHref?: string;
 };
 
 /* ------------------------------------------------------------------ */
@@ -397,6 +398,7 @@ export const websiteIndustries: WebsiteIndustry[] = [
       { title: "Editorial voice", copy: "Articles and insights position the firm as a thought leader." },
     ],
     ctaLabel: "Start your law firm site",
+    previewHref: "/templates/multi-lawyer-1/preview",
   },
   {
     domain: "ecommerce.com",
