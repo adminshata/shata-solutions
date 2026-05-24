@@ -79,7 +79,8 @@ export default function Navbar({
   ];
 
   return (
-    <header className="sticky top-4 z-50 px-4">
+    <>
+    <header className="fixed top-3 left-0 right-0 z-50 px-4">
       <div
         className={`relative mx-auto max-w-7xl px-6 h-16 flex items-center justify-between rounded-2xl backdrop-blur-2xl border shadow-[0_20px_60px_rgba(0,0,0,0.12)] hover:shadow-[0_30px_80px_rgba(0,0,0,0.18)] transition-colors duration-300 ${
           isDark ? "bg-slate-900/60 border-white/10" : "bg-white/30 border-white/30"
@@ -503,5 +504,8 @@ export default function Navbar({
         </>
       )}
     </header>
+    {/* Spacer — pushes page content below the fixed navbar (top-3=12px + h-16=64px = 76px) */}
+    <div className="h-[76px]" aria-hidden="true" />
+    </>
   );
 }
