@@ -382,19 +382,54 @@ export default function Navbar({
           <button
             type="button"
             onClick={toggleTheme}
-            aria-label="Toggle theme"
-            className={`group relative inline-flex h-11 w-[78px] items-center rounded-full border px-1.5 transition-all duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_40px_rgba(59,130,246,0.18)] active:scale-[0.98] ${
-              isDark ? "border-white/10 bg-white/10 backdrop-blur-xl" : "border-slate-200 bg-white/80 backdrop-blur-xl"
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            className={`group relative inline-flex h-9 w-16 shrink-0 items-center rounded-full border transition-all duration-300 hover:scale-105 active:scale-95 ${
+              isDark
+                ? "border-blue-500/25 bg-slate-900 shadow-[0_0_16px_rgba(99,102,241,0.15)] hover:shadow-[0_0_24px_rgba(99,102,241,0.3)]"
+                : "border-slate-200/80 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.08)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
             }`}
           >
+            {/* Track fill */}
             <span
-              className={`absolute inset-y-1.5 left-1.5 w-8 rounded-full transition-all duration-300 shadow-md ${
-                isDark ? "translate-x-[34px] bg-gradient-to-br from-slate-700 to-slate-900" : "translate-x-0 bg-gradient-to-br from-yellow-300 to-orange-400"
+              className={`absolute inset-0 rounded-full transition-all duration-500 ${
+                isDark ? "bg-gradient-to-r from-indigo-950 to-slate-900 opacity-100" : "opacity-0"
               }`}
             />
-            <span className="relative z-10 flex w-full items-center justify-between px-1 text-sm">
-              <span className={`transition-all duration-300 ${isDark ? "text-white/40 scale-90" : "text-slate-700 scale-100"}`}>☀️</span>
-              <span className={`transition-all duration-300 ${isDark ? "text-white scale-100" : "text-slate-400 scale-90"}`}>🌙</span>
+            {/* Knob */}
+            <span
+              className={`relative z-10 flex h-7 w-7 items-center justify-center rounded-full shadow-md transition-all duration-300 ${
+                isDark
+                  ? "translate-x-[34px] bg-gradient-to-br from-indigo-600 to-violet-700 shadow-[0_2px_8px_rgba(99,102,241,0.5)]"
+                  : "translate-x-0.5 bg-gradient-to-br from-amber-400 to-orange-500 shadow-[0_2px_8px_rgba(251,146,60,0.4)]"
+              }`}
+            >
+              {isDark ? (
+                <svg className="h-3.5 w-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              ) : (
+                <svg className="h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                </svg>
+              )}
+            </span>
+            {/* Opposing icon (faint, on the other side) */}
+            <span
+              className={`absolute z-10 flex h-7 w-7 items-center justify-center rounded-full transition-all duration-300 ${
+                isDark ? "left-0.5" : "right-0.5"
+              }`}
+            >
+              {isDark ? (
+                <svg className="h-3 w-3 text-white/20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+                </svg>
+              ) : (
+                <svg className="h-3 w-3 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
             </span>
           </button>
 

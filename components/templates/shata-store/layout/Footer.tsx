@@ -60,7 +60,7 @@ export function Footer() {
                 <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--store-muted)]">{col.title}</div>
                 <ul className="mt-3 space-y-2 text-sm">
                   {col.items.map((it) => (
-                    <li key={it.href}>
+                    <li key={`${it.href}-${it.label}`}>
                       <Link href={it.href} className="text-[color:var(--store-fg)]/85 hover:text-[color:var(--store-fg)]">
                         {it.label}
                       </Link>
