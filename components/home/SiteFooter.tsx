@@ -94,6 +94,7 @@ export default function SiteFooter({ isDark }: Props) {
             </h4>
             <ul className="space-y-2 text-sm font-bold">
               <li><a href="#services" className="hover:text-blue-500 transition hover:translate-x-1">Services</a></li>
+              <li><a href="/website-templates" className="hover:text-blue-500 transition hover:translate-x-1">Templates</a></li>
               <li><a href="/pricing" className="hover:text-blue-500 transition hover:translate-x-1">Pricing</a></li>
               <li><a href="/checkout-demo" className="hover:text-blue-500 transition hover:translate-x-1">Checkout Demo</a></li>
               <li><a href="#flow" className="hover:text-blue-500 transition hover:translate-x-1">How it works</a></li>
