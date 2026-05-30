@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
 import { cn } from "../lib/utils";
 import { OrderStatus } from "@shata/types";
 
@@ -25,6 +24,23 @@ const ORDER_INDEX: Partial<Record<OrderStatus, number>> = {
 interface StatusTrackerProps {
   status: OrderStatus;
   className?: string;
+}
+
+function AnimatedCheck() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" className="h-4 w-4">
+      <motion.path
+        d="M4 11l4 4 8-8"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+      />
+    </svg>
+  );
 }
 
 export function StatusTracker({ status, className }: StatusTrackerProps) {
@@ -62,28 +78,40 @@ export function StatusTracker({ status, className }: StatusTrackerProps) {
 
           return (
             <div key={step.status} className="relative flex flex-col items-center gap-2 flex-1">
-              <motion.div
-                initial={{ scale: 0.8 }}
-                animate={{ scale: active ? 1.15 : 1 }}
-                className={cn(
-                  "relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors",
-                  done && "border-brand bg-brand text-white",
-                  active && "border-brand bg-white shadow-[0_0_0_4px_rgba(255,69,0,0.15)]",
-                  !done && !active && "border-muted bg-background"
-                )}
-              >
-                {done ? (
-                  <Check className="h-4 w-4" strokeWidth={3} />
-                ) : active ? (
-                  <motion.div
-                    className="h-2.5 w-2.5 rounded-full bg-brand"
-                    animate={{ scale: [1, 1.4, 1] }}
-                    transition={{ repeat: Infinity, duration: 1.5 }}
+              <div className="relative z-10 flex h-8 w-8 items-center justify-center">
+                {/* Pulsing ring behind active step */}
+                {active && (
+                  <motion.span
+                    className="absolute inset-0 rounded-full border-2 border-brand"
+                    animate={{ scale: [1, 1.7, 1], opacity: [0.8, 0, 0.8] }}
+                    transition={{ repeat: Infinity, duration: 1.8, ease: "easeOut" }}
                   />
-                ) : (
-                  <div className="h-2.5 w-2.5 rounded-full bg-muted" />
                 )}
-              </motion.div>
+
+                <motion.div
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: active ? 1.15 : 1 }}
+                  className={cn(
+                    "flex h-8 w-8 items-center justify-center rounded-full border-2 transition-colors",
+                    done && "border-brand bg-brand text-white",
+                    active && "border-brand bg-white shadow-[0_0_0_4px_rgba(255,69,0,0.15)]",
+                    !done && !active && "border-muted bg-background"
+                  )}
+                >
+                  {done ? (
+                    <AnimatedCheck />
+                  ) : active ? (
+                    <motion.div
+                      className="h-2.5 w-2.5 rounded-full bg-brand"
+                      animate={{ scale: [1, 1.4, 1] }}
+                      transition={{ repeat: Infinity, duration: 1.5 }}
+                    />
+                  ) : (
+                    <div className="h-2.5 w-2.5 rounded-full bg-muted" />
+                  )}
+                </motion.div>
+              </div>
+
               <span
                 className={cn(
                   "text-center text-[10px] font-semibold leading-tight",

@@ -1,6 +1,8 @@
 import { Injectable, BadRequestException, NotFoundException } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { DatabaseService } from "../../shared/database/database.service";
 import { StripeProvider } from "./providers/stripe.provider";
+import { PaymobProvider } from "./providers/paymob.provider";
 import type { IPaymentProvider } from "./payment-provider.interface";
 
 @Injectable()
@@ -9,11 +11,13 @@ export class PaymentsService {
 
   constructor(
     private readonly db: DatabaseService,
-    private readonly stripeProvider: StripeProvider
+    private readonly stripeProvider: StripeProvider,
+    private readonly paymobProvider: PaymobProvider,
+    private readonly events: EventEmitter2,
   ) {
     this.providers = new Map([
       ["STRIPE", stripeProvider],
-      // Add PaymobProvider, FawryProvider etc here as regional add-ons
+      ["PAYMOB", paymobProvider],
     ]);
   }
 
@@ -69,12 +73,37 @@ export class PaymentsService {
         where: { orderId: event.orderId },
         data: { status: "COMPLETED", settledAt: new Date() },
       });
-      await this.db.order.update({
+      const order = await this.db.order.update({
         where: { id: event.orderId },
         data: { status: "CONFIRMED" },
       });
+      this.events.emit("payment.completed", { orderId: event.orderId, restaurantId: order.restaurantId });
+    }
+
+    if (event.type === "payment.failed" && event.orderId) {
+      await this.db.paymentIntent.updateMany({
+        where: { orderId: event.orderId },
+        data: { status: "FAILED" },
+      });
+      this.events.emit("payment.failed", { orderId: event.orderId });
     }
 
     return { processed: true };
+  }
+
+  // Used by reconciliation queue job — returns stale PROCESSING intents
+  async getStaleProcessingIntents(olderThanMinutes = 10) {
+    const cutoff = new Date(Date.now() - olderThanMinutes * 60 * 1000);
+    return this.db.paymentIntent.findMany({
+      where: { status: "PROCESSING", createdAt: { lt: cutoff } },
+      include: { order: { select: { restaurantId: true } } },
+    });
+  }
+
+  async markIntentFailed(intentId: string) {
+    return this.db.paymentIntent.update({
+      where: { id: intentId },
+      data: { status: "FAILED" },
+    });
   }
 }

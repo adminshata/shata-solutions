@@ -8,6 +8,7 @@ import { DatabaseModule } from "./shared/database/database.module";
 import { RedisModule } from "./shared/redis/redis.module";
 import { RealtimeModule } from "./shared/realtime/realtime.module";
 import { TaxModule } from "./shared/tax/tax.module";
+import { QueueModule } from "./shared/queue/queue.module";
 
 import { AuthModule } from "./modules/auth/auth.module";
 import { TenantModule } from "./modules/tenant/tenant.module";
@@ -55,6 +56,7 @@ import { validateConfig } from "./config/config.validation";
     RedisModule,
     RealtimeModule,
     TaxModule,
+    QueueModule,
 
     // Feature modules
     AuthModule,

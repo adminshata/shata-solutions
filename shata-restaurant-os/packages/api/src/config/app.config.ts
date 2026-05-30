@@ -15,7 +15,20 @@ export default registerAs("app", () => ({
     apiKey: process.env["PAYMOB_API_KEY"] ?? "",
     integrationIdCard: process.env["PAYMOB_INTEGRATION_ID_CARD"] ?? "",
     integrationIdWallet: process.env["PAYMOB_INTEGRATION_ID_WALLET"] ?? "",
+    integrationIdInstapay: process.env["PAYMOB_INTEGRATION_ID_INSTAPAY"] ?? "",
     hmacSecret: process.env["PAYMOB_HMAC_SECRET"] ?? "",
+    iframeId: process.env["PAYMOB_IFRAME_ID"] ?? "",
+  },
+  anthropic: {
+    apiKey: process.env["ANTHROPIC_API_KEY"] ?? "",
+  },
+  onesignal: {
+    appId: process.env["ONESIGNAL_APP_ID"] ?? "",
+    apiKey: process.env["ONESIGNAL_API_KEY"] ?? "",
+  },
+  printer: {
+    defaultIp: process.env["PRINTER_DEFAULT_IP"] ?? "",
+    defaultPort: parseInt(process.env["PRINTER_DEFAULT_PORT"] ?? "9100", 10),
   },
   cloudflare: {
     r2Endpoint: process.env["CLOUDFLARE_R2_ENDPOINT"] ?? "",

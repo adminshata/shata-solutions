@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { StatusTracker, formatCurrency } from "@shata/ui";
@@ -14,20 +14,55 @@ interface OrderState {
   items: Array<{ id: string; quantity: number; product: { name: string }; totalPrice: number }>;
 }
 
+function AnimatedSuccessCircle() {
+  return (
+    <motion.div
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      transition={{ type: "spring", damping: 10, stiffness: 200 }}
+      className="mx-auto mb-4 flex h-20 w-20 items-center justify-center"
+    >
+      <svg viewBox="0 0 56 56" fill="none" className="h-20 w-20">
+        <motion.circle
+          cx="28"
+          cy="28"
+          r="26"
+          stroke="currentColor"
+          strokeWidth="2"
+          className="text-success"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        />
+        <motion.path
+          d="M16 29l8 8 16-16"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-success"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 0.4, ease: "easeOut", delay: 0.45 }}
+        />
+      </svg>
+    </motion.div>
+  );
+}
+
 export default function OrderTrackingPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const [order, setOrder] = useState<OrderState | null>(null);
+  const prevStatusRef = useRef<OrderStatus | null>(null);
 
   useEffect(() => {
     const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "";
 
-    // Initial fetch
     fetch(`${apiUrl}/api/orders/${orderId}`)
       .then((r) => r.json())
       .then(setOrder)
       .catch(console.error);
 
-    // SSE for live status updates
     const es = new EventSource(`${apiUrl}/api/orders/${orderId}/stream`);
     es.onmessage = (e: MessageEvent<string>) => {
       const data = JSON.parse(e.data) as { status: OrderStatus };
@@ -36,6 +71,32 @@ export default function OrderTrackingPage() {
     es.onerror = () => es.close();
     return () => es.close();
   }, [orderId]);
+
+  // Haptic + confetti on status transitions
+  useEffect(() => {
+    if (!order) return;
+
+    if (prevStatusRef.current !== null && prevStatusRef.current !== order.status) {
+      // Haptic feedback on every status change
+      if (typeof navigator !== "undefined" && navigator.vibrate) {
+        navigator.vibrate([50]);
+      }
+
+      // Full confetti celebration when served
+      if (order.status === "SERVED") {
+        import("canvas-confetti").then(({ default: confetti }) => {
+          confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+          // Second burst 400ms later for extra celebration
+          setTimeout(() => {
+            confetti({ particleCount: 60, spread: 120, origin: { x: 0.2, y: 0.7 } });
+            confetti({ particleCount: 60, spread: 120, origin: { x: 0.8, y: 0.7 } });
+          }, 400);
+        });
+      }
+    }
+
+    prevStatusRef.current = order.status;
+  }, [order?.status]);
 
   if (!order) {
     return (
@@ -56,20 +117,13 @@ export default function OrderTrackingPage() {
       >
         {isDone ? (
           <>
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", damping: 10, stiffness: 200 }}
-              className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-success/10 text-4xl"
-            >
-              ✓
-            </motion.div>
+            <AnimatedSuccessCircle />
             <h1 className="text-2xl font-bold text-success">Enjoy your meal!</h1>
           </>
         ) : (
           <>
             <h1 className="text-2xl font-bold">Order #{orderId.slice(-4).toUpperCase()}</h1>
-            <p className="mt-1 text-muted-foreground">We're working on it</p>
+            <p className="mt-1 text-muted-foreground">We&apos;re working on it</p>
           </>
         )}
       </motion.div>

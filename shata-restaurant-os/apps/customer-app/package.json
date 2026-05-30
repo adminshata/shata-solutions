@@ -12,6 +12,7 @@
   "dependencies": {
     "@shata/types": "*",
     "@shata/ui": "*",
+    "canvas-confetti": "^1.9.4",
     "framer-motion": "^11.0.0",
     "next": "^14.2.0",
     "react": "^18.3.0",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@shata/config": "*",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20.14.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",

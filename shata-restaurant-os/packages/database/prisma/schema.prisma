@@ -54,6 +54,7 @@ model Restaurant {
   staff          Staff[]
   kitchenTickets KitchenTicket[]
   transactions   Transaction[]
+  stampCards     StampCard[]
 
   @@index([orgId])
 }
@@ -130,6 +131,7 @@ model Product {
   isAvailable     Boolean    @default(true)
   isFeatured      Boolean    @default(false)
   calories        Int?
+  avgPrepMinutes  Int        @default(10)
   sortOrder       Int        @default(0)
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
@@ -184,11 +186,13 @@ model Order {
   total        Decimal     @db.Decimal(10, 2)
   notes        String?
   voidReason   String?
+  tipAmount    Decimal     @db.Decimal(10, 2) @default(0)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   items        OrderItem[]
   payment      PaymentIntent?
   kitchenTicket KitchenTicket?
+  tip          Tip?
 
   @@index([restaurantId, status])
   @@index([sessionId])
@@ -332,6 +336,187 @@ model LoyaltyTransaction {
   @@index([loyaltyAccountId])
 }
 
+// ── Phase 2: Stamp Card Loyalty ───────────────────────────────────────────
+
+model StampCard {
+  id               String             @id @default(cuid())
+  restaurantId     String
+  restaurant       Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  customerId       String
+  stamps           Int                @default(0)
+  stampsRequired   Int                @default(10)
+  rewardType       RewardType         @default(FREE_ITEM)
+  rewardProductId  String?
+  rewardDiscount   Decimal?           @db.Decimal(5, 2)
+  isRedeemed       Boolean            @default(false)
+  completedAt      DateTime?
+  createdAt        DateTime           @default(now())
+  transactions     StampTransaction[]
+
+  @@unique([restaurantId, customerId])
+  @@index([restaurantId])
+}
+
+model StampTransaction {
+  id          String    @id @default(cuid())
+  stampCardId String
+  stampCard   StampCard @relation(fields: [stampCardId], references: [id], onDelete: Cascade)
+  orderId     String
+  stampsAdded Int       @default(1)
+  createdAt   DateTime  @default(now())
+
+  @@index([stampCardId])
+}
+
+// ── Phase 2: Analytics Snapshot (pre-computed daily stats) ────────────────
+
+model AnalyticsSnapshot {
+  id                 String   @id @default(cuid())
+  restaurantId       String
+  date               DateTime @db.Date
+  totalOrders        Int
+  totalRevenue       Decimal  @db.Decimal(12, 2)
+  avgOrderValue      Decimal  @db.Decimal(10, 2)
+  topProducts        Json     @default("[]")
+  peakHour           Int      @default(0)
+  newCustomers       Int      @default(0)
+  returningCustomers Int      @default(0)
+  createdAt          DateTime @default(now())
+
+  @@unique([restaurantId, date])
+  @@index([restaurantId])
+}
+
+// ── Phase 2: Z-Report (daily settlement) ─────────────────────────────────
+
+model ZReport {
+  id           String   @id @default(cuid())
+  restaurantId String
+  date         DateTime @db.Date
+  pdfUrl       String   @default("")
+  totalOrders  Int
+  totalRevenue Decimal  @db.Decimal(12, 2)
+  totalTax     Decimal  @db.Decimal(12, 2)
+  totalRefunds Decimal  @db.Decimal(12, 2)
+  netRevenue   Decimal  @db.Decimal(12, 2)
+  createdAt    DateTime @default(now())
+
+  @@unique([restaurantId, date])
+  @@index([restaurantId])
+}
+
+// ── Phase 2: Thermal Printer Config ───────────────────────────────────────
+
+model PrinterConfig {
+  id           String      @id @default(cuid())
+  restaurantId String      @unique
+  type         PrinterType @default(NETWORK)
+  ipAddress    String?
+  port         Int?        @default(9100)
+  usbPath      String?
+  isActive     Boolean     @default(true)
+  printOnOrder Boolean     @default(true)
+  printReceipt Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+// ── Phase 2: Customer Devices (Push Notifications) ────────────────────────
+
+model CustomerDevice {
+  id           String   @id @default(cuid())
+  customerId   String
+  onesignalId  String   @unique
+  platform     String
+  restaurantId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([restaurantId])
+}
+
+// ── Phase 2: Menu Branch Overrides (per-branch price/availability) ────────
+
+model ProductBranchOverride {
+  id           String   @id @default(cuid())
+  productId    String
+  restaurantId String
+  price        Decimal? @db.Decimal(10, 2)
+  isAvailable  Boolean?
+  createdAt    DateTime @default(now())
+
+  @@unique([productId, restaurantId])
+  @@index([restaurantId])
+}
+
+// ── Phase 2: Tips ─────────────────────────────────────────────────────────
+
+model Tip {
+  id           String   @id @default(cuid())
+  orderId      String   @unique
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  restaurantId String
+  amount       Decimal  @db.Decimal(10, 2)
+  percentage   Int?
+  createdAt    DateTime @default(now())
+
+  @@index([restaurantId])
+}
+
+// ── Phase 2: Payment Links ────────────────────────────────────────────────
+
+model PaymentLink {
+  id            String     @id @default(cuid())
+  restaurantId  String
+  token         String     @unique @default(cuid())
+  amount        Decimal    @db.Decimal(10, 2)
+  currency      String     @default("USD")
+  description   String?
+  customerName  String?
+  customerPhone String?
+  status        LinkStatus @default(PENDING)
+  expiresAt     DateTime
+  paidAt        DateTime?
+  orderId       String?
+  createdAt     DateTime   @default(now())
+
+  @@index([restaurantId])
+  @@index([token])
+}
+
+// ── Phase 2: Webhook System ───────────────────────────────────────────────
+
+model WebhookEndpoint {
+  id           String            @id @default(cuid())
+  restaurantId String
+  url          String
+  events       String[]
+  secret       String            @default(cuid())
+  isActive     Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+  deliveries   WebhookDelivery[]
+
+  @@index([restaurantId])
+}
+
+model WebhookDelivery {
+  id             String          @id @default(cuid())
+  endpointId     String
+  endpoint       WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  event          String
+  payload        Json
+  responseStatus Int?
+  responseBody   String?
+  attempts       Int             @default(0)
+  succeededAt    DateTime?
+  nextRetryAt    DateTime?
+  createdAt      DateTime        @default(now())
+
+  @@index([endpointId])
+  @@index([nextRetryAt])
+}
+
 // ── Subscription ──────────────────────────────────────────────────────────
 
 model Subscription {
@@ -442,4 +627,22 @@ enum SubStatus {
   CANCELLED
   PAST_DUE
   TRIALING
+}
+
+enum RewardType {
+  FREE_ITEM
+  PERCENTAGE_DISCOUNT
+  FIXED_DISCOUNT
+}
+
+enum PrinterType {
+  NETWORK
+  USB
+}
+
+enum LinkStatus {
+  PENDING
+  PAID
+  EXPIRED
+  CANCELLED
 }

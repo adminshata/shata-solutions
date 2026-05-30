@@ -12,6 +12,8 @@ export default function MenuPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  // Track recently-added product IDs for the bounce animation
+  const [bouncingIds, setBouncingIds] = useState<Set<string>>(new Set());
   const { addItem, currency, locale } = useCartStore();
 
   useEffect(() => {
@@ -37,9 +39,22 @@ export default function MenuPage() {
   const activeProducts =
     categories.find((c) => c.id === activeCategory)?.products ?? [];
 
+  function handleAdd(product: Product) {
+    addItem({ productId: product.id, name: product.name, price: product.price, quantity: 1 });
+    setBouncingIds((prev) => new Set(prev).add(product.id));
+    // Clear bounce state after animation completes
+    setTimeout(() => {
+      setBouncingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(product.id);
+        return next;
+      });
+    }, 300);
+  }
+
   return (
     <div className="flex h-screen flex-col">
-      {/* Category sidebar (horizontal on mobile) */}
+      {/* Category nav */}
       <nav className="sticky top-0 z-20 flex gap-2 overflow-x-auto bg-background/95 px-4 py-3 shadow-sm backdrop-blur-sm">
         {categories.map((cat) => (
           <button
@@ -87,12 +102,19 @@ export default function MenuPage() {
                   <span className="font-bold text-brand">
                     {formatCurrency(product.price, currency, locale)}
                   </span>
-                  <button
-                    onClick={() => addItem({ productId: product.id, name: product.name, price: product.price, quantity: 1 })}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-white text-xl font-bold shadow hover:bg-brand-dark active:scale-95 transition-all"
+                  <motion.button
+                    animate={
+                      bouncingIds.has(product.id)
+                        ? { scale: [1, 1.15, 1] }
+                        : { scale: 1 }
+                    }
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    whileTap={{ scale: 1.15 }}
+                    onClick={() => handleAdd(product)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-white text-xl font-bold shadow hover:bg-brand-dark transition-colors"
                   >
                     +
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             </div>
