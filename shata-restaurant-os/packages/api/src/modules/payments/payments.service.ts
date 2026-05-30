@@ -15,7 +15,7 @@ export class PaymentsService {
     private readonly paymobProvider: PaymobProvider,
     private readonly events: EventEmitter2,
   ) {
-    this.providers = new Map([
+    this.providers = new Map<string, IPaymentProvider>([
       ["STRIPE", stripeProvider],
       ["PAYMOB", paymobProvider],
     ]);

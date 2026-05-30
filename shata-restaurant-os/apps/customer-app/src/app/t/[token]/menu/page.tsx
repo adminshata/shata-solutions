@@ -1,48 +1,80 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { useParams, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@shata/ui";
 import { useCartStore } from "@/store/cart";
 import type { Category, Product } from "@shata/types";
 
+interface LastOrderItem {
+  productId: string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  isAvailable: boolean;
+}
+
+interface LastOrder {
+  id: string;
+  orderNumber: number;
+  total: number;
+  currency: string;
+  items: LastOrderItem[];
+}
+
 export default function MenuPage() {
   const { token } = useParams<{ token: string }>();
+  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  // Track recently-added product IDs for the bounce animation
+  const [lastOrder, setLastOrder] = useState<LastOrder | null>(null);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [reordering, setReordering] = useState(false);
   const [bouncingIds, setBouncingIds] = useState<Set<string>>(new Set());
   const { addItem, currency, locale } = useCartStore();
 
   useEffect(() => {
     const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "";
-    fetch(`${apiUrl}/api/sessions/${token}/menu`)
-      .then((r) => r.json())
-      .then((data: Category[]) => {
-        setCategories(data);
-        if (data.length > 0 && data[0]) setActiveCategory(data[0].id);
+    Promise.all([
+      fetch(`${apiUrl}/api/sessions/${token}/menu`).then((r) => r.json()),
+      fetch(`${apiUrl}/api/sessions/${token}/last-order`).then((r) =>
+        r.status === 200 ? r.json() : null
+      ),
+    ])
+      .then(([menuData, lastOrderData]: [Category[], LastOrder | null]) => {
+        setCategories(menuData);
+        if (menuData.length > 0 && menuData[0]) setActiveCategory(menuData[0].id);
+        if (lastOrderData) setLastOrder(lastOrderData);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [token]);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-      </div>
-    );
+  async function handleReorder() {
+    if (!lastOrder) return;
+    setReordering(true);
+    try {
+      const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "";
+      const res = await fetch(
+        `${apiUrl}/api/sessions/${token}/reorder/${lastOrder.id}`,
+        { method: "POST" }
+      );
+      if (res.ok) {
+        const order = await res.json() as { id: string };
+        router.push(`/t/${token}/order/${order.id}`);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setReordering(false);
+    }
   }
-
-  const activeProducts =
-    categories.find((c) => c.id === activeCategory)?.products ?? [];
 
   function handleAdd(product: Product) {
     addItem({ productId: product.id, name: product.name, price: product.price, quantity: 1 });
     setBouncingIds((prev) => new Set(prev).add(product.id));
-    // Clear bounce state after animation completes
     setTimeout(() => {
       setBouncingIds((prev) => {
         const next = new Set(prev);
@@ -52,8 +84,58 @@ export default function MenuPage() {
     }, 300);
   }
 
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+      </div>
+    );
+  }
+
+  const activeProducts = categories.find((c) => c.id === activeCategory)?.products ?? [];
+  const availableLastItems = lastOrder?.items.filter((i) => i.isAvailable) ?? [];
+
   return (
     <div className="flex h-screen flex-col">
+      {/* Reorder banner */}
+      <AnimatePresence>
+        {lastOrder && !bannerDismissed && availableLastItems.length > 0 && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="overflow-hidden"
+          >
+            <div className="mx-4 mt-3 flex items-center justify-between gap-3 rounded-2xl bg-brand/8 border border-brand/20 px-4 py-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-brand">Last order</p>
+                <p className="mt-0.5 truncate text-sm text-foreground">
+                  {availableLastItems.slice(0, 3).map((i) => `${i.quantity}× ${i.name}`).join(", ")}
+                  {availableLastItems.length > 3 && ` +${availableLastItems.length - 3} more`}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  onClick={handleReorder}
+                  disabled={reordering}
+                  className="rounded-xl bg-brand px-3.5 py-1.5 text-xs font-bold text-white disabled:opacity-60"
+                >
+                  {reordering ? "Adding..." : "Reorder"}
+                </button>
+                <button
+                  onClick={() => setBannerDismissed(true)}
+                  className="text-muted-foreground hover:text-foreground transition-colors text-lg leading-none"
+                  aria-label="Dismiss"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Category nav */}
       <nav className="sticky top-0 z-20 flex gap-2 overflow-x-auto bg-background/95 px-4 py-3 shadow-sm backdrop-blur-sm">
         {categories.map((cat) => (

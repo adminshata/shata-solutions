@@ -3,7 +3,7 @@ import { DatabaseService } from "../../shared/database/database.service";
 import { RedisService } from "../../shared/redis/redis.service";
 import { SessionTokenService } from "../auth/session-token.service";
 import type { SessionContextDto } from "@shata/types";
-import { PaymentProvider } from "@shata/types";
+import { PaymentProvider, OrderStatus } from "@shata/types";
 
 const SESSION_CONTEXT_TTL = 3600; // 1 hour
 
@@ -56,5 +56,57 @@ export class SessionsService {
 
     await this.redis.setJson(cacheKey, ctx, SESSION_CONTEXT_TTL);
     return ctx;
+  }
+
+  async getLastOrder(token: string) {
+    const { tableId, restaurantId } = await this.sessionTokenSvc.verify(token);
+
+    const order = await this.db.order.findFirst({
+      where: {
+        restaurantId,
+        session: { tableId },
+        status: OrderStatus.SERVED,
+      },
+      orderBy: { createdAt: "desc" },
+      include: {
+        items: {
+          select: {
+            id: true,
+            quantity: true,
+            unitPrice: true,
+            totalPrice: true,
+            productId: true,
+            product: { select: { name: true, isAvailable: true } },
+          },
+        },
+      },
+    });
+
+    if (!order) return null;
+
+    return {
+      id: order.id,
+      orderNumber: order.orderNumber,
+      total: Number(order.total),
+      currency: order.currency,
+      createdAt: order.createdAt,
+      items: order.items.map((i) => ({
+        productId: i.productId,
+        name: i.product.name,
+        quantity: i.quantity,
+        unitPrice: Number(i.unitPrice),
+        isAvailable: i.product.isAvailable,
+      })),
+    };
+  }
+
+  async getActiveSessionForTable(token: string) {
+    const { tableId, restaurantId } = await this.sessionTokenSvc.verify(token);
+    const session = await this.db.session.findFirst({
+      where: { tableId, status: "ACTIVE" },
+      orderBy: { openedAt: "desc" },
+      select: { id: true },
+    });
+    return { sessionId: session?.id ?? null, restaurantId };
   }
 }

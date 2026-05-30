@@ -19,7 +19,7 @@ export class SessionCleanupProcessor extends WorkerHost {
     const cutoff = new Date(Date.now() - 4 * 60 * 60 * 1000);
 
     const result = await this.db.session.updateMany({
-      where: { status: "ACTIVE", createdAt: { lt: cutoff } },
+      where: { status: "ACTIVE", openedAt: { lt: cutoff } },
       data: { status: "ABANDONED", closedAt: new Date() },
     });
 

@@ -123,6 +123,26 @@ export class OrdersService {
     return order;
   }
 
+  async reorderFrom(restaurantId: string, sessionId: string, orderId: string) {
+    const original = await this.db.order.findUnique({
+      where: { id: orderId, restaurantId },
+      include: { items: { select: { productId: true, quantity: true, notes: true } } },
+    });
+    if (!original) throw new NotFoundException("Original order not found");
+
+    // Re-place with cloned items — placeOrder re-validates availability and re-prices
+    const dto = {
+      items: original.items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        selectedOptionIds: [] as string[],
+        notes: item.notes ?? undefined,
+      })),
+    } as import("@shata/types").PlaceOrderDto;
+
+    return this.placeOrder(restaurantId, sessionId, dto);
+  }
+
   async updateStatus(restaurantId: string, orderId: string, status: string, voidReason?: string) {
     const order = await this.db.order.update({
       where: { id: orderId, restaurantId },
