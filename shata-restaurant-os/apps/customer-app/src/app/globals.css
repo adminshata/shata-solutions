@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --border: 214.3 31.8% 91.4%;
+    --ring: 15 100% 50%;
+    --radius: 0.75rem;
+  }
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+}
+
+/* Cart bar safe area */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }

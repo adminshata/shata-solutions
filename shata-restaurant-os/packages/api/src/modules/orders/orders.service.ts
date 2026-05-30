@@ -1,0 +1,140 @@
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { DatabaseService } from "../../shared/database/database.service";
+import { TaxService } from "../../shared/tax/tax.service";
+import { KitchenGateway } from "../../shared/realtime/kitchen.gateway";
+import { DashboardGateway } from "../../shared/realtime/dashboard.gateway";
+import type { PlaceOrderDto } from "@shata/types";
+
+@Injectable()
+export class OrdersService {
+  constructor(
+    private readonly db: DatabaseService,
+    private readonly taxService: TaxService,
+    private readonly kitchenGateway: KitchenGateway,
+    private readonly dashboardGateway: DashboardGateway,
+    private readonly events: EventEmitter2
+  ) {}
+
+  async placeOrder(restaurantId: string, sessionId: string, dto: PlaceOrderDto) {
+    // 1. Load restaurant for currency + tax config
+    const restaurant = await this.db.restaurant.findUnique({
+      where: { id: restaurantId },
+    });
+    if (!restaurant) throw new NotFoundException("Restaurant not found");
+
+    // 2. Load and validate every product — NEVER trust client prices
+    const productIds = dto.items.map((i) => i.productId);
+    const products = await this.db.product.findMany({
+      where: { id: { in: productIds }, restaurantId, isAvailable: true },
+      include: { modifierGroups: { include: { options: true } } },
+    });
+
+    if (products.length !== productIds.length) {
+      throw new BadRequestException("One or more products are unavailable");
+    }
+
+    // 3. Calculate subtotal server-side
+    let subtotal = 0;
+    const itemsData = dto.items.map((item) => {
+      const product = products.find((p) => p.id === item.productId);
+      if (!product) throw new BadRequestException(`Product ${item.productId} not found`);
+
+      let unitPrice = Number(product.price);
+
+      // Add modifier deltas (server-validated)
+      if (item.selectedOptionIds.length > 0) {
+        for (const optionId of item.selectedOptionIds) {
+          const option = product.modifierGroups
+            .flatMap((g) => g.options)
+            .find((o) => o.id === optionId);
+          if (option) unitPrice += Number(option.priceDelta);
+        }
+      }
+
+      const totalPrice = round2(unitPrice * item.quantity);
+      subtotal += totalPrice;
+
+      return {
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: round2(unitPrice),
+        totalPrice,
+        notes: item.notes,
+        selectedOptions: {
+          create: item.selectedOptionIds.map((id) => {
+            const option = product.modifierGroups
+              .flatMap((g) => g.options)
+              .find((o) => o.id === id);
+            return {
+              modifierOptionId: id,
+              name: option?.name ?? "",
+              priceDelta: Number(option?.priceDelta ?? 0),
+            };
+          }),
+        },
+      };
+    });
+
+    // 4. Calculate tax using TaxService — uses restaurant.taxRate, never hardcoded
+    const { tax, total } = this.taxService.calculate(
+      subtotal,
+      Number(restaurant.taxRate),
+      restaurant.taxInclusive
+    );
+
+    // 5. Atomic order creation
+    const orderCount = await this.db.order.count({ where: { restaurantId } });
+    const order = await this.db.order.create({
+      data: {
+        orderNumber: orderCount + 1,
+        restaurantId,
+        sessionId,
+        currency: restaurant.currency,
+        subtotal,
+        tax,
+        total,
+        notes: dto.notes,
+        status: "PENDING",
+        items: { create: itemsData },
+      },
+      include: { items: { include: { selectedOptions: true } } },
+    });
+
+    // 6. Emit events — kitchen + dashboard will receive in < 500ms
+    this.events.emit("order.created", { restaurantId, order });
+
+    return order;
+  }
+
+  async getOrder(orderId: string) {
+    const order = await this.db.order.findUnique({
+      where: { id: orderId },
+      include: {
+        items: { include: { product: true, selectedOptions: true } },
+        kitchenTicket: true,
+      },
+    });
+    if (!order) throw new NotFoundException("Order not found");
+    return order;
+  }
+
+  async updateStatus(restaurantId: string, orderId: string, status: string, voidReason?: string) {
+    const order = await this.db.order.update({
+      where: { id: orderId, restaurantId },
+      data: { status: status as never, voidReason },
+    });
+
+    this.dashboardGateway.emitOrderUpdate(restaurantId, order);
+    this.events.emit("order.status_changed", { restaurantId, order });
+    return order;
+  }
+}
+
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}

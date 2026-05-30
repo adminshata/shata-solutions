@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 15 23 42;
+    --foreground: 248 250 252;
+    --muted: 30 41 59;
+    --muted-foreground: 148 163 184;
+    --border: 51 65 85;
+    --ring: 15 100% 50%;
+    --radius: 0.75rem;
+  }
+  * { @apply border-border; }
+  body { @apply bg-slate-950 text-slate-50; }
+}
