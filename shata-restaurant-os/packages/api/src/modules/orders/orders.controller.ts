@@ -29,6 +29,13 @@ export class OrdersController {
   }
 
   @Public()
+  @Get("orders/:id/eta")
+  @ApiOperation({ summary: "Get estimated prep time for an order" })
+  getEta(@Param("id") id: string) {
+    return this.ordersService.getEta(id);
+  }
+
+  @Public()
   @Get("orders/:id/stream")
   @Sse()
   @ApiOperation({ summary: "SSE stream for live order status updates" })

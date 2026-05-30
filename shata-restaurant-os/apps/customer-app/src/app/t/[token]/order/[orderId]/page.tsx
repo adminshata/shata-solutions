@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { StatusTracker, formatCurrency } from "@shata/ui";
 import type { OrderStatus } from "@shata/types";
 
@@ -13,6 +13,14 @@ interface OrderState {
   currency: string;
   items: Array<{ id: string; quantity: number; product: { name: string }; totalPrice: number }>;
 }
+
+interface EtaState {
+  estimatedMinutes: number;
+  activeTicketsAhead: number;
+  fetchedAt: number;
+}
+
+const ETA_STATUSES: string[] = ["PREPARING", "COOKING"];
 
 function AnimatedSuccessCircle() {
   return (
@@ -50,17 +58,94 @@ function AnimatedSuccessCircle() {
   );
 }
 
+function CountdownTimer({ eta }: { eta: EtaState }) {
+  const [now, setNow] = useState(Date.now);
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const remainingSeconds = Math.max(
+    0,
+    eta.estimatedMinutes * 60 - Math.floor((now - eta.fetchedAt) / 1000)
+  );
+  const mins = Math.floor(remainingSeconds / 60);
+  const secs = remainingSeconds % 60;
+  const readySoon = remainingSeconds <= 120 && remainingSeconds > 0;
+  const done = remainingSeconds === 0;
+
+  return (
+    <AnimatePresence mode="wait">
+      {done ? null : (
+        <motion.div
+          key="countdown"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          className={`mt-6 flex flex-col items-center rounded-2xl px-6 py-4 ${
+            readySoon ? "bg-success/10" : "bg-muted"
+          }`}
+        >
+          {readySoon ? (
+            <>
+              <motion.p
+                animate={{ scale: [1, 1.04, 1] }}
+                transition={{ repeat: Infinity, duration: 1.4 }}
+                className="text-sm font-bold text-success"
+              >
+                Ready soon!
+              </motion.p>
+              <p className="mt-1 tabular-nums text-2xl font-black text-success">
+                {mins}:{String(secs).padStart(2, "0")}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-muted-foreground">Estimated wait</p>
+              <p className="mt-1 tabular-nums text-3xl font-black">
+                {mins}:{String(secs).padStart(2, "0")}
+              </p>
+              {eta.activeTicketsAhead > 0 && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {eta.activeTicketsAhead} order{eta.activeTicketsAhead !== 1 ? "s" : ""} ahead of yours
+                </p>
+              )}
+            </>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function OrderTrackingPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const [order, setOrder] = useState<OrderState | null>(null);
+  const [eta, setEta] = useState<EtaState | null>(null);
   const prevStatusRef = useRef<OrderStatus | null>(null);
+
+  // Fetch ETA whenever order enters a cooking status
+  const fetchEta = async () => {
+    const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "";
+    try {
+      const res = await fetch(`${apiUrl}/api/orders/${orderId}/eta`);
+      if (res.ok) {
+        const data = await res.json() as { estimatedMinutes: number; activeTicketsAhead: number };
+        setEta({ ...data, fetchedAt: Date.now() });
+      }
+    } catch { /* non-critical */ }
+  };
 
   useEffect(() => {
     const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "";
 
     fetch(`${apiUrl}/api/orders/${orderId}`)
       .then((r) => r.json())
-      .then(setOrder)
+      .then((data: OrderState) => {
+        setOrder(data);
+        if (ETA_STATUSES.includes(data.status)) fetchEta();
+      })
       .catch(console.error);
 
     const es = new EventSource(`${apiUrl}/api/orders/${orderId}/stream`);
@@ -72,21 +157,22 @@ export default function OrderTrackingPage() {
     return () => es.close();
   }, [orderId]);
 
-  // Haptic + confetti on status transitions
+  // Haptic + confetti + re-fetch ETA on status transition
   useEffect(() => {
     if (!order) return;
 
     if (prevStatusRef.current !== null && prevStatusRef.current !== order.status) {
-      // Haptic feedback on every status change
       if (typeof navigator !== "undefined" && navigator.vibrate) {
         navigator.vibrate([50]);
       }
 
-      // Full confetti celebration when served
+      if (ETA_STATUSES.includes(order.status)) {
+        fetchEta();
+      }
+
       if (order.status === "SERVED") {
         import("canvas-confetti").then(({ default: confetti }) => {
           confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
-          // Second burst 400ms later for extra celebration
           setTimeout(() => {
             confetti({ particleCount: 60, spread: 120, origin: { x: 0.2, y: 0.7 } });
             confetti({ particleCount: 60, spread: 120, origin: { x: 0.8, y: 0.7 } });
@@ -107,6 +193,7 @@ export default function OrderTrackingPage() {
   }
 
   const isDone = order.status === "SERVED";
+  const showEta = eta !== null && ETA_STATUSES.includes(order.status);
 
   return (
     <div className="mx-auto max-w-md px-4 py-8">
@@ -127,6 +214,8 @@ export default function OrderTrackingPage() {
           </>
         )}
       </motion.div>
+
+      {showEta && <CountdownTimer eta={eta} />}
 
       <div className="mt-10">
         <StatusTracker status={order.status} />

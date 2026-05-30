@@ -123,6 +123,39 @@ export class OrdersService {
     return order;
   }
 
+  async getEta(orderId: string) {
+    const order = await this.db.order.findUnique({
+      where: { id: orderId },
+      select: {
+        restaurantId: true,
+        createdAt: true,
+        items: { select: { product: { select: { avgPrepMinutes: true } } } },
+      },
+    });
+    if (!order) throw new NotFoundException("Order not found");
+
+    // Worst-case product prep time in this order (minimum 5 min floor)
+    const maxPrepMinutes = Math.max(
+      5,
+      ...order.items.map((i) => i.product.avgPrepMinutes)
+    );
+
+    // Active tickets created before this order are "ahead" in the queue
+    const activeTicketsAhead = await this.db.kitchenTicket.count({
+      where: {
+        restaurantId: order.restaurantId,
+        status: { in: ["PENDING", "IN_PROGRESS"] },
+        createdAt: { lt: order.createdAt },
+      },
+    });
+
+    // 2 min per ticket ahead, capped at 15 min
+    const queuePenalty = Math.min(activeTicketsAhead * 2, 15);
+    const estimatedMinutes = maxPrepMinutes + queuePenalty;
+
+    return { estimatedMinutes, activeTicketsAhead, maxPrepMinutes };
+  }
+
   async reorderFrom(restaurantId: string, sessionId: string, orderId: string) {
     const original = await this.db.order.findUnique({
       where: { id: orderId, restaurantId },
