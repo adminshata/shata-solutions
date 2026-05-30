@@ -184,6 +184,9 @@ export class OrdersService {
 
     this.dashboardGateway.emitOrderUpdate(restaurantId, order);
     this.events.emit("order.status_changed", { restaurantId, order });
+    if (status === "SERVED") {
+      this.events.emit("order.completed", { restaurantId, order });
+    }
     return order;
   }
 }

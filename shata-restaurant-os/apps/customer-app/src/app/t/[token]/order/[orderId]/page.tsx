@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { StatusTracker, formatCurrency } from "@shata/ui";
 import type { OrderStatus } from "@shata/types";
+import { StampCard } from "@/components/stamp-card";
 
 interface OrderState {
   id: string;
@@ -12,6 +13,14 @@ interface OrderState {
   total: number;
   currency: string;
   items: Array<{ id: string; quantity: number; product: { name: string }; totalPrice: number }>;
+}
+
+interface StampCardState {
+  stamps: number;
+  stampsRequired: number;
+  rewardType: string;
+  completedAt: string | null;
+  isRedeemed: boolean;
 }
 
 interface EtaState {
@@ -120,9 +129,10 @@ function CountdownTimer({ eta }: { eta: EtaState }) {
 }
 
 export default function OrderTrackingPage() {
-  const { orderId } = useParams<{ orderId: string }>();
+  const { token, orderId } = useParams<{ token: string; orderId: string }>();
   const [order, setOrder] = useState<OrderState | null>(null);
   const [eta, setEta] = useState<EtaState | null>(null);
+  const [stampCard, setStampCard] = useState<StampCardState | null>(null);
   const prevStatusRef = useRef<OrderStatus | null>(null);
 
   // Fetch ETA whenever order enters a cooking status
@@ -147,6 +157,14 @@ export default function OrderTrackingPage() {
         if (ETA_STATUSES.includes(data.status)) fetchEta();
       })
       .catch(console.error);
+
+    // Fetch loyalty card (non-critical, suppress errors)
+    if (token) {
+      fetch(`${apiUrl}/api/sessions/${token}/loyalty`)
+        .then((r) => r.ok ? r.json() : null)
+        .then((data: StampCardState | null) => { if (data) setStampCard(data); })
+        .catch(() => {/* non-critical */});
+    }
 
     const es = new EventSource(`${apiUrl}/api/orders/${orderId}/stream`);
     es.onmessage = (e: MessageEvent<string>) => {
@@ -238,6 +256,18 @@ export default function OrderTrackingPage() {
           <span>{formatCurrency(order.total, order.currency)}</span>
         </div>
       </div>
+
+      {stampCard && (
+        <div className="mt-4">
+          <StampCard
+            stamps={stampCard.stamps}
+            stampsRequired={stampCard.stampsRequired}
+            rewardType={stampCard.rewardType}
+            completedAt={stampCard.completedAt}
+            isRedeemed={stampCard.isRedeemed}
+          />
+        </div>
+      )}
     </div>
   );
 }

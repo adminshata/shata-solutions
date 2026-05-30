@@ -22,6 +22,7 @@ import { KitchenModule } from "./modules/kitchen/kitchen.module";
 import { AnalyticsModule } from "./modules/analytics/analytics.module";
 import { StaffModule } from "./modules/staff/staff.module";
 import { AdminModule } from "./modules/admin/admin.module";
+import { LoyaltyModule } from "./modules/loyalty/loyalty.module";
 
 import { CorrelationIdMiddleware } from "./shared/middleware/correlation-id.middleware";
 import { TenantMiddleware } from "./modules/tenant/tenant.middleware";
@@ -71,6 +72,7 @@ import { validateConfig } from "./config/config.validation";
     AnalyticsModule,
     StaffModule,
     AdminModule,
+    LoyaltyModule,
   ],
 })
 export class AppModule implements NestModule {
