@@ -36,6 +36,7 @@ export default function KitchenPage({
   const [connected, setConnected] = useState(false);
   const [online, setOnline] = useState(true);
   const [station, setStation] = useState<Station>("ALL");
+  const [recoveredCount, setRecoveredCount] = useState<number | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
   // Tick elapsed seconds every second
@@ -71,7 +72,7 @@ export default function KitchenPage({
 
     socket.on("connect", async () => {
       setConnected(true);
-      // Hydrate active tickets from REST on reconnect
+      // Re-hydrate from REST on every (re)connect to recover stale tickets
       const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "";
       try {
         const res = await fetch(
@@ -79,7 +80,16 @@ export default function KitchenPage({
         );
         if (res.ok) {
           const data: KitchenTicketDto[] = await res.json();
-          setTickets(data.filter((t) => t.status !== "READY"));
+          const fresh = data.filter((t) => t.status !== "READY");
+          setTickets((prev) => {
+            // Merge: add tickets not already in local state
+            const existingIds = new Set(prev.map((t) => t.id));
+            const newTickets = fresh.filter((t) => !existingIds.has(t.id));
+            if (newTickets.length > 0) setRecoveredCount(newTickets.length);
+            return [...newTickets, ...prev.filter((t) => fresh.find((f) => f.id === t.id))];
+          });
+          // Clear recovered notification after 4 seconds
+          setTimeout(() => setRecoveredCount(null), 4000);
         }
       } catch {
         // Non-fatal: will hydrate from socket events
@@ -162,6 +172,11 @@ export default function KitchenPage({
   return (
     <div className="flex h-screen flex-col bg-slate-950">
       {!online && <OfflineBanner />}
+      {recoveredCount !== null && (
+        <div className="bg-green-900 text-green-200 text-xs font-semibold text-center py-1.5 animate-pulse">
+          Reconnected — {recoveredCount} stale ticket{recoveredCount !== 1 ? "s" : ""} recovered
+        </div>
+      )}
 
       {/* Header */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-800 bg-slate-900 px-5">

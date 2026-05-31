@@ -12,6 +12,9 @@ import type { PlaceOrderDto } from "@shata/types";
 
 @Injectable()
 export class OrdersService {
+  // In-memory idempotency cache — evicts after 5 min. Production: use Redis.
+  private readonly idempotencyCache = new Map<string, { id: string; expiresAt: number }>();
+
   constructor(
     private readonly db: DatabaseService,
     private readonly taxService: TaxService,
@@ -19,6 +22,17 @@ export class OrdersService {
     private readonly dashboardGateway: DashboardGateway,
     private readonly events: EventEmitter2
   ) {}
+
+  findByIdempotencyKey(key: string): { id: string } | null {
+    const entry = this.idempotencyCache.get(key);
+    if (!entry) return null;
+    if (Date.now() > entry.expiresAt) { this.idempotencyCache.delete(key); return null; }
+    return { id: entry.id };
+  }
+
+  private cacheIdempotencyKey(key: string, orderId: string): void {
+    this.idempotencyCache.set(key, { id: orderId, expiresAt: Date.now() + 5 * 60 * 1000 });
+  }
 
   async placeOrder(restaurantId: string, sessionId: string, dto: PlaceOrderDto) {
     // 1. Load restaurant for currency + tax config

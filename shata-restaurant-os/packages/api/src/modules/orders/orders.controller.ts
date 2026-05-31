@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Param, Body, Sse } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Param, Body, Sse, Headers, ConflictException } from "@nestjs/common";
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
 import { Observable, Subject } from "rxjs";
 import type { MessageEvent } from "@nestjs/common";
@@ -16,7 +16,16 @@ export class OrdersController {
   @Public()
   @Post("sessions/:token/orders")
   @ApiOperation({ summary: "Place an order (customer)" })
-  placeOrder(@Param("token") _token: string, @Body() body: Record<string, unknown>) {
+  async placeOrder(
+    @Param("token") _token: string,
+    @Body() body: Record<string, unknown>,
+    @Headers("idempotency-key") idempotencyKey?: string
+  ) {
+    // Idempotency check — if key seen in last 5 min, return 409 so client deduplicates
+    if (idempotencyKey) {
+      const recent = await this.ordersService.findByIdempotencyKey(idempotencyKey);
+      if (recent) throw new ConflictException({ id: recent.id, deduplicated: true });
+    }
     // TODO: decode session token → restaurantId + sessionId
     return this.ordersService.placeOrder("restaurantId", "sessionId", body as never);
   }
