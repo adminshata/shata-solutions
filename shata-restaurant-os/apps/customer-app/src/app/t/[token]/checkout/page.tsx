@@ -7,11 +7,13 @@ import { formatCurrency } from "@shata/ui";
 import { enqueueOrder } from "@/lib/offline-queue";
 import { useOfflineSync } from "@/lib/use-offline-sync";
 
-type PaymentMethod = "CARD" | "CASH" | "APPLE_PAY" | "GOOGLE_PAY";
+type PaymentMethod = "CARD" | "CASH" | "APPLE_PAY" | "GOOGLE_PAY" | "INSTAPAY" | "FAWRY";
 
 const PAYMENT_OPTIONS: { id: PaymentMethod; label: string; icon: string }[] = [
   { id: "CARD", label: "Credit / Debit Card", icon: "💳" },
   { id: "CASH", label: "Pay at Counter", icon: "💵" },
+  { id: "INSTAPAY", label: "InstaPay", icon: "📲" },
+  { id: "FAWRY", label: "Fawry", icon: "🏪" },
   { id: "APPLE_PAY", label: "Apple Pay", icon: "🍎" },
   { id: "GOOGLE_PAY", label: "Google Pay", icon: "G" },
 ];

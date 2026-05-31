@@ -3,10 +3,11 @@ import { PaymentsController } from "./payments.controller";
 import { PaymentsService } from "./payments.service";
 import { StripeProvider } from "./providers/stripe.provider";
 import { PaymobProvider } from "./providers/paymob.provider";
+import { FawryProvider } from "./providers/fawry.provider";
 
 @Module({
   controllers: [PaymentsController],
-  providers: [PaymentsService, StripeProvider, PaymobProvider],
-  exports: [PaymentsService, PaymobProvider],
+  providers: [PaymentsService, StripeProvider, PaymobProvider, FawryProvider],
+  exports: [PaymentsService, PaymobProvider, FawryProvider],
 })
 export class PaymentsModule {}

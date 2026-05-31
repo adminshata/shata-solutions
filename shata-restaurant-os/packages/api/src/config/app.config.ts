@@ -19,6 +19,8 @@ export default registerAs("app", () => ({
     hmacSecret: process.env["PAYMOB_HMAC_SECRET"] ?? "",
     iframeId: process.env["PAYMOB_IFRAME_ID"] ?? "",
   },
+  fawryMerchantCode: process.env["FAWRY_MERCHANT_CODE"] ?? "",
+  fawrySecurityKey: process.env["FAWRY_SECURITY_KEY"] ?? "",
   anthropic: {
     apiKey: process.env["ANTHROPIC_API_KEY"] ?? "",
   },
