@@ -8,6 +8,7 @@ import { AnalyticsComputeProcessor } from "./processors/analytics-compute.proces
 import { SessionCleanupProcessor } from "./processors/session-cleanup.processor";
 import { ZReportProcessor } from "./processors/z-report.processor";
 import { RefundProcessProcessor } from "./processors/refund-process.processor";
+import { InstapayExpiryProcessor } from "./processors/instapay-expiry.processor";
 import { QueueSchedulerService } from "./queue-scheduler.service";
 import { DatabaseModule } from "../database/database.module";
 
@@ -43,6 +44,7 @@ const queues = Object.values(QUEUES).map((name) =>
     SessionCleanupProcessor,
     ZReportProcessor,
     RefundProcessProcessor,
+    InstapayExpiryProcessor,
     QueueSchedulerService,
   ],
   exports: [BullModule],

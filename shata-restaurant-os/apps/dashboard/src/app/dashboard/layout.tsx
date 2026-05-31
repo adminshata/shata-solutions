@@ -12,6 +12,7 @@ const navItems = [
   { href: "/dashboard/refunds", label: "Refunds", icon: "↩" },
   { href: "/dashboard/nfc", label: "NFC Tags", icon: "⬡" },
   { href: "/dashboard/billing", label: "Billing", icon: "$" },
+  { href: "/dashboard/instapay", label: "InstaPay", icon: "📲" },
   { href: "/dashboard/settings", label: "Settings", icon: "⚙️" },
 ];
 

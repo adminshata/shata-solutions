@@ -27,6 +27,7 @@ import { RefundsModule } from "./modules/refunds/refunds.module";
 import { PrinterModule } from "./modules/printer/printer.module";
 import { NfcModule } from "./modules/nfc/nfc.module";
 import { BillingModule } from "./modules/billing/billing.module";
+import { InstapayModule } from "./modules/instapay/instapay.module";
 
 import { CorrelationIdMiddleware } from "./shared/middleware/correlation-id.middleware";
 import { TenantMiddleware } from "./modules/tenant/tenant.middleware";
@@ -81,6 +82,7 @@ import { validateConfig } from "./config/config.validation";
     PrinterModule,
     NfcModule,
     BillingModule,
+    InstapayModule,
   ],
 })
 export class AppModule implements NestModule {
