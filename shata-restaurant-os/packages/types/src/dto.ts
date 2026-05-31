@@ -89,8 +89,22 @@ export interface KitchenItemDto {
 // ── Analytics DTOs ────────────────────────────────────────────────────────
 
 export interface AnalyticsOverviewDto {
-  revenue: { today: number; week: number; month: number; currency: string };
-  orders: { today: number; week: number; month: number };
+  revenue: {
+    today: number;
+    week: number;
+    month: number;
+    currency: string;
+    /** Percentage change vs yesterday (null if no prior data) */
+    todayVsYesterday?: number | null;
+    /** Percentage change vs last week (null if no prior data) */
+    weekVsLastWeek?: number | null;
+  };
+  orders: {
+    today: number;
+    week: number;
+    month: number;
+    todayVsYesterday?: number | null;
+  };
   avgOrderValue: number;
   topProducts: Array<{ id: string; name: string; count: number; revenue: number }>;
   recentTransactions: Array<{ id: string; amount: number; currency: string; createdAt: Date }>;
