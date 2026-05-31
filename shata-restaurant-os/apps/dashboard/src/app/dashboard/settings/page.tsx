@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 // All settings are per-restaurant — currency, locale, timezone, tax
 // Never hardcoded anywhere in the system
@@ -23,6 +24,12 @@ export default function SettingsPage() {
   return (
     <div className="flex-1 overflow-y-auto p-6">
       <h1 className="mb-6 text-xl font-bold">Restaurant Settings</h1>
+
+      <div className="mb-6 flex gap-3">
+        <Link href="/dashboard/settings/printer" className="flex items-center gap-2 rounded-xl border bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:border-brand hover:text-brand transition-colors shadow-sm">
+          <span>🖨</span> Thermal Printer
+        </Link>
+      </div>
 
       <div className="max-w-xl space-y-6 rounded-2xl border bg-white p-6 shadow-sm">
         <section>
