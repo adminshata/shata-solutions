@@ -11,6 +11,7 @@ const navItems = [
   { href: "/dashboard/staff", label: "Staff", icon: "👥" },
   { href: "/dashboard/refunds", label: "Refunds", icon: "↩" },
   { href: "/dashboard/nfc", label: "NFC Tags", icon: "⬡" },
+  { href: "/dashboard/billing", label: "Billing", icon: "$" },
   { href: "/dashboard/settings", label: "Settings", icon: "⚙️" },
 ];
 
