@@ -1,3 +1,4 @@
+import "./instrument"; // Sentry — must be first
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe, VersioningType } from "@nestjs/common";

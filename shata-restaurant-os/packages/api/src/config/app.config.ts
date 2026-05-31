@@ -21,6 +21,8 @@ export default registerAs("app", () => ({
   },
   fawryMerchantCode: process.env["FAWRY_MERCHANT_CODE"] ?? "",
   fawrySecurityKey: process.env["FAWRY_SECURITY_KEY"] ?? "",
+  sentryDsn: process.env["SENTRY_DSN"] ?? "",
+  sentryRelease: process.env["SENTRY_RELEASE"] ?? "",
   anthropic: {
     apiKey: process.env["ANTHROPIC_API_KEY"] ?? "",
   },

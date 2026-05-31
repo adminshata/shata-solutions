@@ -28,6 +28,9 @@ import { PrinterModule } from "./modules/printer/printer.module";
 import { NfcModule } from "./modules/nfc/nfc.module";
 import { BillingModule } from "./modules/billing/billing.module";
 import { InstapayModule } from "./modules/instapay/instapay.module";
+import { HealthModule } from "./modules/health/health.module";
+import { APP_FILTER } from "@nestjs/core";
+import { SentryGlobalFilter } from "@sentry/nestjs/setup";
 
 import { CorrelationIdMiddleware } from "./shared/middleware/correlation-id.middleware";
 import { TenantMiddleware } from "./modules/tenant/tenant.middleware";
@@ -83,6 +86,10 @@ import { validateConfig } from "./config/config.validation";
     NfcModule,
     BillingModule,
     InstapayModule,
+    HealthModule,
+  ],
+  providers: [
+    { provide: APP_FILTER, useClass: SentryGlobalFilter },
   ],
 })
 export class AppModule implements NestModule {

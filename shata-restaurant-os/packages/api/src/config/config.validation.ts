@@ -22,6 +22,8 @@ const configSchema = z.object({
   PRINTER_DEFAULT_IP: z.string().optional(),
   PRINTER_DEFAULT_PORT: z.string().default("9100"),
   CLOUDFLARE_R2_BUCKET: z.string().default("shata-media"),
+  SENTRY_DSN: z.string().optional(),
+  SENTRY_RELEASE: z.string().optional(),
   THROTTLE_TTL_SECONDS: z.string().default("60"),
   THROTTLE_LIMIT: z.string().default("120"),
 });
