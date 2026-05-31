@@ -176,6 +176,71 @@ export class OrdersService {
     return this.placeOrder(restaurantId, sessionId, dto);
   }
 
+  async placeManualOrder(
+    restaurantId: string,
+    staffId: string,
+    dto: {
+      tableId?: string;
+      items: { productId: string; quantity: number; notes?: string }[];
+      notes?: string;
+      paymentMethod?: string;
+    }
+  ) {
+    const restaurant = await this.db.restaurant.findUnique({ where: { id: restaurantId } });
+    if (!restaurant) throw new NotFoundException("Restaurant not found");
+
+    const productIds = dto.items.map((i) => i.productId);
+    const products = await this.db.product.findMany({
+      where: { id: { in: productIds }, restaurantId, isAvailable: true },
+    });
+    if (products.length !== productIds.length) {
+      throw new BadRequestException("One or more products are unavailable");
+    }
+
+    let subtotal = 0;
+    const itemsData = dto.items.map((item) => {
+      const product = products.find((p) => p.id === item.productId)!;
+      const unitPrice = Number(product.price);
+      const totalPrice = round2(unitPrice * item.quantity);
+      subtotal += totalPrice;
+      return { productId: item.productId, quantity: item.quantity, unitPrice, totalPrice, notes: item.notes };
+    });
+
+    const { tax, total } = this.taxService.calculate(subtotal, Number(restaurant.taxRate), restaurant.taxInclusive);
+    const orderCount = await this.db.order.count({ where: { restaurantId } });
+
+    // Resolve sessionId from tableId if provided
+    let sessionId: string | undefined;
+    if (dto.tableId) {
+      const session = await this.db.session.findFirst({
+        where: { tableId: dto.tableId, restaurantId, status: "ACTIVE" },
+        select: { id: true },
+      });
+      sessionId = session?.id;
+    }
+
+    const order = await this.db.order.create({
+      data: {
+        orderNumber: orderCount + 1,
+        restaurantId,
+        sessionId,
+        currency: restaurant.currency,
+        subtotal,
+        tax,
+        total,
+        notes: dto.notes,
+        status: "PENDING",
+        type: "STAFF_ENTRY",
+        items: { create: itemsData },
+      },
+      include: { items: { include: { selectedOptions: true } } },
+    });
+
+    this.events.emit("order.created", { restaurantId, order });
+    this.dashboardGateway.emitOrderUpdate(restaurantId, order);
+    return order;
+  }
+
   async updateStatus(restaurantId: string, orderId: string, status: string, voidReason?: string) {
     const order = await this.db.order.update({
       where: { id: orderId, restaurantId },

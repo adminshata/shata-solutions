@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency, formatElapsed } from "@shata/ui";
 import type { Order } from "@shata/types";
@@ -66,9 +67,17 @@ export default function LiveOrdersPage() {
           <h1 className="font-bold text-slate-900">Live Orders</h1>
           <p className="text-xs text-slate-500">{liveOrders.length} active orders</p>
         </div>
-        <div className="flex items-center gap-2 text-xs">
-          <span className={`h-2 w-2 rounded-full ${connected ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
-          {connected ? "Connected" : "Reconnecting…"}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard/orders/new"
+            className="rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white hover:opacity-90"
+          >
+            + Manual Order
+          </Link>
+          <div className="flex items-center gap-2 text-xs">
+            <span className={`h-2 w-2 rounded-full ${connected ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
+            {connected ? "Connected" : "Reconnecting…"}
+          </div>
         </div>
       </div>
 

@@ -46,6 +46,26 @@ export class OrdersController {
     return this.subjects.get(orderId)!.asObservable();
   }
 
+  @Post("dashboard/orders/manual")
+  @ApiOperation({ summary: "Staff manual order entry (no customer session required)" })
+  placeManualOrder(
+    @Body() body: {
+      restaurantId: string;
+      staffId: string;
+      tableId?: string;
+      items: { productId: string; quantity: number; notes?: string }[];
+      notes?: string;
+      paymentMethod?: string;
+    }
+  ) {
+    return this.ordersService.placeManualOrder(body.restaurantId, body.staffId, {
+      tableId: body.tableId,
+      items: body.items,
+      notes: body.notes,
+      paymentMethod: body.paymentMethod,
+    });
+  }
+
   @Patch("dashboard/orders/:id")
   @ApiOperation({ summary: "Update order status (dashboard)" })
   updateOrderStatus(
