@@ -4,6 +4,8 @@ export const QUEUES = {
   ANALYTICS_COMPUTE: "analytics-compute",
   SESSION_CLEANUP: "session-cleanup",
   Z_REPORT_GENERATE: "z-report-generate",
+  REFUND_PROCESS: "refund-process",
+  INSTAPAY_EXPIRY: "instapay-expiry",
 } as const;
 
 export const JOBS = {
@@ -12,4 +14,6 @@ export const JOBS = {
   COMPUTE_DAILY_STATS: "compute-daily-stats",
   CLEANUP_SESSIONS: "cleanup-sessions",
   GENERATE_Z_REPORT: "generate-z-report",
+  PROCESS_REFUND: "process-refund",
+  EXPIRE_INSTAPAY: "expire-instapay",
 } as const;

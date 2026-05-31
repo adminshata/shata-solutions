@@ -7,6 +7,7 @@ import { NotificationSendProcessor } from "./processors/notification-send.proces
 import { AnalyticsComputeProcessor } from "./processors/analytics-compute.processor";
 import { SessionCleanupProcessor } from "./processors/session-cleanup.processor";
 import { ZReportProcessor } from "./processors/z-report.processor";
+import { RefundProcessProcessor } from "./processors/refund-process.processor";
 import { QueueSchedulerService } from "./queue-scheduler.service";
 import { DatabaseModule } from "../database/database.module";
 
@@ -41,6 +42,7 @@ const queues = Object.values(QUEUES).map((name) =>
     AnalyticsComputeProcessor,
     SessionCleanupProcessor,
     ZReportProcessor,
+    RefundProcessProcessor,
     QueueSchedulerService,
   ],
   exports: [BullModule],

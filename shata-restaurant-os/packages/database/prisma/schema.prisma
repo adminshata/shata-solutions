@@ -193,6 +193,7 @@ model Order {
   payment      PaymentIntent?
   kitchenTicket KitchenTicket?
   tip          Tip?
+  refunds      Refund[]
 
   @@index([restaurantId, status])
   @@index([sessionId])
@@ -568,6 +569,7 @@ enum OrderType {
   DINE_IN
   PICKUP
   DELIVERY
+  STAFF_ENTRY
 }
 
 enum PaymentProvider {
@@ -645,4 +647,124 @@ enum LinkStatus {
   PAID
   EXPIRED
   CANCELLED
+}
+
+// ── Phase 3: Refund Flow ──────────────────────────────────────────────────
+
+model Refund {
+  id              String       @id @default(cuid())
+  orderId         String
+  order           Order        @relation(fields: [orderId], references: [id])
+  restaurantId    String
+  paymentIntentId String
+  amount          Decimal      @db.Decimal(10, 2)
+  reason          RefundReason
+  notes           String?
+  status          RefundStatus @default(PENDING_APPROVAL)
+  initiatedBy     String
+  approvedBy      String?
+  providerRefId   String?
+  processedAt     DateTime?
+  createdAt       DateTime     @default(now())
+
+  @@index([restaurantId, status])
+  @@index([orderId])
+}
+
+enum RefundReason {
+  WRONG_ITEM
+  QUALITY_ISSUE
+  CUSTOMER_CANCELLED
+  DUPLICATE_PAYMENT
+  OTHER
+}
+
+enum RefundStatus {
+  PENDING_APPROVAL
+  APPROVED
+  PROCESSING
+  COMPLETED
+  REJECTED
+}
+
+// ── Phase 3: NFC Tags ─────────────────────────────────────────────────────
+
+model NfcTag {
+  id           String    @id @default(cuid())
+  restaurantId String
+  serialNumber String    @unique
+  tableId      String?   @unique
+  status       NfcStatus @default(UNASSIGNED)
+  programmedAt DateTime?
+  lastScanned  DateTime?
+  scanCount    Int       @default(0)
+  notes        String?
+  createdAt    DateTime  @default(now())
+
+  @@index([restaurantId])
+  @@index([restaurantId, status])
+}
+
+enum NfcStatus {
+  UNASSIGNED
+  ASSIGNED
+  ACTIVE
+  DAMAGED
+  LOST
+}
+
+// ── Phase 3: Subscription Billing ────────────────────────────────────────
+
+model Invoice {
+  id                String        @id @default(cuid())
+  orgId             String
+  amount            Decimal       @db.Decimal(10, 2)
+  currency          String        @default("EGP")
+  status            InvoiceStatus @default(DRAFT)
+  dueDate           DateTime
+  paidAt            DateTime?
+  pdfUrl            String?
+  lineItems         Json
+  providerInvoiceId String?
+  createdAt         DateTime      @default(now())
+
+  @@index([orgId, status])
+  @@index([orgId, createdAt])
+}
+
+model PaymentMethod {
+  id          String   @id @default(cuid())
+  orgId       String
+  type        String
+  last4       String?
+  brand       String?
+  isDefault   Boolean  @default(false)
+  providerRef String?
+  createdAt   DateTime @default(now())
+
+  @@index([orgId])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+// ── Phase 3: InstaPay Pending Confirmations ───────────────────────────────
+
+model InstapayPendingConfirmation {
+  id           String    @id @default(cuid())
+  orderId      String    @unique
+  restaurantId String
+  amount       Decimal   @db.Decimal(10, 2)
+  expiresAt    DateTime
+  confirmedBy  String?
+  confirmedAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([restaurantId])
+  @@index([expiresAt])
 }

@@ -23,6 +23,7 @@ import { AnalyticsModule } from "./modules/analytics/analytics.module";
 import { StaffModule } from "./modules/staff/staff.module";
 import { AdminModule } from "./modules/admin/admin.module";
 import { LoyaltyModule } from "./modules/loyalty/loyalty.module";
+import { RefundsModule } from "./modules/refunds/refunds.module";
 
 import { CorrelationIdMiddleware } from "./shared/middleware/correlation-id.middleware";
 import { TenantMiddleware } from "./modules/tenant/tenant.middleware";
@@ -73,6 +74,7 @@ import { validateConfig } from "./config/config.validation";
     StaffModule,
     AdminModule,
     LoyaltyModule,
+    RefundsModule,
   ],
 })
 export class AppModule implements NestModule {

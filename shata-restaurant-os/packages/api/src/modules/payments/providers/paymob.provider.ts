@@ -84,10 +84,33 @@ export class PaymobProvider implements IPaymentProvider {
     return { success: true, providerRef: _intentId };
   }
 
-  async refund(_intentId: string, _amount?: number): Promise<RefundResult> {
-    // Paymob refund via Void/Refund API
-    this.logger.warn(`Paymob refund requested for ${_intentId} — implement via dashboard for now`);
-    return { success: false, refundRef: "" };
+  async refund(transactionId: string, amount?: number): Promise<RefundResult> {
+    try {
+      const authToken = await this.authenticate();
+      const body: Record<string, unknown> = {
+        auth_token: authToken,
+        transaction_id: transactionId,
+      };
+      if (amount !== undefined) {
+        body["amount_cents"] = Math.round(amount * 100);
+      }
+      const res = await fetch(
+        `${PAYMOB_BASE}/api/acceptance/void_refund/refund`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }
+      );
+      const data = await res.json() as Record<string, unknown>;
+      if (data["success"]) {
+        return { success: true, refundRef: String(data["id"] ?? "") };
+      }
+      return { success: false, refundRef: "", error: String(data["message"] ?? "Unknown error") };
+    } catch (err) {
+      this.logger.error(`Paymob refund failed: ${(err as Error).message}`);
+      return { success: false, refundRef: "", error: (err as Error).message };
+    }
   }
 
   async parseWebhookEvent(payload: Buffer, _signature: string): Promise<WebhookEvent> {

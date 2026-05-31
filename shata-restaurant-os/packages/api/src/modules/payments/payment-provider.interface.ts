@@ -23,6 +23,7 @@ export interface PaymentResult {
 export interface RefundResult {
   success: boolean;
   refundRef: string;
+  error?: string;
 }
 
 export interface WebhookEvent {
