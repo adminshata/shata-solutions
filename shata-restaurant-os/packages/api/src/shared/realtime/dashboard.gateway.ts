@@ -36,4 +36,12 @@ export class DashboardGateway implements OnGatewayInit, OnGatewayConnection {
   emitOrderUpdate(restaurantId: string, order: Record<string, unknown>) {
     this.server.to(`dashboard:${restaurantId}`).emit("order_updated", order);
   }
+
+  emitWaiterCall(restaurantId: string, payload: Record<string, unknown>) {
+    this.server.to(`dashboard:${restaurantId}`).emit("waiter_call", payload);
+  }
+
+  emitWaiterCallUpdate(restaurantId: string, payload: Record<string, unknown>) {
+    this.server.to(`dashboard:${restaurantId}`).emit("waiter_call_updated", payload);
+  }
 }
