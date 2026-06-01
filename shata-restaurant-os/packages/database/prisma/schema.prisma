@@ -1,7 +1,3 @@
-// Shata Restaurant OS — Prisma Schema
-// Global-first: currency, locale, timezone, taxRate per restaurant — never hardcoded
-// Tenant isolation: every table has restaurantId; RLS enabled at DB level
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/client"
@@ -13,58 +9,57 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ── Organization / Tenant Hierarchy ───────────────────────────────────────
-
 model Organization {
-  id            String        @id @default(cuid())
-  name          String
-  plan          PlanType      @default(STARTER)
-  billingStatus String        @default("active")
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  restaurants   Restaurant[]
-  subscription  Subscription?
+  id               String            @id @default(cuid())
+  name             String
+  plan             PlanType          @default(STARTER)
+  billingStatus    String            @default("active")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  restaurants      Restaurant[]
+  subscription     Subscription?
+  whiteLabelConfig WhiteLabelConfig?
 }
 
 model Restaurant {
-  id           String     @id @default(cuid())
-  orgId        String
-  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  name         String
-  branchCode   String?
-  slug         String?    @unique
-
-  // Localization — every field is per-restaurant, never global
-  currency     String     @default("USD")    // ISO 4217
-  locale       String     @default("en")     // BCP-47
-  timezone     String     @default("UTC")    // IANA tz
-  taxRate      Decimal    @db.Decimal(5, 4)  @default(0)      // e.g. 0.14 = 14%
-  taxLabel     String     @default("Tax")    // "VAT", "GST", "Sales Tax"
-  taxInclusive Boolean    @default(false)
-
-  settings     Json       @default("{}")
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  tables         Table[]
-  sessions       Session[]
-  categories     Category[]
-  products       Product[]
-  orders         Order[]
-  staff          Staff[]
-  kitchenTickets KitchenTicket[]
-  transactions   Transaction[]
-  stampCards     StampCard[]
+  id             String          @id @default(cuid())
+  orgId          String
+  name           String
+  branchCode     String?
+  slug           String?         @unique
+  currency       String          @default("USD")
+  locale         String          @default("en")
+  timezone       String          @default("UTC")
+  taxRate        Decimal         @default(0) @db.Decimal(5, 4)
+  taxLabel       String          @default("Tax")
+  taxInclusive   Boolean         @default(false)
+  settings       Json            @default("{}")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  categories      Category[]
+  kitchenTickets  KitchenTicket[]
+  orders          Order[]
+  products        Product[]
+  org             Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  sessions        Session[]
+  staff           Staff[]
+  stampCards      StampCard[]
+  tables          Table[]
+  transactions    Transaction[]
+  loyaltyProgram  LoyaltyProgram?
+  loyaltyTiers    LoyaltyTier[]
+  referrals       Referral[]
+  waiterCalls     WaiterCall[]
+  pricingRules    PricingRule[]
+  ingredientStocks IngredientStock[]
+  posIntegration  PosIntegration?
 
   @@index([orgId])
 }
 
-// ── Tables & Sessions ─────────────────────────────────────────────────────
-
 model Table {
   id           String      @id @default(cuid())
   restaurantId String
-  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   number       String
   label        String?
   qrCode       String      @unique
@@ -75,6 +70,7 @@ model Table {
   positionY    Float?
   createdAt    DateTime    @default(now())
   sessions     Session[]
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@index([restaurantId, status])
 }
@@ -82,25 +78,23 @@ model Table {
 model Session {
   id           String        @id @default(cuid())
   tableId      String
-  table        Table         @relation(fields: [tableId], references: [id])
   restaurantId String
-  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id])
   status       SessionStatus @default(ACTIVE)
   openedAt     DateTime      @default(now())
   closedAt     DateTime?
   orders       Order[]
+  waiterCalls  WaiterCall[]
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id])
+  table        Table         @relation(fields: [tableId], references: [id])
 
   @@unique([tableId, status], name: "active_session_per_table")
   @@index([restaurantId, status])
   @@index([tableId, status])
 }
 
-// ── Menu ──────────────────────────────────────────────────────────────────
-
 model Category {
   id            String     @id @default(cuid())
   restaurantId  String
-  restaurant    Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   name          String
   nameAr        String?
   description   String?
@@ -111,89 +105,89 @@ model Category {
   isAvailable   Boolean    @default(true)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   products      Product[]
 
   @@index([restaurantId, isAvailable])
 }
 
 model Product {
-  id              String     @id @default(cuid())
-  restaurantId    String
-  restaurant      Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  categoryId      String
-  category        Category   @relation(fields: [categoryId], references: [id])
-  name            String
-  nameAr          String?
-  description     String?
-  descriptionAr   String?
-  price           Decimal    @db.Decimal(10, 2)
-  imageUrl        String?
-  isAvailable     Boolean    @default(true)
-  isFeatured      Boolean    @default(false)
-  calories        Int?
-  avgPrepMinutes  Int        @default(10)
-  sortOrder       Int        @default(0)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  modifierGroups  ModifierGroup[]
-  orderItems      OrderItem[]
+  id             String          @id @default(cuid())
+  restaurantId   String
+  categoryId     String
+  name           String
+  nameAr         String?
+  description    String?
+  descriptionAr  String?
+  price          Decimal         @db.Decimal(10, 2)
+  imageUrl       String?
+  isAvailable    Boolean         @default(true)
+  isFeatured     Boolean         @default(false)
+  calories       Int?
+  avgPrepMinutes Int             @default(10)
+  sortOrder      Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  modifierGroups ModifierGroup[]
+  orderItems     OrderItem[]
+  ingredients    ProductIngredient[]
+  category       Category        @relation(fields: [categoryId], references: [id])
+  restaurant     Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@index([restaurantId, isAvailable])
   @@index([categoryId])
 }
 
 model ModifierGroup {
-  id         String         @id @default(cuid())
-  productId  String
-  product    Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
-  name       String
-  nameAr     String?
-  type       ModifierType
-  required   Boolean        @default(false)
-  minSelect  Int            @default(0)
-  maxSelect  Int            @default(1)
-  sortOrder  Int            @default(0)
-  options    ModifierOption[]
+  id        String           @id @default(cuid())
+  productId String
+  name      String
+  nameAr    String?
+  type      ModifierType
+  required  Boolean          @default(false)
+  minSelect Int              @default(0)
+  maxSelect Int              @default(1)
+  sortOrder Int              @default(0)
+  product   Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  options   ModifierOption[]
 }
 
 model ModifierOption {
   id              String        @id @default(cuid())
   modifierGroupId String
-  modifierGroup   ModifierGroup @relation(fields: [modifierGroupId], references: [id], onDelete: Cascade)
   name            String
   nameAr          String?
-  priceDelta      Decimal       @db.Decimal(10, 2) @default(0)
+  priceDelta      Decimal       @default(0) @db.Decimal(10, 2)
   isAvailable     Boolean       @default(true)
   sortOrder       Int           @default(0)
+  modifierGroup   ModifierGroup @relation(fields: [modifierGroupId], references: [id], onDelete: Cascade)
 }
 
-// ── Orders ────────────────────────────────────────────────────────────────
-
 model Order {
-  id           String      @id @default(cuid())
-  orderNumber  Int
-  sessionId    String?
-  session      Session?    @relation(fields: [sessionId], references: [id])
-  restaurantId String
-  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
-  customerId   String?
-  status       OrderStatus @default(PENDING)
-  type         OrderType   @default(DINE_IN)
-  // Currency copied from restaurant at order creation — immutable after creation
-  currency     String
-  subtotal     Decimal     @db.Decimal(10, 2)
-  tax          Decimal     @db.Decimal(10, 2) @default(0)
-  total        Decimal     @db.Decimal(10, 2)
-  notes        String?
-  voidReason   String?
-  tipAmount    Decimal     @db.Decimal(10, 2) @default(0)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  items        OrderItem[]
-  payment      PaymentIntent?
+  id            String         @id @default(cuid())
+  orderNumber   Int
+  sessionId     String?
+  restaurantId  String
+  customerId    String?
+  status        OrderStatus    @default(PENDING)
+  type          OrderType      @default(DINE_IN)
+  currency      String
+  subtotal      Decimal        @db.Decimal(10, 2)
+  tax           Decimal        @default(0) @db.Decimal(10, 2)
+  total         Decimal        @db.Decimal(10, 2)
+  notes         String?
+  voidReason    String?
+  tipAmount     Decimal        @default(0) @db.Decimal(10, 2)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   kitchenTicket KitchenTicket?
-  tip          Tip?
-  refunds      Refund[]
+  restaurant    Restaurant     @relation(fields: [restaurantId], references: [id])
+  session       Session?       @relation(fields: [sessionId], references: [id])
+  items         OrderItem[]
+  payment       PaymentIntent?
+  refunds       Refund[]
+  tip           Tip?
+  review        OrderReview?
 
   @@index([restaurantId, status])
   @@index([sessionId])
@@ -203,41 +197,39 @@ model Order {
 model OrderItem {
   id              String              @id @default(cuid())
   orderId         String
-  order           Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId       String
-  product         Product             @relation(fields: [productId], references: [id])
   quantity        Int
   unitPrice       Decimal             @db.Decimal(10, 2)
   totalPrice      Decimal             @db.Decimal(10, 2)
   notes           String?
+  order           Order               @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product         Product             @relation(fields: [productId], references: [id])
   selectedOptions OrderItemModifier[]
 }
 
 model OrderItemModifier {
-  id               String      @id @default(cuid())
+  id               String    @id @default(cuid())
   orderItemId      String
-  orderItem        OrderItem   @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
   modifierOptionId String
   name             String
-  priceDelta       Decimal     @db.Decimal(10, 2)
+  priceDelta       Decimal   @db.Decimal(10, 2)
+  orderItem        OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
 }
 
-// ── Payments ──────────────────────────────────────────────────────────────
-
 model PaymentIntent {
-  id           String          @id @default(cuid())
-  orderId      String          @unique
-  order        Order           @relation(fields: [orderId], references: [id])
-  provider     PaymentProvider
-  providerRef  String?
-  amount       Decimal         @db.Decimal(10, 2)
-  currency     String
-  status       PaymentStatus   @default(PENDING)
-  metadata     Json?
-  idempotencyKey String?       @unique
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  settledAt    DateTime?
+  id             String          @id @default(cuid())
+  orderId        String          @unique
+  provider       PaymentProvider
+  providerRef    String?
+  amount         Decimal         @db.Decimal(10, 2)
+  currency       String
+  status         PaymentStatus   @default(PENDING)
+  metadata       Json?
+  idempotencyKey String?         @unique
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  settledAt      DateTime?
+  order          Order           @relation(fields: [orderId], references: [id])
 
   @@index([orderId])
   @@index([provider, providerRef])
@@ -246,28 +238,24 @@ model PaymentIntent {
 model Transaction {
   id           String          @id @default(cuid())
   restaurantId String
-  restaurant   Restaurant      @relation(fields: [restaurantId], references: [id])
   type         TransactionType
   amount       Decimal         @db.Decimal(10, 2)
   currency     String
-  fee          Decimal         @db.Decimal(10, 2) @default(0)
+  fee          Decimal         @default(0) @db.Decimal(10, 2)
   net          Decimal         @db.Decimal(10, 2)
   refId        String?
   metadata     Json?
   createdAt    DateTime        @default(now())
+  restaurant   Restaurant      @relation(fields: [restaurantId], references: [id])
 
   @@index([restaurantId, createdAt])
   @@index([restaurantId, type])
 }
 
-// ── Kitchen ───────────────────────────────────────────────────────────────
-
 model KitchenTicket {
   id            String       @id @default(cuid())
   orderId       String       @unique
-  order         Order        @relation(fields: [orderId], references: [id])
   restaurantId  String
-  restaurant    Restaurant   @relation(fields: [restaurantId], references: [id])
   station       String?
   status        TicketStatus @default(PENDING)
   priority      Int          @default(0)
@@ -276,17 +264,16 @@ model KitchenTicket {
   servedAt      DateTime?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
+  order         Order        @relation(fields: [orderId], references: [id])
+  restaurant    Restaurant   @relation(fields: [restaurantId], references: [id])
 
   @@index([restaurantId, status])
   @@index([restaurantId, station, status])
 }
 
-// ── Staff ─────────────────────────────────────────────────────────────────
-
 model Staff {
   id           String     @id @default(cuid())
   restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   clerkUserId  String     @unique
   name         String
   email        String?
@@ -294,30 +281,33 @@ model Staff {
   isActive     Boolean    @default(true)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@index([restaurantId, isActive])
 }
 
-// ── Customer & Loyalty ────────────────────────────────────────────────────
-
 model Customer {
-  id              String           @id @default(cuid())
-  phone           String           @unique
-  name            String?
-  email           String?
-  createdAt       DateTime         @default(now())
-  loyaltyAccounts LoyaltyAccount[]
+  id               String           @id @default(cuid())
+  phone            String           @unique
+  name             String?
+  email            String?
+  createdAt        DateTime         @default(now())
+  loyaltyAccounts  LoyaltyAccount[]
+  profile          CustomerProfile?
+  savedOrders      SavedOrder[]
+  referralsGiven   Referral[]       @relation("ReferrerCustomer")
+  referralsReceived Referral[]      @relation("ReferredCustomer")
 }
 
 model LoyaltyAccount {
   id            String               @id @default(cuid())
   customerId    String
-  customer      Customer             @relation(fields: [customerId], references: [id])
   restaurantId  String
   points        Int                  @default(0)
-  walletBalance Decimal              @db.Decimal(10, 2) @default(0)
+  walletBalance Decimal              @default(0) @db.Decimal(10, 2)
   currency      String
   createdAt     DateTime             @default(now())
+  customer      Customer             @relation(fields: [customerId], references: [id])
   transactions  LoyaltyTransaction[]
 
   @@unique([customerId, restaurantId])
@@ -327,32 +317,30 @@ model LoyaltyAccount {
 model LoyaltyTransaction {
   id               String         @id @default(cuid())
   loyaltyAccountId String
-  loyaltyAccount   LoyaltyAccount @relation(fields: [loyaltyAccountId], references: [id])
   type             LoyaltyTxType
   pointsDelta      Int
   refOrderId       String?
   note             String?
   createdAt        DateTime       @default(now())
+  loyaltyAccount   LoyaltyAccount @relation(fields: [loyaltyAccountId], references: [id])
 
   @@index([loyaltyAccountId])
 }
 
-// ── Phase 2: Stamp Card Loyalty ───────────────────────────────────────────
-
 model StampCard {
-  id               String             @id @default(cuid())
-  restaurantId     String
-  restaurant       Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  customerId       String
-  stamps           Int                @default(0)
-  stampsRequired   Int                @default(10)
-  rewardType       RewardType         @default(FREE_ITEM)
-  rewardProductId  String?
-  rewardDiscount   Decimal?           @db.Decimal(5, 2)
-  isRedeemed       Boolean            @default(false)
-  completedAt      DateTime?
-  createdAt        DateTime           @default(now())
-  transactions     StampTransaction[]
+  id              String             @id @default(cuid())
+  restaurantId    String
+  customerId      String
+  stamps          Int                @default(0)
+  stampsRequired  Int                @default(10)
+  rewardType      RewardType         @default(FREE_ITEM)
+  rewardProductId String?
+  rewardDiscount  Decimal?           @db.Decimal(5, 2)
+  isRedeemed      Boolean            @default(false)
+  completedAt     DateTime?
+  createdAt       DateTime           @default(now())
+  restaurant      Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  transactions    StampTransaction[]
 
   @@unique([restaurantId, customerId])
   @@index([restaurantId])
@@ -361,15 +349,13 @@ model StampCard {
 model StampTransaction {
   id          String    @id @default(cuid())
   stampCardId String
-  stampCard   StampCard @relation(fields: [stampCardId], references: [id], onDelete: Cascade)
   orderId     String
   stampsAdded Int       @default(1)
   createdAt   DateTime  @default(now())
+  stampCard   StampCard @relation(fields: [stampCardId], references: [id], onDelete: Cascade)
 
   @@index([stampCardId])
 }
-
-// ── Phase 2: Analytics Snapshot (pre-computed daily stats) ────────────────
 
 model AnalyticsSnapshot {
   id                 String   @id @default(cuid())
@@ -388,8 +374,6 @@ model AnalyticsSnapshot {
   @@index([restaurantId])
 }
 
-// ── Phase 2: Z-Report (daily settlement) ─────────────────────────────────
-
 model ZReport {
   id           String   @id @default(cuid())
   restaurantId String
@@ -406,8 +390,6 @@ model ZReport {
   @@index([restaurantId])
 }
 
-// ── Phase 2: Thermal Printer Config ───────────────────────────────────────
-
 model PrinterConfig {
   id           String      @id @default(cuid())
   restaurantId String      @unique
@@ -422,8 +404,6 @@ model PrinterConfig {
   updatedAt    DateTime    @updatedAt
 }
 
-// ── Phase 2: Customer Devices (Push Notifications) ────────────────────────
-
 model CustomerDevice {
   id           String   @id @default(cuid())
   customerId   String
@@ -437,8 +417,6 @@ model CustomerDevice {
   @@index([restaurantId])
 }
 
-// ── Phase 2: Menu Branch Overrides (per-branch price/availability) ────────
-
 model ProductBranchOverride {
   id           String   @id @default(cuid())
   productId    String
@@ -451,21 +429,17 @@ model ProductBranchOverride {
   @@index([restaurantId])
 }
 
-// ── Phase 2: Tips ─────────────────────────────────────────────────────────
-
 model Tip {
   id           String   @id @default(cuid())
   orderId      String   @unique
-  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   restaurantId String
   amount       Decimal  @db.Decimal(10, 2)
   percentage   Int?
   createdAt    DateTime @default(now())
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([restaurantId])
 }
-
-// ── Phase 2: Payment Links ────────────────────────────────────────────────
 
 model PaymentLink {
   id            String     @id @default(cuid())
@@ -486,8 +460,6 @@ model PaymentLink {
   @@index([token])
 }
 
-// ── Phase 2: Webhook System ───────────────────────────────────────────────
-
 model WebhookEndpoint {
   id           String            @id @default(cuid())
   restaurantId String
@@ -504,7 +476,6 @@ model WebhookEndpoint {
 model WebhookDelivery {
   id             String          @id @default(cuid())
   endpointId     String
-  endpoint       WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
   event          String
   payload        Json
   responseStatus Int?
@@ -513,17 +484,15 @@ model WebhookDelivery {
   succeededAt    DateTime?
   nextRetryAt    DateTime?
   createdAt      DateTime        @default(now())
+  endpoint       WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
 
   @@index([endpointId])
   @@index([nextRetryAt])
 }
 
-// ── Subscription ──────────────────────────────────────────────────────────
-
 model Subscription {
   id                     String       @id @default(cuid())
   orgId                  String       @unique
-  org                    Organization @relation(fields: [orgId], references: [id])
   planType               PlanType
   status                 SubStatus    @default(ACTIVE)
   currentPeriodStart     DateTime
@@ -531,9 +500,88 @@ model Subscription {
   providerSubscriptionId String?
   createdAt              DateTime     @default(now())
   updatedAt              DateTime     @updatedAt
+  org                    Organization @relation(fields: [orgId], references: [id])
 }
 
-// ── Enums ─────────────────────────────────────────────────────────────────
+model Refund {
+  id              String       @id @default(cuid())
+  orderId         String
+  restaurantId    String
+  paymentIntentId String
+  amount          Decimal      @db.Decimal(10, 2)
+  reason          RefundReason
+  notes           String?
+  status          RefundStatus @default(PENDING_APPROVAL)
+  initiatedBy     String
+  approvedBy      String?
+  providerRefId   String?
+  processedAt     DateTime?
+  createdAt       DateTime     @default(now())
+  order           Order        @relation(fields: [orderId], references: [id])
+
+  @@index([restaurantId, status])
+  @@index([orderId])
+}
+
+model NfcTag {
+  id           String    @id @default(cuid())
+  restaurantId String
+  serialNumber String    @unique
+  tableId      String?   @unique
+  status       NfcStatus @default(UNASSIGNED)
+  programmedAt DateTime?
+  lastScanned  DateTime?
+  scanCount    Int       @default(0)
+  notes        String?
+  createdAt    DateTime  @default(now())
+
+  @@index([restaurantId])
+  @@index([restaurantId, status])
+}
+
+model Invoice {
+  id                String        @id @default(cuid())
+  orgId             String
+  amount            Decimal       @db.Decimal(10, 2)
+  currency          String        @default("EGP")
+  status            InvoiceStatus @default(DRAFT)
+  dueDate           DateTime
+  paidAt            DateTime?
+  pdfUrl            String?
+  lineItems         Json
+  providerInvoiceId String?
+  createdAt         DateTime      @default(now())
+
+  @@index([orgId, status])
+  @@index([orgId, createdAt])
+}
+
+model PaymentMethod {
+  id          String   @id @default(cuid())
+  orgId       String
+  type        String
+  last4       String?
+  brand       String?
+  isDefault   Boolean  @default(false)
+  providerRef String?
+  createdAt   DateTime @default(now())
+
+  @@index([orgId])
+}
+
+model InstapayPendingConfirmation {
+  id           String    @id @default(cuid())
+  orderId      String    @unique
+  restaurantId String
+  amount       Decimal   @db.Decimal(10, 2)
+  expiresAt    DateTime
+  confirmedBy  String?
+  confirmedAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([restaurantId])
+  @@index([expiresAt])
+}
 
 enum PlanType {
   STARTER
@@ -570,6 +618,7 @@ enum OrderType {
   PICKUP
   DELIVERY
   STAFF_ENTRY
+  EXTERNAL_POS
 }
 
 enum PaymentProvider {
@@ -649,28 +698,6 @@ enum LinkStatus {
   CANCELLED
 }
 
-// ── Phase 3: Refund Flow ──────────────────────────────────────────────────
-
-model Refund {
-  id              String       @id @default(cuid())
-  orderId         String
-  order           Order        @relation(fields: [orderId], references: [id])
-  restaurantId    String
-  paymentIntentId String
-  amount          Decimal      @db.Decimal(10, 2)
-  reason          RefundReason
-  notes           String?
-  status          RefundStatus @default(PENDING_APPROVAL)
-  initiatedBy     String
-  approvedBy      String?
-  providerRefId   String?
-  processedAt     DateTime?
-  createdAt       DateTime     @default(now())
-
-  @@index([restaurantId, status])
-  @@index([orderId])
-}
-
 enum RefundReason {
   WRONG_ITEM
   QUALITY_ISSUE
@@ -687,62 +714,12 @@ enum RefundStatus {
   REJECTED
 }
 
-// ── Phase 3: NFC Tags ─────────────────────────────────────────────────────
-
-model NfcTag {
-  id           String    @id @default(cuid())
-  restaurantId String
-  serialNumber String    @unique
-  tableId      String?   @unique
-  status       NfcStatus @default(UNASSIGNED)
-  programmedAt DateTime?
-  lastScanned  DateTime?
-  scanCount    Int       @default(0)
-  notes        String?
-  createdAt    DateTime  @default(now())
-
-  @@index([restaurantId])
-  @@index([restaurantId, status])
-}
-
 enum NfcStatus {
   UNASSIGNED
   ASSIGNED
   ACTIVE
   DAMAGED
   LOST
-}
-
-// ── Phase 3: Subscription Billing ────────────────────────────────────────
-
-model Invoice {
-  id                String        @id @default(cuid())
-  orgId             String
-  amount            Decimal       @db.Decimal(10, 2)
-  currency          String        @default("EGP")
-  status            InvoiceStatus @default(DRAFT)
-  dueDate           DateTime
-  paidAt            DateTime?
-  pdfUrl            String?
-  lineItems         Json
-  providerInvoiceId String?
-  createdAt         DateTime      @default(now())
-
-  @@index([orgId, status])
-  @@index([orgId, createdAt])
-}
-
-model PaymentMethod {
-  id          String   @id @default(cuid())
-  orgId       String
-  type        String
-  last4       String?
-  brand       String?
-  isDefault   Boolean  @default(false)
-  providerRef String?
-  createdAt   DateTime @default(now())
-
-  @@index([orgId])
 }
 
 enum InvoiceStatus {
@@ -753,18 +730,250 @@ enum InvoiceStatus {
   CANCELLED
 }
 
-// ── Phase 3: InstaPay Pending Confirmations ───────────────────────────────
+// ── Phase 4 Enums ───────────────────────────────────────────────────────────
 
-model InstapayPendingConfirmation {
-  id           String    @id @default(cuid())
-  orderId      String    @unique
+enum LoyaltyType {
+  STAMP
+  POINTS
+  CASHBACK
+  HYBRID
+}
+
+enum ReferralStatus {
+  PENDING
+  COMPLETED
+  EXPIRED
+}
+
+enum CallType {
+  ASSISTANCE
+  CHECK_PLEASE
+  WATER
+  MORE_NAPKINS
+}
+
+enum CallStatus {
+  PENDING
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+enum PricingType {
+  PERCENTAGE_OFF
+  FIXED_OFF
+  FIXED_PRICE
+}
+
+enum PosProvider {
+  FOODICS
+  IIKO
+  LIGHTSPEED
+  CUSTOM
+}
+
+// ── Phase 4: Advanced Loyalty ───────────────────────────────────────────────
+
+model LoyaltyProgram {
+  id            String       @id @default(cuid())
+  restaurantId  String       @unique
+  type          LoyaltyType  @default(STAMP)
+  pointsPerEgp  Decimal?     @db.Decimal(5, 2)
+  pointsValue   Decimal?     @db.Decimal(5, 4)
+  minRedemption Int?
+  expiryDays    Int?
+  birthdayBonus Int?
+  referrerBonus Int?
+  referredBonus Int?
+  referralEnabled Boolean    @default(false)
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  restaurant    Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+model LoyaltyTier {
+  id           String     @id @default(cuid())
   restaurantId String
-  amount       Decimal   @db.Decimal(10, 2)
-  expiresAt    DateTime
-  confirmedBy  String?
-  confirmedAt  DateTime?
-  createdAt    DateTime  @default(now())
+  name         String
+  nameAr       String?
+  minPoints    Int
+  multiplier   Decimal    @db.Decimal(3, 1)
+  perks        Json       @default("[]")
+  badgeColor   String     @default("#C0A060")
+  sortOrder    Int        @default(0)
+  createdAt    DateTime   @default(now())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@index([restaurantId])
-  @@index([expiresAt])
+  @@index([restaurantId, minPoints])
+}
+
+model Referral {
+  id           String         @id @default(cuid())
+  restaurantId String
+  referrerId   String
+  referredId   String
+  rewardPoints Int            @default(0)
+  status       ReferralStatus @default(PENDING)
+  createdAt    DateTime       @default(now())
+  restaurant   Restaurant     @relation(fields: [restaurantId], references: [id])
+  referrer     Customer       @relation("ReferrerCustomer", fields: [referrerId], references: [id])
+  referred     Customer       @relation("ReferredCustomer", fields: [referredId], references: [id])
+
+  @@index([restaurantId])
+  @@index([referrerId])
+}
+
+// ── Phase 4: Customer Profiles ──────────────────────────────────────────────
+
+model CustomerProfile {
+  id             String    @id @default(cuid())
+  customerId     String    @unique
+  name           String
+  email          String?
+  birthdate      DateTime?
+  preferredLang  String    @default("ar")
+  dietaryPrefs   String[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  customer       Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model SavedOrder {
+  id           String   @id @default(cuid())
+  customerId   String
+  restaurantId String
+  name         String
+  items        Json
+  createdAt    DateTime @default(now())
+  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId, restaurantId])
+}
+
+// ── Phase 4: Smart Waiter Call ──────────────────────────────────────────────
+
+model WaiterCall {
+  id           String     @id @default(cuid())
+  sessionId    String
+  tableId      String
+  restaurantId String
+  type         CallType   @default(ASSISTANCE)
+  status       CallStatus @default(PENDING)
+  resolvedBy   String?
+  resolvedAt   DateTime?
+  createdAt    DateTime   @default(now())
+  session      Session    @relation(fields: [sessionId], references: [id])
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  @@index([restaurantId, status])
+  @@index([sessionId])
+}
+
+// ── Phase 4: Dynamic Pricing ────────────────────────────────────────────────
+
+model PricingRule {
+  id           String      @id @default(cuid())
+  restaurantId String
+  name         String
+  nameAr       String?
+  type         PricingType @default(PERCENTAGE_OFF)
+  value        Decimal     @db.Decimal(5, 2)
+  daysOfWeek   Int[]
+  startTime    String
+  endTime      String
+  productIds   String[]
+  categoryIds  String[]
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId, isActive])
+}
+
+// ── Phase 4: Reviews ────────────────────────────────────────────────────────
+
+model OrderReview {
+  id              String    @id @default(cuid())
+  orderId         String    @unique
+  restaurantId    String
+  customerId      String?
+  rating          Int
+  comment         String?
+  tags            String[]
+  isPublic        Boolean   @default(true)
+  restaurantReply String?
+  repliedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  order           Order     @relation(fields: [orderId], references: [id])
+
+  @@index([restaurantId, rating])
+  @@index([restaurantId, createdAt])
+}
+
+// ── Phase 4: Inventory ──────────────────────────────────────────────────────
+
+model IngredientStock {
+  id           String              @id @default(cuid())
+  restaurantId String
+  name         String
+  nameAr       String?
+  unit         String
+  currentStock Decimal             @db.Decimal(10, 3)
+  minStock     Decimal             @db.Decimal(10, 3)
+  costPerUnit  Decimal             @db.Decimal(10, 2)
+  updatedAt    DateTime            @updatedAt
+  restaurant   Restaurant          @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  products     ProductIngredient[]
+
+  @@index([restaurantId])
+  @@index([restaurantId, currentStock])
+}
+
+model ProductIngredient {
+  productId    String
+  ingredientId String
+  quantity     Decimal         @db.Decimal(10, 3)
+  product      Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ingredient   IngredientStock @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@id([productId, ingredientId])
+}
+
+// ── Phase 4: White-label ────────────────────────────────────────────────────
+
+model WhiteLabelConfig {
+  id             String       @id @default(cuid())
+  orgId          String       @unique
+  appName        String
+  appNameAr      String?
+  logoUrl        String?
+  faviconUrl     String?
+  primaryColor   String       @default("#FF4500")
+  secondaryColor String?
+  customDomain   String?      @unique
+  customFont     String?
+  hideShataLogo  Boolean      @default(false)
+  isActive       Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  org            Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+// ── Phase 4: POS Integration ────────────────────────────────────────────────
+
+model PosIntegration {
+  id           String      @id @default(cuid())
+  restaurantId String      @unique
+  provider     PosProvider
+  webhookSecret String
+  inboundUrl   String?
+  outboundUrl  String?
+  isActive     Boolean     @default(false)
+  lastSyncAt   DateTime?
+  config       Json?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 }
