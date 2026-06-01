@@ -41,6 +41,7 @@
     "jose": "^5.4.0",
     "nestjs-pino": "^4.1.0",
     "node-thermal-printer": "^4.6.0",
+    "pdfkit": "^0.18.0",
     "pino": "^9.2.0",
     "pino-http": "^10.1.0",
     "reflect-metadata": "^0.2.2",
@@ -55,6 +56,7 @@
     "@shata/config": "*",
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.0",
+    "@types/pdfkit": "^0.17.6",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"
   }

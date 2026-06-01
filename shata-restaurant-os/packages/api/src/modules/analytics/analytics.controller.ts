@@ -1,5 +1,6 @@
-import { Controller, Get, Query } from "@nestjs/common";
-import { ApiTags, ApiOperation } from "@nestjs/swagger";
+import { Controller, Get, Query, Res } from "@nestjs/common";
+import type { Response } from "express";
+import { ApiTags, ApiOperation, ApiProduces } from "@nestjs/swagger";
 import { AnalyticsService } from "./analytics.service";
 
 @ApiTags("Analytics")
@@ -51,5 +52,21 @@ export class AnalyticsController {
     @Query("to") to?: string
   ) {
     return this.analyticsService.getCustomerStats(restaurantId, from, to);
+  }
+
+  @Get("z-report")
+  @ApiOperation({ summary: "End-of-day Z-report — returns a PDF" })
+  @ApiProduces("application/pdf")
+  async getZReport(
+    @Query("restaurantId") restaurantId: string,
+    @Query("date") date: string | undefined,
+    @Res() res: Response
+  ) {
+    const pdf = await this.analyticsService.generateZReportPdf(restaurantId, date);
+    const dateLabel = (date ?? new Date().toISOString().slice(0, 10));
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="z-report-${dateLabel}.pdf"`);
+    res.setHeader("Content-Length", pdf.length);
+    res.end(pdf);
   }
 }
