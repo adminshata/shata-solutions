@@ -37,6 +37,7 @@ import { CustomerProfileModule } from "./modules/customer-profile/customer-profi
 import { WaiterCallsModule } from "./modules/waiter-calls/waiter-calls.module";
 import { PricingModule } from "./modules/pricing/pricing.module";
 import { ReviewsModule } from "./modules/reviews/reviews.module";
+import { UpsellModule } from "./modules/upsell/upsell.module";
 import { APP_FILTER } from "@nestjs/core";
 import { SentryGlobalFilter } from "@sentry/nestjs/setup";
 
@@ -109,6 +110,7 @@ import { validateConfig } from "./config/config.validation";
     WaiterCallsModule,
     PricingModule,
     ReviewsModule,
+    UpsellModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: SentryGlobalFilter },
