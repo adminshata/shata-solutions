@@ -40,6 +40,7 @@ import { ReviewsModule } from "./modules/reviews/reviews.module";
 import { UpsellModule } from "./modules/upsell/upsell.module";
 import { InventoryModule } from "./modules/inventory/inventory.module";
 import { WhiteLabelModule } from "./modules/white-label/white-label.module";
+import { PosModule } from "./modules/pos/pos.module";
 import { APP_FILTER } from "@nestjs/core";
 import { SentryGlobalFilter } from "@sentry/nestjs/setup";
 
@@ -115,6 +116,7 @@ import { validateConfig } from "./config/config.validation";
     UpsellModule,
     InventoryModule,
     WhiteLabelModule,
+    PosModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: SentryGlobalFilter },
