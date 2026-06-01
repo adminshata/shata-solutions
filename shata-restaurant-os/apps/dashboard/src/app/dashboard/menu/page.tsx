@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const API = process.env["NEXT_PUBLIC_API_URL"] ?? "";
+const RESTAURANT_ID = "REPLACE_WITH_RESTAURANT_ID";
 
 interface MenuItem {
   id: string;
@@ -13,29 +16,180 @@ interface MenuItem {
   imageUrl?: string;
 }
 
+// ── Image uploader ────────────────────────────────────────────────
+function ProductImage({
+  item,
+  onUploaded,
+}: {
+  item: MenuItem;
+  onUploaded: (id: string, url: string | null) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function upload(file: File) {
+    setUploading(true);
+    setError(null);
+    try {
+      // 1. Get presigned URL
+      const presignRes = await fetch(
+        `${API}/api/dashboard/media/presign?restaurantId=${RESTAURANT_ID}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fileName: file.name,
+            contentType: file.type,
+            contentLength: file.size,
+            folder: "products",
+          }),
+        }
+      );
+      if (!presignRes.ok) throw new Error("Failed to get upload URL");
+      const { uploadUrl, publicUrl } = (await presignRes.json()) as {
+        uploadUrl: string;
+        publicUrl: string;
+      };
+
+      // 2. Upload directly to R2
+      const putRes = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      if (!putRes.ok) throw new Error("Upload to storage failed");
+
+      // 3. Save URL on product
+      const patchRes = await fetch(
+        `${API}/api/dashboard/media/products/${item.id}/image?restaurantId=${RESTAURANT_ID}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageUrl: publicUrl }),
+        }
+      );
+      if (!patchRes.ok) throw new Error("Failed to save image URL");
+
+      onUploaded(item.id, publicUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function removeImage() {
+    setUploading(true);
+    try {
+      await fetch(
+        `${API}/api/dashboard/media/products/${item.id}/image?restaurantId=${RESTAURANT_ID}`,
+        { method: "DELETE" }
+      );
+      onUploaded(item.id, null);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="relative mb-3 h-32 w-full overflow-hidden rounded-xl bg-slate-50 border border-dashed border-slate-200 group">
+      {item.imageUrl ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={item.imageUrl}
+            alt={item.name}
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={() => inputRef.current?.click()}
+              disabled={uploading}
+              className="rounded-lg bg-white/90 px-2 py-1 text-xs font-medium text-slate-800 hover:bg-white"
+            >
+              Replace
+            </button>
+            <button
+              onClick={removeImage}
+              disabled={uploading}
+              className="rounded-lg bg-red-500/90 px-2 py-1 text-xs font-medium text-white hover:bg-red-500"
+            >
+              Remove
+            </button>
+          </div>
+        </>
+      ) : (
+        <button
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+        >
+          {uploading ? (
+            <span className="text-xs">Uploading…</span>
+          ) : (
+            <>
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
+              </svg>
+              <span className="text-xs">Add photo</span>
+            </>
+          )}
+        </button>
+      )}
+      {uploading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+        </div>
+      )}
+      {error && (
+        <p className="absolute bottom-0 inset-x-0 bg-red-500 px-2 py-0.5 text-[10px] text-white text-center">
+          {error}
+        </p>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/avif"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void upload(f);
+          e.target.value = "";
+        }}
+      />
+    </div>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────
 export default function MenuPage() {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "";
-    fetch(`${apiUrl}/api/dashboard/menu?restaurantId=REPLACE_WITH_RESTAURANT_ID`)
+    fetch(`${API}/api/dashboard/menu?restaurantId=${RESTAURANT_ID}`)
       .then((r) => (r.ok ? r.json() : []))
       .then(setItems)
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
   }, []);
 
+  function handleImageUpdate(id: string, url: string | null) {
+    setItems((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, imageUrl: url ?? undefined } : i))
+    );
+  }
+
   async function toggleAvailability(item: MenuItem) {
-    const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "";
     setItems((prev) =>
       prev.map((i) => (i.id === item.id ? { ...i, available: !i.available } : i))
     );
-    await fetch(`${apiUrl}/api/dashboard/menu/${item.id}`, {
+    await fetch(`${API}/api/dashboard/menu/${item.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ available: !item.available, restaurantId: "REPLACE_WITH_RESTAURANT_ID" }),
+      body: JSON.stringify({ available: !item.available, restaurantId: RESTAURANT_ID }),
     });
   }
 
@@ -44,7 +198,6 @@ export default function MenuPage() {
       i.name.toLowerCase().includes(search.toLowerCase()) ||
       i.category.toLowerCase().includes(search.toLowerCase())
   );
-
   const categories = [...new Set(filtered.map((i) => i.category))];
 
   return (
@@ -88,6 +241,8 @@ export default function MenuPage() {
                         item.available ? "" : "opacity-50"
                       }`}
                     >
+                      <ProductImage item={item} onUploaded={handleImageUpdate} />
+
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-slate-900 truncate">{item.name}</p>

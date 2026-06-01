@@ -9,6 +9,7 @@ import { RedisModule } from "./shared/redis/redis.module";
 import { RealtimeModule } from "./shared/realtime/realtime.module";
 import { TaxModule } from "./shared/tax/tax.module";
 import { QueueModule } from "./shared/queue/queue.module";
+import { StorageModule } from "./shared/storage/storage.module";
 
 import { AuthModule } from "./modules/auth/auth.module";
 import { TenantModule } from "./modules/tenant/tenant.module";
@@ -29,6 +30,7 @@ import { NfcModule } from "./modules/nfc/nfc.module";
 import { BillingModule } from "./modules/billing/billing.module";
 import { InstapayModule } from "./modules/instapay/instapay.module";
 import { HealthModule } from "./modules/health/health.module";
+import { MediaModule } from "./modules/media/media.module";
 import { APP_FILTER } from "@nestjs/core";
 import { SentryGlobalFilter } from "@sentry/nestjs/setup";
 
@@ -66,6 +68,7 @@ import { validateConfig } from "./config/config.validation";
     RealtimeModule,
     TaxModule,
     QueueModule,
+    StorageModule,
 
     // Feature modules
     AuthModule,
@@ -87,6 +90,7 @@ import { validateConfig } from "./config/config.validation";
     BillingModule,
     InstapayModule,
     HealthModule,
+    MediaModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: SentryGlobalFilter },
