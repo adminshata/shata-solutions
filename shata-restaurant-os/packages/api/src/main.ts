@@ -4,6 +4,7 @@ import { NestFactory } from "@nestjs/core";
 import { ValidationPipe, VersioningType } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { Logger } from "nestjs-pino";
+import compression from "compression";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
@@ -11,6 +12,9 @@ async function bootstrap() {
 
   // Pino structured logger
   app.useLogger(app.get(Logger));
+
+  // Response compression — reduces payload size by 60-80%
+  app.use(compression());
 
   // CORS — restrict origins in production
   app.enableCors({
