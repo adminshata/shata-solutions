@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "@shata/ui/globals.css";
 import "./globals.css";
+import { PostHogProvider } from "@/components/posthog-provider";
+import { PostHogPageView } from "@/components/posthog-pageview";
 
 export const metadata: Metadata = {
   title: "Order | Shata Restaurant OS",
@@ -20,7 +22,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="bg-background text-foreground antialiased">
-        {children}
+        <PostHogProvider>
+          <PostHogPageView />
+          {children}
+        </PostHogProvider>
       </body>
     </html>
   );
