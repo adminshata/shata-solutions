@@ -35,6 +35,7 @@ import { MediaModule } from "./modules/media/media.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { CustomerProfileModule } from "./modules/customer-profile/customer-profile.module";
 import { WaiterCallsModule } from "./modules/waiter-calls/waiter-calls.module";
+import { PricingModule } from "./modules/pricing/pricing.module";
 import { APP_FILTER } from "@nestjs/core";
 import { SentryGlobalFilter } from "@sentry/nestjs/setup";
 
@@ -105,6 +106,7 @@ import { validateConfig } from "./config/config.validation";
     NotificationsModule,
     CustomerProfileModule,
     WaiterCallsModule,
+    PricingModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: SentryGlobalFilter },
