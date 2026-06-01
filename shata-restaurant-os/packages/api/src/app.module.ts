@@ -3,6 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { ScheduleModule } from "@nestjs/schedule";
+import { LoggerModule } from "nestjs-pino";
 
 import { DatabaseModule } from "./shared/database/database.module";
 import { RedisModule } from "./shared/redis/redis.module";
@@ -43,6 +44,13 @@ import { validateConfig } from "./config/config.validation";
 
 @Module({
   imports: [
+    // Structured logging
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: process.env["NODE_ENV"] !== "production" ? "debug" : "info",
+      },
+    }),
+
     // Config — load and validate env vars at startup
     ConfigModule.forRoot({
       isGlobal: true,

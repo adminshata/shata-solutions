@@ -357,12 +357,12 @@ export class AnalyticsService {
       // ── Summary ─────────────────────────────────────────────────
       doc.fontSize(12).font("Helvetica-Bold").text("Summary");
       doc.moveDown(0.3);
-      const rows = [
+      const rows: [string, string][] = [
         ["Total orders", summary.totalOrders.toString()],
         ["Cancelled", summary.cancelledOrders.toString()],
         ["Refunded", summary.refundedOrders.toString()],
         ["Net revenue (excl. tax)", fmt(summary.netRevenue)],
-        [`${restaurant.taxLabel}`, fmt(summary.totalTax)],
+        [restaurant.taxLabel, fmt(summary.totalTax)],
         ["Gross revenue", fmt(summary.grossRevenue)],
       ];
       for (const [label, value] of rows) {

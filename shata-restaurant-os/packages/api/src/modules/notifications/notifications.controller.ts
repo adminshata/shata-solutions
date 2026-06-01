@@ -50,7 +50,7 @@ export class NotificationsController {
       },
     };
 
-    const msg = messages[scenario];
+    const msg = messages[scenario] ?? messages["PAYMENT"]!;
 
     await this.onesignal.send({
       headings: { en: msg.heading.en, ar: msg.heading.ar },
