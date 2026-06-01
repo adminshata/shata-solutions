@@ -4,6 +4,8 @@ import { DatabaseService } from "../../shared/database/database.service";
 import { StripeProvider } from "./providers/stripe.provider";
 import { PaymobProvider } from "./providers/paymob.provider";
 import { FawryProvider } from "./providers/fawry.provider";
+import { TabbyProvider } from "./providers/tabby.provider";
+import { TamaraProvider } from "./providers/tamara.provider";
 import type { IPaymentProvider } from "./payment-provider.interface";
 
 @Injectable()
@@ -15,12 +17,16 @@ export class PaymentsService {
     private readonly stripeProvider: StripeProvider,
     private readonly paymobProvider: PaymobProvider,
     private readonly fawryProvider: FawryProvider,
+    private readonly tabbyProvider: TabbyProvider,
+    private readonly tamaraProvider: TamaraProvider,
     private readonly events: EventEmitter2,
   ) {
     this.providers = new Map<string, IPaymentProvider>([
       ["STRIPE", stripeProvider],
       ["PAYMOB", paymobProvider],
       ["FAWRY", fawryProvider],
+      ["TABBY", tabbyProvider],
+      ["TAMARA", tamaraProvider],
     ]);
   }
 

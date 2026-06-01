@@ -21,6 +21,14 @@ export default registerAs("app", () => ({
   },
   fawryMerchantCode: process.env["FAWRY_MERCHANT_CODE"] ?? "",
   fawrySecurityKey: process.env["FAWRY_SECURITY_KEY"] ?? "",
+  tabby: {
+    apiKey: process.env["TABBY_API_KEY"] ?? "",
+    webhookSecret: process.env["TABBY_WEBHOOK_SECRET"] ?? "",
+  },
+  tamara: {
+    apiToken: process.env["TAMARA_API_TOKEN"] ?? "",
+    notificationKey: process.env["TAMARA_NOTIFICATION_KEY"] ?? "",
+  },
   sentryDsn: process.env["SENTRY_DSN"] ?? "",
   sentryRelease: process.env["SENTRY_RELEASE"] ?? "",
   anthropic: {
