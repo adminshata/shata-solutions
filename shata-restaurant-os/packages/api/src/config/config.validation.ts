@@ -26,6 +26,8 @@ const configSchema = z.object({
   CLOUDFLARE_R2_SECRET_KEY: z.string().optional(),
   CLOUDFLARE_R2_BUCKET: z.string().default("shata-media"),
   CLOUDFLARE_R2_PUBLIC_URL: z.string().optional(),
+  ONESIGNAL_APP_ID: z.string().optional(),
+  ONESIGNAL_API_KEY: z.string().optional(),
   SENTRY_DSN: z.string().optional(),
   SENTRY_RELEASE: z.string().optional(),
   THROTTLE_TTL_SECONDS: z.string().default("60"),

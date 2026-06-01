@@ -31,6 +31,7 @@ import { BillingModule } from "./modules/billing/billing.module";
 import { InstapayModule } from "./modules/instapay/instapay.module";
 import { HealthModule } from "./modules/health/health.module";
 import { MediaModule } from "./modules/media/media.module";
+import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { APP_FILTER } from "@nestjs/core";
 import { SentryGlobalFilter } from "@sentry/nestjs/setup";
 
@@ -91,6 +92,7 @@ import { validateConfig } from "./config/config.validation";
     InstapayModule,
     HealthModule,
     MediaModule,
+    NotificationsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: SentryGlobalFilter },
