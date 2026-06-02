@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 const API = process.env["NEXT_PUBLIC_API_URL"] ?? "";
@@ -17,6 +17,25 @@ export default function SettingsPage() {
   const [taxInclusive, setTaxInclusive] = useState(false);
   const [saving, setSaving] = useState(false);
   const [testScenario, setTestScenario] = useState<"PAYMENT" | "READY">("PAYMENT");
+  const [upsellMinOrders, setUpsellMinOrders] = useState(500);
+  const [upsellStatus, setUpsellStatus] = useState<{ isActive: boolean; orderCount: number; ordersNeeded: number } | null>(null);
+  const [savingUpsell, setSavingUpsell] = useState(false);
+
+  useEffect(() => {
+    fetch(`${API}/api/dashboard/settings/upsell?restaurantId=${RESTAURANT_ID}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) { setUpsellMinOrders(d.minOrders); setUpsellStatus(d); } })
+      .catch(() => {});
+  }, []);
+
+  async function saveUpsellConfig() {
+    setSavingUpsell(true);
+    const res = await fetch(`${API}/api/dashboard/settings/upsell?restaurantId=${RESTAURANT_ID}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ minOrders: upsellMinOrders }),
+    });
+    if (res.ok) { const d = await res.json(); setUpsellStatus(prev => prev ? { ...prev, minOrders: d.minOrders } : null); }
+    setSavingUpsell(false);
+  }
   const [testingPush, setTestingPush] = useState(false);
   const [pushResult, setPushResult] = useState<string | null>(null);
 
@@ -160,6 +179,31 @@ export default function SettingsPage() {
             <li>Order status changed → customer (if subscribed)</li>
             <li>Order served → customer thank-you</li>
           </ul>
+        </div>
+      </div>
+      {/* Upsell Threshold */}
+      <div className="max-w-xl mt-6 space-y-4 rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-slate-700">Smart Upselling Threshold</h2>
+          {upsellStatus && (
+            <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${upsellStatus.isActive ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>
+              {upsellStatus.isActive ? "Active" : "Not yet active"}
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-slate-500">Show "Customers also ordered" after this many total orders.</p>
+        {upsellStatus && !upsellStatus.isActive && (
+          <p className="text-xs text-amber-600 font-medium">{upsellStatus.orderCount} orders so far — need {upsellStatus.ordersNeeded} more to activate.</p>
+        )}
+        <div className="flex items-center gap-3">
+          <select value={upsellMinOrders} onChange={e => setUpsellMinOrders(parseInt(e.target.value))}
+            className="rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:ring-brand/40 outline-none">
+            {[20, 50, 100, 200, 500, 1000].map(v => <option key={v} value={v}>{v} orders</option>)}
+          </select>
+          <button onClick={saveUpsellConfig} disabled={savingUpsell}
+            className="rounded-xl bg-brand px-4 py-2 text-sm font-bold text-white disabled:opacity-60">
+            {savingUpsell ? "Saving…" : "Save"}
+          </button>
         </div>
       </div>
     </div>

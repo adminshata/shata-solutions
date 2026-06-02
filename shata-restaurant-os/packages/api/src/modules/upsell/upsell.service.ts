@@ -6,7 +6,7 @@ import { SessionTokenService } from "../auth/session-token.service";
 
 const UPSELL_TTL = 3600; // 1 hour
 const MIN_CONFIDENCE = 10; // minimum co-occurrences to surface
-const MIN_ORDERS = 500;    // minimum orders before engine activates
+const DEFAULT_MIN_ORDERS = 500; // minimum orders before engine activates (overridable per restaurant)
 
 export interface UpsellProduct {
   productId: string;
@@ -44,7 +44,9 @@ export class UpsellService {
   private async computeCoOccurrences(restaurantId: string, productId: string): Promise<UpsellProduct[]> {
     // Only run if restaurant has enough order history
     const orderCount = await this.db.order.count({ where: { restaurantId } });
-    if (orderCount < MIN_ORDERS) return [];
+    const restaurant = await this.db.restaurant.findUnique({ where: { id: restaurantId }, select: { settings: true } });
+    const minOrders = ((restaurant?.settings as Record<string, unknown>)?.["upsellMinOrders"] as number | undefined) ?? DEFAULT_MIN_ORDERS;
+    if (orderCount < minOrders) return [];
 
     // Find orders that contain this product
     const orderItems = await this.db.orderItem.findMany({
@@ -98,7 +100,9 @@ export class UpsellService {
 
     for (const r of restaurants) {
       const count = await this.db.order.count({ where: { restaurantId: r.id } });
-      if (count < MIN_ORDERS) continue;
+      const rSettings = await this.db.restaurant.findUnique({ where: { id: r.id }, select: { settings: true } });
+      const minO = ((rSettings?.settings as Record<string, unknown>)?.["upsellMinOrders"] as number | undefined) ?? DEFAULT_MIN_ORDERS;
+      if (count < minO) continue;
 
       const products = await this.db.product.findMany({ where: { restaurantId: r.id, isAvailable: true }, select: { id: true } });
       for (const p of products) {
@@ -106,5 +110,26 @@ export class UpsellService {
       }
       this.logger.log(`Upsell pre-computed for restaurant ${r.id} (${products.length} products)`);
     }
+  }
+
+  async getUpsellConfig(restaurantId: string) {
+    const r = await this.db.restaurant.findUnique({ where: { id: restaurantId }, select: { settings: true } });
+    const settings = (r?.settings ?? {}) as Record<string, unknown>;
+    const minOrders = (settings["upsellMinOrders"] as number | undefined) ?? DEFAULT_MIN_ORDERS;
+    const orderCount = await this.db.order.count({ where: { restaurantId } });
+    return {
+      minOrders,
+      orderCount,
+      isActive: orderCount >= minOrders,
+      ordersNeeded: Math.max(0, minOrders - orderCount),
+    };
+  }
+
+  async updateUpsellConfig(restaurantId: string, minOrders: number) {
+    const clamped = Math.max(10, Math.min(10000, minOrders));
+    const r = await this.db.restaurant.findUnique({ where: { id: restaurantId }, select: { settings: true } });
+    const settings = { ...((r?.settings ?? {}) as Record<string, unknown>), upsellMinOrders: clamped };
+    await this.db.restaurant.update({ where: { id: restaurantId }, data: { settings } });
+    return { minOrders: clamped };
   }
 }

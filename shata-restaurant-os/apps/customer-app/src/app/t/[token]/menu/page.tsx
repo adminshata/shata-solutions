@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@shata/ui";
 import { useCartStore } from "@/store/cart";
+import { WaiterCallButton } from "@/components/waiter-call-button";
 import type { Category, Product } from "@shata/types";
 
 interface LastOrderItem {
@@ -203,6 +204,7 @@ export default function MenuPage() {
           ))}
         </motion.div>
       </div>
+      <WaiterCallButton sessionToken={token} />
     </div>
   );
 }

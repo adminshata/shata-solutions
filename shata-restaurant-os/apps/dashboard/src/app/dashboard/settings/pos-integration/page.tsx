@@ -7,24 +7,50 @@ const RID = "REPLACE_WITH_RESTAURANT_ID";
 
 const PROVIDERS = ["FOODICS", "IIKO", "LIGHTSPEED", "CUSTOM"] as const;
 type Provider = (typeof PROVIDERS)[number];
+type Tab = "config" | "mapping";
 
 interface PosConfig { id?: string; provider: Provider; outboundUrl: string; inboundUrl: string; webhookSecret: string; isActive: boolean; lastSyncAt?: string }
+interface MappingItem { id: string; externalSku: string; externalName: string; occurrences: number; productId?: string | null; product?: { id: string; name: string } | null }
+interface MappingData { unmapped: MappingItem[]; mapped: MappingItem[]; ignored: MappingItem[] }
 
 export default function PosIntegrationPage() {
+  const [activeTab, setActiveTab] = useState<Tab>("config");
   const [config, setConfig] = useState<PosConfig>({ provider: "FOODICS", outboundUrl: "", inboundUrl: "", webhookSecret: "", isActive: false });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [mapping, setMapping] = useState<MappingData>({ unmapped: [], mapped: [], ignored: [] });
+  const [mapInputs, setMapInputs] = useState<Record<string, string>>({});
 
   useEffect(() => {
     Promise.all([
       fetch(`${API}/api/dashboard/settings/pos-integration?restaurantId=${RID}`).then(r => r.ok ? r.json() : null),
       fetch(`${API}/api/dashboard/settings/pos-integration/webhook-url?restaurantId=${RID}`).then(r => r.ok ? r.json() : null),
-    ]).then(([cfg, urlData]) => {
-      if (cfg) setConfig({ ...config, ...cfg });
+      fetch(`${API}/api/dashboard/pos/unmapped?restaurantId=${RID}`).then(r => r.ok ? r.json() : null),
+    ]).then(([cfg, urlData, mapData]) => {
+      if (cfg) setConfig(c => ({ ...c, ...cfg }));
       if (urlData?.url) setConfig(c => ({ ...c, inboundUrl: urlData.url }));
+      if (mapData) setMapping(mapData);
     }).finally(() => setLoading(false));
   }, []);
+
+  async function doMap(itemId: string) {
+    const productId = mapInputs[itemId];
+    if (!productId) return;
+    const res = await fetch(`${API}/api/dashboard/pos/map/${itemId}?restaurantId=${RID}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ productId }) });
+    if (res.ok) { const updated = await res.json(); setMapping(m => ({ ...m, unmapped: m.unmapped.filter(i => i.id !== itemId), mapped: [...m.mapped, updated] })); }
+  }
+
+  async function doIgnore(itemId: string) {
+    await fetch(`${API}/api/dashboard/pos/ignore/${itemId}?restaurantId=${RID}`, { method: "PATCH" });
+    setMapping(m => ({ unmapped: m.unmapped.filter(i => i.id !== itemId), mapped: m.mapped.filter(i => i.id !== itemId), ignored: [...m.ignored, m.unmapped.find(i => i.id === itemId) ?? m.mapped.find(i => i.id === itemId)!] }));
+  }
+
+  async function doUnmap(itemId: string) {
+    await fetch(`${API}/api/dashboard/pos/unmap/${itemId}?restaurantId=${RID}`, { method: "PATCH" });
+    const item = mapping.mapped.find(i => i.id === itemId);
+    if (item) setMapping(m => ({ ...m, mapped: m.mapped.filter(i => i.id !== itemId), unmapped: [{ ...item, productId: null, product: null }, ...m.unmapped] }));
+  }
 
   async function save() {
     setSaving(true);
@@ -52,7 +78,83 @@ export default function PosIntegrationPage() {
         </div>
       </div>
 
-      <div className="max-w-xl space-y-6">
+      {/* Tabs */}
+      <div className="flex border-b mb-6 gap-1">
+        {(["config", "mapping"] as Tab[]).map(t => (
+          <button key={t} onClick={() => setActiveTab(t)}
+            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors capitalize ${activeTab === t ? "border-brand text-brand" : "border-transparent text-slate-500"}`}>
+            {t === "config" ? "Configuration" : `Product Mapping ${mapping.unmapped.length > 0 ? `(${mapping.unmapped.length} unmapped)` : ""}`}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "mapping" && (
+        <div className="max-w-3xl space-y-6">
+          <div className="flex gap-4 text-sm font-semibold">
+            <span className="rounded-full bg-red-100 text-red-700 px-3 py-1">{mapping.unmapped.length} unmapped</span>
+            <span className="rounded-full bg-green-100 text-green-700 px-3 py-1">{mapping.mapped.length} mapped</span>
+            <span className="rounded-full bg-slate-100 text-slate-600 px-3 py-1">{mapping.ignored.length} ignored</span>
+          </div>
+
+          {mapping.unmapped.length > 0 && (
+            <section>
+              <h3 className="mb-3 text-sm font-semibold text-slate-700">Unmapped Items</h3>
+              <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50 text-xs font-semibold uppercase text-slate-500">
+                    <tr><th className="px-4 py-2 text-left">SKU / Name</th><th className="px-4 py-2 text-right">Occurrences</th><th className="px-4 py-2">Map to Product ID</th><th className="px-4 py-2" /></tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {mapping.unmapped.map(item => (
+                      <tr key={item.id} className="hover:bg-slate-50">
+                        <td className="px-4 py-2">
+                          <p className="font-medium text-slate-900">{item.externalName}</p>
+                          <p className="text-xs text-slate-400 font-mono">{item.externalSku}</p>
+                        </td>
+                        <td className="px-4 py-2 text-right text-xs text-slate-400">{item.occurrences}×</td>
+                        <td className="px-4 py-2">
+                          <input value={mapInputs[item.id] ?? ""} onChange={e => setMapInputs(mi => ({ ...mi, [item.id]: e.target.value }))}
+                            placeholder="Shata product ID…" className="w-full rounded-lg border px-2 py-1 text-xs font-mono focus:ring-2 focus:ring-brand/40 outline-none" />
+                        </td>
+                        <td className="px-4 py-2 text-right">
+                          <div className="flex gap-1 justify-end">
+                            <button onClick={() => doMap(item.id)} disabled={!mapInputs[item.id]} className="text-xs rounded-lg bg-brand/10 px-2 py-1 font-semibold text-brand disabled:opacity-40">Map</button>
+                            <button onClick={() => doIgnore(item.id)} className="text-xs rounded-lg bg-slate-100 px-2 py-1 font-medium text-slate-500">Ignore</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {mapping.mapped.length > 0 && (
+            <section>
+              <h3 className="mb-3 text-sm font-semibold text-slate-700">Mapped Items</h3>
+              <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50 text-xs font-semibold uppercase text-slate-500">
+                    <tr><th className="px-4 py-2 text-left">External</th><th className="px-4 py-2 text-left">→ Shata Product</th><th className="px-4 py-2" /></tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {mapping.mapped.map(item => (
+                      <tr key={item.id} className="hover:bg-slate-50">
+                        <td className="px-4 py-2 text-slate-900">{item.externalName}</td>
+                        <td className="px-4 py-2 text-green-700 font-medium">{item.product?.name ?? item.productId}</td>
+                        <td className="px-4 py-2 text-right"><button onClick={() => doUnmap(item.id)} className="text-xs text-red-400 hover:text-red-600">Unmap</button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+        </div>
+      )}
+
+      {activeTab === "config" && <div className="max-w-xl space-y-6">
         {/* Provider */}
         <section className="rounded-2xl border bg-white p-6 shadow-sm space-y-4">
           <h2 className="font-semibold text-slate-700">POS Provider</h2>
@@ -120,7 +222,7 @@ export default function PosIntegrationPage() {
         <button onClick={save} disabled={saving} className="rounded-xl bg-brand px-8 py-3 font-bold text-white hover:bg-brand-dark disabled:opacity-60">
           {saving ? "Saving…" : "Save Configuration"}
         </button>
-      </div>
+      </div>}
     </div>
   );
 }

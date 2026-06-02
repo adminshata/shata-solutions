@@ -128,11 +128,12 @@ model Product {
   sortOrder      Int             @default(0)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
-  modifierGroups ModifierGroup[]
-  orderItems     OrderItem[]
-  ingredients    ProductIngredient[]
-  category       Category        @relation(fields: [categoryId], references: [id])
-  restaurant     Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  modifierGroups  ModifierGroup[]
+  orderItems      OrderItem[]
+  ingredients     ProductIngredient[]
+  posProductMaps  PosProductMap[]
+  category        Category        @relation(fields: [categoryId], references: [id])
+  restaurant      Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@index([restaurantId, isAvailable])
   @@index([categoryId])
@@ -976,4 +977,24 @@ model PosIntegration {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+// ── Phase 4.5: POS Product Mapping ─────────────────────────────────────────
+
+model PosProductMap {
+  id            String   @id @default(cuid())
+  restaurantId  String
+  posProvider   String
+  externalSku   String
+  externalName  String
+  productId     String?
+  isIgnored     Boolean  @default(false)
+  occurrences   Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  product       Product? @relation(fields: [productId], references: [id])
+
+  @@unique([restaurantId, posProvider, externalSku])
+  @@index([restaurantId, posProvider])
+  @@index([restaurantId, productId])
 }

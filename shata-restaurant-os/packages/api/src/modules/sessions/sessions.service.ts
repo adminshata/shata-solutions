@@ -26,7 +26,11 @@ export class SessionsService {
 
     const table = await this.db.table.findUnique({
       where: { id: tableId },
-      include: { restaurant: true },
+      include: {
+        restaurant: {
+          include: { org: { include: { whiteLabelConfig: true } } },
+        },
+      },
     });
 
     if (!table || table.restaurantId !== restaurantId) {
@@ -35,23 +39,33 @@ export class SessionsService {
 
     const r = table.restaurant;
     const settings = r.settings as Record<string, unknown>;
+    const wl = r.org.whiteLabelConfig?.isActive ? r.org.whiteLabelConfig : null;
 
     const ctx: SessionContextDto = {
       token,
       restaurantId: r.id,
       tableId: table.id,
       tableNumber: table.number,
-      restaurantName: r.name,
+      restaurantName: wl?.appName ?? r.name,
       currency: r.currency,
       locale: r.locale,
       timezone: r.timezone,
       taxRate: Number(r.taxRate),
       taxLabel: r.taxLabel,
       taxInclusive: r.taxInclusive,
-      logo: settings["logo"] as string | undefined,
-      primaryColor: settings["primaryColor"] as string | undefined,
+      logo: wl?.logoUrl ?? (settings["logo"] as string | undefined),
+      primaryColor: wl?.primaryColor ?? (settings["primaryColor"] as string | undefined),
       enabledPaymentProviders:
         (settings["enabledPaymentProviders"] as PaymentProvider[]) ?? [PaymentProvider.STRIPE],
+      whiteLabelConfig: wl ? {
+        appName: wl.appName,
+        appNameAr: wl.appNameAr ?? undefined,
+        logoUrl: wl.logoUrl ?? undefined,
+        faviconUrl: wl.faviconUrl ?? undefined,
+        primaryColor: wl.primaryColor,
+        secondaryColor: wl.secondaryColor ?? undefined,
+        hideShataLogo: wl.hideShataLogo,
+      } : undefined,
     };
 
     await this.redis.setJson(cacheKey, ctx, SESSION_CONTEXT_TTL);

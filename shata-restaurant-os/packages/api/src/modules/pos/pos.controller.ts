@@ -43,4 +43,34 @@ export class PosController {
   getWebhookUrl(@Query("restaurantId") restaurantId: string) {
     return this.svc.getWebhookUrl(restaurantId);
   }
+
+  // ── Product mapping ──────────────────────────────────────────────────────
+
+  @ApiBearerAuth()
+  @Get("dashboard/pos/unmapped")
+  @ApiOperation({ summary: "Get unmapped, mapped, and ignored POS items" })
+  getUnmapped(@Query("restaurantId") restaurantId: string) {
+    return this.svc.getUnmappedItems(restaurantId);
+  }
+
+  @ApiBearerAuth()
+  @Patch("dashboard/pos/map/:id")
+  @ApiOperation({ summary: "Map a POS SKU to a Shata product" })
+  mapProduct(@Param("id") id: string, @Body() body: { productId: string }) {
+    return this.svc.mapProduct(id, body.productId);
+  }
+
+  @ApiBearerAuth()
+  @Patch("dashboard/pos/ignore/:id")
+  @ApiOperation({ summary: "Mark a POS item as ignored (delivery fee, packaging, etc.)" })
+  ignoreItem(@Param("id") id: string) {
+    return this.svc.ignoreItem(id);
+  }
+
+  @ApiBearerAuth()
+  @Patch("dashboard/pos/unmap/:id")
+  @ApiOperation({ summary: "Remove product mapping from a POS item" })
+  unmapItem(@Param("id") id: string) {
+    return this.svc.unmapItem(id);
+  }
 }

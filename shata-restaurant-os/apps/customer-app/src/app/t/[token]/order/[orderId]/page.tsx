@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { StatusTracker, formatCurrency } from "@shata/ui";
 import type { OrderStatus } from "@shata/types";
 import { StampCard } from "@/components/stamp-card";
+import { WaiterCallButton } from "@/components/waiter-call-button";
 
 interface OrderState {
   id: string;
@@ -268,6 +269,7 @@ export default function OrderTrackingPage() {
           />
         </div>
       )}
+      <WaiterCallButton sessionToken={token} />
     </div>
   );
 }

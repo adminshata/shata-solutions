@@ -47,9 +47,26 @@ export class PosService {
     }
 
     const restaurant = await this.db.restaurant.findUnique({ where: { id: restaurantId }, select: { currency: true } });
+    const provider = integration.provider;
 
-    // Calculate totals
-    const subtotal = dto.items.reduce((s, i) => s + i.price * i.quantity, 0);
+    // Resolve items via SKU mapping table
+    const resolvedItems = await Promise.all(dto.items.map(async (item) => {
+      const externalSku = item.name; // use item name as SKU when no explicit SKU
+      let mapping = await this.db.posProductMap.findUnique({
+        where: { restaurantId_posProvider_externalSku: { restaurantId, posProvider: provider, externalSku } },
+      });
+      if (!mapping) {
+        mapping = await this.db.posProductMap.create({
+          data: { restaurantId, posProvider: provider, externalSku, externalName: item.name },
+        });
+      } else {
+        await this.db.posProductMap.update({ where: { id: mapping.id }, data: { occurrences: { increment: 1 } } });
+      }
+      return { ...item, productId: mapping.productId ?? null, isIgnored: mapping.isIgnored };
+    }));
+
+    const activeItems = resolvedItems.filter(i => !i.isIgnored);
+    const subtotal = activeItems.reduce((s, i) => s + i.price * i.quantity, 0);
     const orderCount = await this.db.order.count({ where: { restaurantId } });
 
     const order = await this.db.order.create({
@@ -62,15 +79,15 @@ export class PosService {
         subtotal,
         tax: 0,
         total: subtotal,
-        notes: dto.notes ?? dto.externalOrderId ? `POS: ${dto.externalOrderId}` : undefined,
+        notes: dto.notes ?? (dto.externalOrderId ? `POS: ${dto.externalOrderId}` : undefined),
         status: "CONFIRMED",
         items: {
-          create: dto.items.map(item => ({
-            productId: "", // POS items don't have product IDs
+          create: activeItems.map(item => ({
+            productId: item.productId ?? "",
             quantity: item.quantity,
             unitPrice: item.price,
             totalPrice: item.price * item.quantity,
-            notes: item.name,
+            notes: item.name, // always store external name for kitchen display
           })),
         },
       },
@@ -134,6 +151,37 @@ export class PosService {
 
   async getWebhookUrl(restaurantId: string) {
     return { url: `https://api.shataos.com/api/v1/pos/webhook/${restaurantId}` };
+  }
+
+  // ── Product mapping ──────────────────────────────────────────────────────
+
+  async getUnmappedItems(restaurantId: string) {
+    const integration = await this.db.posIntegration.findUnique({ where: { restaurantId }, select: { provider: true } });
+    if (!integration) return { unmapped: [], mapped: [], ignored: [] };
+
+    const all = await this.db.posProductMap.findMany({
+      where: { restaurantId, posProvider: integration.provider },
+      orderBy: { occurrences: "desc" },
+      include: { product: { select: { id: true, name: true } } },
+    });
+
+    return {
+      unmapped: all.filter(m => !m.productId && !m.isIgnored),
+      mapped: all.filter(m => !!m.productId),
+      ignored: all.filter(m => m.isIgnored),
+    };
+  }
+
+  async mapProduct(mapId: string, productId: string) {
+    return this.db.posProductMap.update({ where: { id: mapId }, data: { productId, isIgnored: false } });
+  }
+
+  async ignoreItem(mapId: string) {
+    return this.db.posProductMap.update({ where: { id: mapId }, data: { isIgnored: true, productId: null } });
+  }
+
+  async unmapItem(mapId: string) {
+    return this.db.posProductMap.update({ where: { id: mapId }, data: { productId: null, isIgnored: false } });
   }
 
   private async logDelivery(restaurantId: string, direction: string, payload: unknown) {

@@ -2,6 +2,16 @@ import type { OrderStatus, PaymentProvider, TicketStatus } from "./enums";
 
 // ── Session / Menu DTOs ───────────────────────────────────────────────────
 
+export interface WhiteLabelConfigDto {
+  appName: string;
+  appNameAr?: string;
+  logoUrl?: string;
+  faviconUrl?: string;
+  primaryColor: string;
+  secondaryColor?: string;
+  hideShataLogo: boolean;
+}
+
 export interface SessionContextDto {
   token: string;
   restaurantId: string;
@@ -17,6 +27,7 @@ export interface SessionContextDto {
   logo?: string | null;
   primaryColor?: string | null;
   enabledPaymentProviders: PaymentProvider[];
+  whiteLabelConfig?: WhiteLabelConfigDto;
 }
 
 // ── Order DTOs ────────────────────────────────────────────────────────────

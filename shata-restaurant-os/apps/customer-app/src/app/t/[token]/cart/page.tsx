@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart";
 import { formatCurrency } from "@shata/ui";
+import { WaiterCallButton } from "@/components/waiter-call-button";
 
 export default function CartPage({ params }: { params: { token: string } }) {
   const router = useRouter();
@@ -97,6 +98,7 @@ export default function CartPage({ params }: { params: { token: string } }) {
           Proceed to Checkout
         </button>
       </div>
+      <WaiterCallButton sessionToken={params.token} />
     </div>
   );
 }
