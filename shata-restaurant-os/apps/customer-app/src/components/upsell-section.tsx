@@ -42,7 +42,6 @@ export function UpsellSection({ sessionToken, cartProductIds, currency, onAddPro
         {suggestions.map(p => (
           <div key={p.productId} className="flex min-w-[140px] flex-col rounded-xl border bg-slate-50 p-3">
             {p.imageUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
               <img src={p.imageUrl} alt={p.name} className="mb-2 h-16 w-full rounded-lg object-cover" />
             )}
             <p className="text-xs font-semibold text-slate-900 line-clamp-2">{p.name}</p>

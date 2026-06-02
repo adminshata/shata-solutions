@@ -96,7 +96,7 @@ function ProductImage({
     <div className="relative mb-3 h-32 w-full overflow-hidden rounded-xl bg-slate-50 border border-dashed border-slate-200 group">
       {item.imageUrl ? (
         <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* img is fine here — product images are from R2 CDN */}
           <img
             src={item.imageUrl}
             alt={item.name}
