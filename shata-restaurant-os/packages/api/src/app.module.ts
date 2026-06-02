@@ -11,6 +11,7 @@ import { RealtimeModule } from "./shared/realtime/realtime.module";
 import { TaxModule } from "./shared/tax/tax.module";
 import { QueueModule } from "./shared/queue/queue.module";
 import { StorageModule } from "./shared/storage/storage.module";
+import { AuditModule } from "./shared/audit/audit.module";
 
 import { AuthModule } from "./modules/auth/auth.module";
 import { TenantModule } from "./modules/tenant/tenant.module";
@@ -41,6 +42,7 @@ import { UpsellModule } from "./modules/upsell/upsell.module";
 import { InventoryModule } from "./modules/inventory/inventory.module";
 import { WhiteLabelModule } from "./modules/white-label/white-label.module";
 import { PosModule } from "./modules/pos/pos.module";
+import { AuditApiModule } from "./modules/audit/audit.module";
 import { APP_FILTER } from "@nestjs/core";
 import { SentryGlobalFilter } from "@sentry/nestjs/setup";
 
@@ -86,6 +88,7 @@ import { validateConfig } from "./config/config.validation";
     TaxModule,
     QueueModule,
     StorageModule,
+    AuditModule,
 
     // Feature modules
     AuthModule,
@@ -117,6 +120,7 @@ import { validateConfig } from "./config/config.validation";
     InventoryModule,
     WhiteLabelModule,
     PosModule,
+    AuditApiModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: SentryGlobalFilter },

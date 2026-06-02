@@ -6,8 +6,10 @@ import { PaymobProvider } from "./providers/paymob.provider";
 import { FawryProvider } from "./providers/fawry.provider";
 import { TabbyProvider } from "./providers/tabby.provider";
 import { TamaraProvider } from "./providers/tamara.provider";
+import { RedisModule } from "../../shared/redis/redis.module";
 
 @Module({
+  imports: [RedisModule],
   controllers: [PaymentsController],
   providers: [PaymentsService, StripeProvider, PaymobProvider, FawryProvider, TabbyProvider, TamaraProvider],
   exports: [PaymentsService, PaymobProvider, FawryProvider, TabbyProvider, TamaraProvider],

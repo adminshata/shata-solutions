@@ -1,6 +1,7 @@
-import { Injectable, BadRequestException, NotFoundException } from "@nestjs/common";
+import { Injectable, BadRequestException, NotFoundException, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { DatabaseService } from "../../shared/database/database.service";
+import { RedisService } from "../../shared/redis/redis.service";
 import { StripeProvider } from "./providers/stripe.provider";
 import { PaymobProvider } from "./providers/paymob.provider";
 import { FawryProvider } from "./providers/fawry.provider";
@@ -10,10 +11,12 @@ import type { IPaymentProvider } from "./payment-provider.interface";
 
 @Injectable()
 export class PaymentsService {
+  private readonly logger = new Logger(PaymentsService.name);
   private providers: Map<string, IPaymentProvider>;
 
   constructor(
     private readonly db: DatabaseService,
+    private readonly redis: RedisService,
     private readonly stripeProvider: StripeProvider,
     private readonly paymobProvider: PaymobProvider,
     private readonly fawryProvider: FawryProvider,
@@ -71,7 +74,16 @@ export class PaymentsService {
     const provider = this.getProvider(providerName);
     const event = await provider.parseWebhookEvent(payload, signature);
 
-    // Check if already processed (idempotency)
+    // Redis-based replay protection: 24h window keyed by provider + eventId
+    const replayKey = `webhook:${providerName}:${event.eventId}`;
+    const alreadySeen = await this.redis.get(replayKey);
+    if (alreadySeen) {
+      this.logger.debug({ provider: providerName, eventId: event.eventId }, "Webhook replay detected — skipping");
+      return { alreadyProcessed: true };
+    }
+    await this.redis.set(replayKey, "1", 86400); // 24h TTL
+
+    // DB-level idempotency check (belt and suspenders)
     const existing = await this.db.paymentIntent.findFirst({
       where: { providerRef: event.eventId },
     });

@@ -998,3 +998,21 @@ model PosProductMap {
   @@index([restaurantId, posProvider])
   @@index([restaurantId, productId])
 }
+
+// ── Phase 4.5: Audit Log ────────────────────────────────────────────────────
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  restaurantId String?
+  userId       String?
+  action       String
+  resource     String
+  resourceId   String?
+  ipAddress    String?
+  userAgent    String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  @@index([restaurantId, createdAt])
+  @@index([action])
+}
