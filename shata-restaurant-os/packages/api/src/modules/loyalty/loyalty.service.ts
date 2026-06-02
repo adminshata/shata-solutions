@@ -62,7 +62,7 @@ export class LoyaltyService {
 
     const [program, account, stampCard, tiers] = await Promise.all([
       this.db.loyaltyProgram.findUnique({ where: { restaurantId } }),
-      this.db.loyaltyAccount.findUnique({ where: { restaurantId_customerId: { restaurantId, customerId } } }),
+      this.db.loyaltyAccount.findUnique({ where: { customerId_restaurantId: { restaurantId, customerId } } }),
       this.db.stampCard.findUnique({ where: { restaurantId_customerId: { restaurantId, customerId } } }),
       this.db.loyaltyTier.findMany({ where: { restaurantId }, orderBy: { minPoints: "asc" } }),
     ]);
@@ -136,7 +136,7 @@ export class LoyaltyService {
   async updateProgram(restaurantId: string, dto: Record<string, unknown>) {
     return this.db.loyaltyProgram.upsert({
       where: { restaurantId },
-      create: { restaurantId, ...(dto as never) },
+      create: Object.assign({ restaurantId }, dto) as never,
       update: dto as never,
     });
   }
@@ -176,7 +176,7 @@ export class LoyaltyService {
 
   private async appendLedger(restaurantId: string, customerId: string, type: "EARN" | "REDEEM" | "ADJUSTMENT", points: number, refOrderId?: string) {
     const account = await this.db.loyaltyAccount.upsert({
-      where: { restaurantId_customerId: { restaurantId, customerId } },
+      where: { customerId_restaurantId: { customerId, restaurantId } },
       create: { restaurantId, customerId, points: type === "EARN" ? points : 0, currency: "EGP" },
       update: { points: { increment: type === "EARN" ? points : -points } },
     });
@@ -187,7 +187,7 @@ export class LoyaltyService {
   }
 
   private async getCustomerTier(restaurantId: string, customerId: string) {
-    const account = await this.db.loyaltyAccount.findUnique({ where: { restaurantId_customerId: { restaurantId, customerId } } });
+    const account = await this.db.loyaltyAccount.findUnique({ where: { customerId_restaurantId: { restaurantId, customerId } } });
     if (!account) return null;
     const tiers = await this.db.loyaltyTier.findMany({ where: { restaurantId }, orderBy: { minPoints: "asc" } });
     return tiers.filter((t) => t.minPoints <= account.points).at(-1) ?? null;

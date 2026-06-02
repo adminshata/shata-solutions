@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from "@nestjs/common";
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
-import { UpsellService } from "./upsell.service";
+import { UpsellService, type UpsellProduct } from "./upsell.service";
 import { Public } from "../auth/clerk.guard";
 
 @ApiTags("Upsell")
@@ -11,7 +11,7 @@ export class UpsellController {
   @Public()
   @Get(":token/upsell/:productId")
   @ApiOperation({ summary: "Collaborative filtering: what customers also ordered with this product" })
-  getUpsells(@Param("token") token: string, @Param("productId") productId: string) {
+  getUpsells(@Param("token") token: string, @Param("productId") productId: string): Promise<UpsellProduct[]> {
     return this.svc.getUpsells(token, productId);
   }
 }

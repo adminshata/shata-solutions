@@ -8,7 +8,7 @@ const UPSELL_TTL = 3600; // 1 hour
 const MIN_CONFIDENCE = 10; // minimum co-occurrences to surface
 const MIN_ORDERS = 500;    // minimum orders before engine activates
 
-interface UpsellProduct {
+export interface UpsellProduct {
   productId: string;
   name: string;
   price: number;

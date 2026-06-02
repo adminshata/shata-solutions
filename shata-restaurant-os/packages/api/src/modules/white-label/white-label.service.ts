@@ -33,7 +33,7 @@ export class WhiteLabelService {
 
     return this.db.whiteLabelConfig.upsert({
       where: { orgId },
-      create: { orgId, appName: dto.appName ?? "My Restaurant", ...dto as never },
+      create: Object.assign({ orgId, appName: dto.appName ?? "My Restaurant" }, dto) as never,
       update: dto as never,
     });
   }

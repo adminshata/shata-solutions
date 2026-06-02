@@ -51,7 +51,7 @@ export default function PricingPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    if (res.ok) { setRules(r => [await res.json(), ...r]); setForm({ ...emptyRule }); setShowForm(false); }
+    if (res.ok) { const newRule = await res.json(); setRules(r => [newRule, ...r]); setForm({ ...emptyRule }); setShowForm(false); }
     setSaving(false);
   }
 

@@ -63,7 +63,7 @@ export class PricingService {
 
         if (!matchingRule) return product;
 
-        const discountedPrice = this.applyRule(originalPrice, matchingRule);
+        const discountedPrice = this.applyRule(originalPrice, { type: matchingRule.type, value: Number(matchingRule.value) });
         return {
           ...product,
           discountedPrice: Math.round(discountedPrice * 100) / 100,

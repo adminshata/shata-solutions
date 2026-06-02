@@ -48,7 +48,6 @@ export class CustomerProfileService {
 
     const loyaltyAccounts = await this.db.loyaltyAccount.findMany({
       where: { customerId },
-      include: { customer: false },
       select: {
         restaurantId: true,
         points: true,
