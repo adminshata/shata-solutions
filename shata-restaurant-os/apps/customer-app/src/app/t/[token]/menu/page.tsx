@@ -30,6 +30,7 @@ export default function MenuPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [lastOrder, setLastOrder] = useState<LastOrder | null>(null);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [reordering, setReordering] = useState(false);
@@ -39,17 +40,29 @@ export default function MenuPage() {
   useEffect(() => {
     const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "";
     Promise.all([
-      fetch(`${apiUrl}/api/sessions/${token}/menu`).then((r) => r.json()),
+      fetch(`${apiUrl}/api/sessions/${token}/menu`).then((r) => {
+        if (!r.ok) throw new Error(`Menu API ${r.status}: ${r.url}`);
+        return r.json();
+      }),
       fetch(`${apiUrl}/api/sessions/${token}/last-order`).then((r) =>
         r.status === 200 ? r.json() : null
-      ),
+      ).catch(() => null),
     ])
-      .then(([menuData, lastOrderData]: [Category[], LastOrder | null]) => {
-        setCategories(menuData);
-        if (menuData.length > 0 && menuData[0]) setActiveCategory(menuData[0].id);
+      .then(([menuData, lastOrderData]: [unknown, LastOrder | null]) => {
+        // Guard: API must return an array of categories
+        const cats = Array.isArray(menuData) ? (menuData as Category[]) : [];
+        if (!Array.isArray(menuData)) {
+          console.error("Menu API returned non-array:", menuData);
+          setFetchError(`Menu data format unexpected. API URL: ${apiUrl}`);
+        }
+        setCategories(cats);
+        if (cats.length > 0 && cats[0]) setActiveCategory(cats[0].id);
         if (lastOrderData) setLastOrder(lastOrderData);
       })
-      .catch(console.error)
+      .catch((err: Error) => {
+        console.error("Menu fetch failed:", err);
+        setFetchError(err.message ?? "Failed to load menu. Check NEXT_PUBLIC_API_URL.");
+      })
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -89,6 +102,22 @@ export default function MenuPage() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
+        <p className="text-2xl">⚠️</p>
+        <p className="font-semibold text-red-600">Menu failed to load</p>
+        <p className="text-xs text-muted-foreground font-mono break-all">{fetchError}</p>
+        <button
+          onClick={() => { setFetchError(null); setLoading(true); }}
+          className="rounded-xl bg-brand px-6 py-2 text-sm font-bold text-white"
+        >
+          Retry
+        </button>
       </div>
     );
   }
