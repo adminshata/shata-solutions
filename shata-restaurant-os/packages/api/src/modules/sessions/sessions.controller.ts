@@ -4,6 +4,7 @@ import {
   Post,
   Param,
   NotFoundException,
+  VERSION_NEUTRAL,
 } from "@nestjs/common";
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
 import { SessionsService } from "./sessions.service";
@@ -11,7 +12,7 @@ import { OrdersService } from "../orders/orders.service";
 import { Public } from "../auth/clerk.guard";
 
 @ApiTags("Sessions")
-@Controller("sessions")
+@Controller({ path: "sessions", version: VERSION_NEUTRAL })
 export class SessionsController {
   constructor(
     private readonly sessionsService: SessionsService,

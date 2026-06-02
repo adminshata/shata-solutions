@@ -1,22 +1,29 @@
-import { Controller, Get, Post, Param, Query, Body, Res } from "@nestjs/common";
+import { Controller, Get, Post, Param, Query, Body, Res, VERSION_NEUTRAL } from "@nestjs/common";
 import type { Response } from "express";
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
 import { MenuService } from "./menu.service";
 import type { ParsedMenuItem } from "./menu.service";
+import { SessionTokenService } from "../auth/session-token.service";
 import { Public } from "../auth/clerk.guard";
 
 @ApiTags("Menu")
-@Controller()
+@Controller({ version: VERSION_NEUTRAL })
 export class MenuController {
-  constructor(private readonly menuService: MenuService) {}
+  constructor(
+    private readonly menuService: MenuService,
+    private readonly sessionTokenSvc: SessionTokenService,
+  ) {}
 
   @Public()
   @Get("sessions/:token/menu")
-  @ApiOperation({ summary: "Get full menu for a session (cached, 5-min CDN TTL)" })
-  async getMenuBySession(@Param("token") _token: string, @Res({ passthrough: true }) res: Response) {
-    // CDN-cacheable: shared 5-min TTL, stale-while-revalidate 60s
+  @ApiOperation({ summary: "Get full menu for a session (Redis-cached, 5-min CDN TTL)" })
+  async getMenuBySession(
+    @Param("token") token: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=60");
-    return { message: "Menu endpoint — decode session token to get restaurantId" };
+    const { restaurantId } = await this.sessionTokenSvc.verify(token);
+    return this.menuService.getMenu(restaurantId);
   }
 
   @Get("dashboard/menu")

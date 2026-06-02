@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Param, Body, Sse, Headers, ConflictException } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Param, Body, Sse, Headers, ConflictException, VERSION_NEUTRAL } from "@nestjs/common";
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
 import { Observable, Subject } from "rxjs";
 import type { MessageEvent } from "@nestjs/common";
@@ -6,7 +6,7 @@ import { OrdersService } from "./orders.service";
 import { Public } from "../auth/clerk.guard";
 
 @ApiTags("Orders")
-@Controller()
+@Controller({ version: VERSION_NEUTRAL })
 export class OrdersController {
   // Per-order subjects for SSE streaming
   private readonly subjects = new Map<string, Subject<MessageEvent>>();

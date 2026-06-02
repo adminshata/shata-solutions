@@ -1,10 +1,10 @@
-import { Controller, Get, Patch, Param, Body, Query } from "@nestjs/common";
+import { Controller, Get, Patch, Param, Body, Query, VERSION_NEUTRAL } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiBearerAuth } from "@nestjs/swagger";
 import { UpsellService, type UpsellProduct } from "./upsell.service";
 import { Public } from "../auth/clerk.guard";
 
 @ApiTags("Upsell")
-@Controller()
+@Controller({ version: VERSION_NEUTRAL })
 export class UpsellController {
   constructor(private readonly svc: UpsellService) {}
 
