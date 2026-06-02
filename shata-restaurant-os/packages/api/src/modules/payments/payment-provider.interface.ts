@@ -28,10 +28,12 @@ export interface RefundResult {
 
 export interface WebhookEvent {
   eventId: string;
-  type: "payment.success" | "payment.failed" | "refund.success" | "refund.failed";
+  type: "payment.success" | "payment.failed" | "refund.success" | "refund.failed" | "dispute.created";
   orderId?: string;
   amount?: number;
   currency?: string;
+  disputeReason?: string;
+  disputeDueDate?: Date;
 }
 
 export interface IPaymentProvider {

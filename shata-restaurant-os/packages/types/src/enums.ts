@@ -26,6 +26,7 @@ export enum OrderStatus {
   SERVED = "SERVED",
   CANCELLED = "CANCELLED",
   REFUNDED = "REFUNDED",
+  DISPUTED = "DISPUTED",
 }
 
 export enum OrderType {

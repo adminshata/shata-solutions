@@ -75,6 +75,19 @@ export class StripeProvider implements IPaymentProvider {
           orderId: pi.metadata["orderId"],
         };
       }
+      case "charge.dispute.created": {
+        const dispute = event.data.object as Stripe.Dispute;
+        return {
+          eventId: event.id,
+          type: "dispute.created",
+          amount: dispute.amount / 100,
+          currency: dispute.currency.toUpperCase(),
+          disputeReason: dispute.reason,
+          disputeDueDate: dispute.evidence_details?.due_by
+            ? new Date(dispute.evidence_details.due_by * 1000)
+            : undefined,
+        };
+      }
       default:
         return { eventId: event.id, type: "payment.failed" };
     }

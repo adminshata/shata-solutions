@@ -189,6 +189,7 @@ model Order {
   refunds       Refund[]
   tip           Tip?
   review        OrderReview?
+  chargebacks   Chargeback[]
 
   @@index([restaurantId, status])
   @@index([sessionId])
@@ -612,6 +613,7 @@ enum OrderStatus {
   SERVED
   CANCELLED
   REFUNDED
+  DISPUTED
 }
 
 enum OrderType {
@@ -1015,4 +1017,32 @@ model AuditLog {
 
   @@index([restaurantId, createdAt])
   @@index([action])
+}
+
+// ── Phase 4.5: Chargebacks ──────────────────────────────────────────────────
+
+model Chargeback {
+  id           String           @id @default(cuid())
+  orderId      String
+  order        Order            @relation(fields: [orderId], references: [id])
+  restaurantId String
+  providerRef  String           @unique
+  amount       Decimal          @db.Decimal(10, 2)
+  reason       String?
+  status       ChargebackStatus @default(RECEIVED)
+  evidence     Json?
+  dueDate      DateTime?
+  resolvedAt   DateTime?
+  createdAt    DateTime         @default(now())
+
+  @@index([restaurantId, status])
+  @@index([restaurantId, createdAt])
+}
+
+enum ChargebackStatus {
+  RECEIVED
+  EVIDENCE_NEEDED
+  EVIDENCE_SUBMITTED
+  WON
+  LOST
 }

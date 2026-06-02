@@ -109,6 +109,30 @@ export class PaymentsService {
       this.events.emit("payment.failed", { orderId: event.orderId });
     }
 
+    if (event.type === "dispute.created") {
+      // Find the order via the payment intent providerRef matching
+      const intent = await this.db.paymentIntent.findFirst({
+        where: { status: "COMPLETED", provider: providerName as never },
+        include: { order: { select: { id: true, restaurantId: true } } },
+        orderBy: { createdAt: "desc" },
+      });
+      if (intent?.order) {
+        await this.db.order.update({ where: { id: intent.order.id }, data: { status: "DISPUTED" as never } });
+        await this.db.chargeback.create({
+          data: {
+            orderId: intent.order.id,
+            restaurantId: intent.order.restaurantId,
+            providerRef: event.eventId,
+            amount: event.amount ?? 0,
+            reason: event.disputeReason,
+            dueDate: event.disputeDueDate,
+          },
+        });
+        this.events.emit("chargeback.created", { orderId: intent.order.id, restaurantId: intent.order.restaurantId });
+        this.logger.warn({ orderId: intent.order.id, restaurantId: intent.order.restaurantId }, "Chargeback created — notify restaurant owner");
+      }
+    }
+
     return { processed: true };
   }
 
