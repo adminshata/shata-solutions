@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "tsc && cp -r prisma dist/",
+    "build": "prisma generate && tsc && cp -r prisma dist/",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
     "db:generate": "prisma generate",
