@@ -1,0 +1,13 @@
+# Nixpacks config for Railway monorepo deployment
+# Root directory MUST be set to: shata-restaurant-os (not packages/api)
+
+[phases.install]
+cmds = ["npm install"]
+
+[phases.build]
+cmds = [
+  "npx turbo build --filter=@shata/api..."
+]
+
+[start]
+cmd = "node packages/api/dist/main.js"
