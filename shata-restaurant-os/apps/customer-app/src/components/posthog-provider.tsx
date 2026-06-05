@@ -1,26 +1,25 @@
 "use client";
 
-import posthog from "posthog-js";
-import { PostHogProvider as PHProvider } from "posthog-js/react";
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 
-export function PostHogProvider({ children }: { children: React.ReactNode }) {
+// PostHog is loaded lazily at runtime — never blocks the build
+export function PostHogProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const key = process.env["NEXT_PUBLIC_POSTHOG_KEY"];
-    const host = process.env["NEXT_PUBLIC_POSTHOG_HOST"] ?? "https://us.i.posthog.com";
+    if (!key || typeof window === "undefined") return;
 
-    if (key && typeof window !== "undefined") {
-      posthog.init(key, {
-        api_host: host,
-        person_profiles: "identified_only",
-        capture_pageview: false,
-        capture_pageleave: true,
-        loaded: (ph) => {
-          if (process.env["NODE_ENV"] === "development") ph.debug();
-        },
-      });
-    }
+    import("posthog-js")
+      .then(({ default: posthog }) => {
+        if (posthog.__loaded) return; // already initialised
+        posthog.init(key, {
+          api_host: process.env["NEXT_PUBLIC_POSTHOG_HOST"] ?? "https://us.i.posthog.com",
+          person_profiles: "identified_only",
+          capture_pageview: false,
+          capture_pageleave: true,
+        });
+      })
+      .catch(() => { /* posthog unavailable — degrade silently */ });
   }, []);
 
-  return <PHProvider client={posthog}>{children}</PHProvider>;
+  return <>{children}</>;
 }
