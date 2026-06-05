@@ -31,16 +31,18 @@ async function bootstrap() {
   // Response compression — reduces payload size by 60-80%
   app.use(compression());
 
-  // CORS — restrict origins in production
+  // CORS — supports ALLOWED_ORIGINS env var (comma-separated) or individual URL vars
+  const allowedOrigins = process.env["ALLOWED_ORIGINS"]
+    ? process.env["ALLOWED_ORIGINS"].split(",").map((o) => o.trim()).filter(Boolean)
+    : [
+        process.env["CUSTOMER_APP_URL"] ?? "",
+        process.env["DASHBOARD_URL"] ?? "",
+        process.env["KITCHEN_URL"] ?? "",
+        process.env["ADMIN_URL"] ?? "",
+      ].filter(Boolean);
+
   app.enableCors({
-    origin: process.env["NODE_ENV"] === "production"
-      ? [
-          process.env["CUSTOMER_APP_URL"] ?? "",
-          process.env["DASHBOARD_URL"] ?? "",
-          process.env["KITCHEN_URL"] ?? "",
-          process.env["ADMIN_URL"] ?? "",
-        ].filter(Boolean)
-      : true,
+    origin: process.env["NODE_ENV"] === "production" ? allowedOrigins : true,
     credentials: true,
   });
 
