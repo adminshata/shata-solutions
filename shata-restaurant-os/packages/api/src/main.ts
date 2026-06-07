@@ -75,7 +75,7 @@ async function bootstrap() {
   }
 
   const port = parseInt(process.env["PORT"] ?? "3014", 10);
-  await app.listen(port);
+  await app.listen(port, "0.0.0.0");
   console.warn(`🚀 Shata API running on http://localhost:${port}/api`);
   if (process.env["NODE_ENV"] !== "production") {
     console.warn(`📖 Swagger docs at http://localhost:${port}/api/docs`);
