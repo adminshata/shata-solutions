@@ -26,6 +26,7 @@ async function bootstrap() {
       },
     },
     crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
   }));
 
   // Response compression — reduces payload size by 60-80%
