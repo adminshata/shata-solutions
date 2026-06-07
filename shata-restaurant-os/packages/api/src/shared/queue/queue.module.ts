@@ -25,6 +25,9 @@ const queues = Object.values(QUEUES).map((name) =>
       useFactory: (config: ConfigService) => ({
         connection: {
           url: config.get<string>("app.redisUrl") ?? "redis://localhost:6379",
+          enableOfflineQueue: false,
+          lazyConnect: true,
+          retryStrategy: () => null,
         },
         defaultJobOptions: {
           removeOnComplete: 100,

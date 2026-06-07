@@ -19,34 +19,43 @@ export class QueueSchedulerService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    // Remove old repeatable jobs before re-registering (prevents duplicates on restart)
-    await this.clearRepeatableJobs();
+    // Redis (Upstash) may be unreachable or rate-limited at boot — never let
+    // schedule registration crash app bootstrap; the API must still listen
+    // and pass the healthcheck. On failure, schedules are simply skipped and
+    // get re-applied on the next deploy/restart.
+    try {
+      await this.clearRepeatableJobs();
 
-    await this.reconciliationQueue.add(
-      JOBS.RECONCILE_PAYMENTS,
-      {},
-      { repeat: { pattern: "*/15 * * * *" } } // every 15 min
-    );
+      await this.reconciliationQueue.add(
+        JOBS.RECONCILE_PAYMENTS,
+        {},
+        { repeat: { pattern: "*/15 * * * *" } } // every 15 min
+      );
 
-    await this.analyticsQueue.add(
-      JOBS.COMPUTE_DAILY_STATS,
-      {},
-      { repeat: { pattern: "0 2 * * *" } } // 2am daily
-    );
+      await this.analyticsQueue.add(
+        JOBS.COMPUTE_DAILY_STATS,
+        {},
+        { repeat: { pattern: "0 2 * * *" } } // 2am daily
+      );
 
-    await this.sessionQueue.add(
-      JOBS.CLEANUP_SESSIONS,
-      {},
-      { repeat: { pattern: "0 * * * *" } } // hourly
-    );
+      await this.sessionQueue.add(
+        JOBS.CLEANUP_SESSIONS,
+        {},
+        { repeat: { pattern: "0 * * * *" } } // hourly
+      );
 
-    await this.zReportQueue.add(
-      JOBS.GENERATE_Z_REPORT,
-      {},
-      { repeat: { pattern: "30 23 * * *" } } // 11:30pm daily
-    );
+      await this.zReportQueue.add(
+        JOBS.GENERATE_Z_REPORT,
+        {},
+        { repeat: { pattern: "30 23 * * *" } } // 11:30pm daily
+      );
 
-    this.logger.log("Queue schedules registered");
+      this.logger.log("Queue schedules registered");
+    } catch (err) {
+      this.logger.warn(
+        `Queue schedule registration skipped — Redis unavailable at boot: ${(err as Error).message}`
+      );
+    }
   }
 
   private async clearRepeatableJobs() {
