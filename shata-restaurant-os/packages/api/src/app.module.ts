@@ -83,10 +83,9 @@ import { validateConfig } from "./config/config.validation";
 
     // Shared infrastructure
     DatabaseModule,
-    RedisModule,
+    ...(process.env["DISABLE_QUEUES"] !== "true" ? [RedisModule, QueueModule.register()] : []),
     RealtimeModule,
     TaxModule,
-    QueueModule.register(),
     StorageModule,
     AuditModule,
 
