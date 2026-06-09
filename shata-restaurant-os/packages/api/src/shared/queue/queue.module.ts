@@ -1,5 +1,5 @@
-import { Module } from "@nestjs/common";
-import { BullModule } from "@nestjs/bullmq";
+import { DynamicModule, Module } from "@nestjs/common";
+import { BullModule, getQueueToken } from "@nestjs/bullmq";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { QUEUES } from "./queue.constants";
 import { PaymentReconciliationProcessor } from "./processors/payment-reconciliation.processor";
@@ -16,40 +16,67 @@ const queues = Object.values(QUEUES).map((name) =>
   BullModule.registerQueue({ name })
 );
 
-@Module({
-  imports: [
-    ConfigModule,
-    DatabaseModule,
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-        connection: {
-          url: config.get<string>("app.redisUrl") ?? "redis://localhost:6379",
-          enableOfflineQueue: false,
-          lazyConnect: true,
-          retryStrategy: () => null,
-        },
-        defaultJobOptions: {
-          removeOnComplete: 100,
-          removeOnFail: 500,
-          attempts: 3,
-          backoff: { type: "exponential", delay: 5000 },
-        },
-      }),
-      inject: [ConfigService],
-    }),
-    ...queues,
-  ],
-  providers: [
-    PaymentReconciliationProcessor,
-    NotificationSendProcessor,
-    AnalyticsComputeProcessor,
-    SessionCleanupProcessor,
-    ZReportProcessor,
-    RefundProcessProcessor,
-    InstapayExpiryProcessor,
-    QueueSchedulerService,
-  ],
-  exports: [BullModule],
-})
-export class QueueModule {}
+// No-op stub satisfies @InjectQueue in downstream services without touching Redis
+const nullQueue = {
+  add: async () => {},
+  addBulk: async () => {},
+  getRepeatableJobs: async () => [],
+  removeRepeatableByKey: async () => {},
+  close: async () => {},
+};
+
+@Module({})
+export class QueueModule {
+  static register(): DynamicModule {
+    if (process.env["DISABLE_QUEUES"] === "true") {
+      const stubProviders = Object.values(QUEUES).map((name) => ({
+        provide: getQueueToken(name),
+        useValue: nullQueue,
+      }));
+      return {
+        module: QueueModule,
+        imports: [ConfigModule, DatabaseModule],
+        providers: stubProviders,
+        exports: stubProviders.map((p) => p.provide),
+      };
+    }
+
+    return {
+      module: QueueModule,
+      imports: [
+        ConfigModule,
+        DatabaseModule,
+        BullModule.forRootAsync({
+          imports: [ConfigModule],
+          useFactory: (config: ConfigService) => ({
+            connection: {
+              url: config.get<string>("app.redisUrl") ?? "redis://localhost:6379",
+              enableOfflineQueue: false,
+              lazyConnect: true,
+              retryStrategy: () => null,
+            },
+            defaultJobOptions: {
+              removeOnComplete: 100,
+              removeOnFail: 500,
+              attempts: 3,
+              backoff: { type: "exponential", delay: 5000 },
+            },
+          }),
+          inject: [ConfigService],
+        }),
+        ...queues,
+      ],
+      providers: [
+        PaymentReconciliationProcessor,
+        NotificationSendProcessor,
+        AnalyticsComputeProcessor,
+        SessionCleanupProcessor,
+        ZReportProcessor,
+        RefundProcessProcessor,
+        InstapayExpiryProcessor,
+        QueueSchedulerService,
+      ],
+      exports: [BullModule],
+    };
+  }
+}

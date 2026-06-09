@@ -6,7 +6,7 @@ import { QueueModule } from "../../shared/queue/queue.module";
 import { AuthModule } from "../auth/auth.module";
 
 @Module({
-  imports: [DatabaseModule, QueueModule, AuthModule],
+  imports: [DatabaseModule, QueueModule.register(), AuthModule],
   controllers: [InstapayController],
   providers: [InstapayService],
   exports: [InstapayService],

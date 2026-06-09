@@ -5,7 +5,7 @@ import { AuthModule } from "../auth/auth.module";
 import { QueueModule } from "../../shared/queue/queue.module";
 
 @Module({
-  imports: [AuthModule, QueueModule],
+  imports: [AuthModule, QueueModule.register()],
   controllers: [RefundsController],
   providers: [RefundsService],
   exports: [RefundsService],

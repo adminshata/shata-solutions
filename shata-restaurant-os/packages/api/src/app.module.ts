@@ -86,7 +86,7 @@ import { validateConfig } from "./config/config.validation";
     RedisModule,
     RealtimeModule,
     TaxModule,
-    QueueModule,
+    QueueModule.register(),
     StorageModule,
     AuditModule,
 
