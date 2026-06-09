@@ -8,10 +8,15 @@ import { RedisService } from "./redis.service";
     {
       provide: "REDIS_CLIENT",
       useFactory: async (config: ConfigService) => {
+        if (process.env.DISABLE_QUEUES === "true") {
+          console.log("⚠️  Redis disabled via DISABLE_QUEUES=true");
+          return null;
+        }
         const { default: Redis } = await import("ioredis");
         const client = new Redis(config.get<string>("app.redisUrl") ?? "redis://localhost:6379", {
           lazyConnect: true,
-          retryStrategy: (times) => Math.min(times * 50, 2000),
+          retryStrategy: () => null,
+          enableOfflineQueue: false,
         });
         await client.connect().catch(() => {
           console.warn("⚠️  Redis connection pending — will retry");
