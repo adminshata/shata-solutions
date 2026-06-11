@@ -152,6 +152,7 @@ export class OrdersService {
 
     // 6. Emit events — kitchen + dashboard will receive in < 500ms
     this.events.emit("order.created", { restaurantId, order });
+    this.dashboardGateway.emitNewOrder(restaurantId, order);
 
     return order;
   }
@@ -166,6 +167,31 @@ export class OrdersService {
     });
     if (!order) throw new NotFoundException("Order not found");
     return order;
+  }
+
+  /** Active (in-progress) orders for the dashboard live view — excludes served/cancelled/refunded/disputed. */
+  async getActiveOrders(restaurantId: string) {
+    if (!restaurantId) throw new BadRequestException("restaurantId is required");
+
+    const orders = await this.db.order.findMany({
+      where: {
+        restaurantId,
+        status: { in: ["PENDING", "CONFIRMED", "PREPARING", "COOKING", "READY"] },
+      },
+      orderBy: { createdAt: "desc" },
+      include: {
+        items: { include: { product: true, selectedOptions: true } },
+        kitchenTicket: true,
+      },
+    });
+
+    return orders.map((order) => ({
+      ...order,
+      subtotal: Number(order.subtotal),
+      tax: Number(order.tax),
+      total: Number(order.total),
+      tipAmount: Number(order.tipAmount),
+    }));
   }
 
   async getEta(orderId: string) {

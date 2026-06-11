@@ -16,6 +16,12 @@ const STATUS_COLORS: Record<string, string> = {
   SERVED: "bg-slate-100 text-slate-600",
 };
 
+// Statuses considered "active" / in-progress on the live orders board
+const ACTIVE_STATUSES = ["PENDING", "CONFIRMED", "PREPARING", "COOKING", "READY"];
+
+// TODO: replace with real restaurant context once dashboard auth/org selection is wired up
+const RESTAURANT_ID = process.env["NEXT_PUBLIC_RESTAURANT_ID"] ?? "demo-restaurant-1";
+
 export default function LiveOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [connected, setConnected] = useState(false);
@@ -25,8 +31,18 @@ export default function LiveOrdersPage() {
     await fetch(`${apiUrl}/api/dashboard/orders/${orderId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, restaurantId: "REPLACE_WITH_RESTAURANT_ID" }),
+      body: JSON.stringify({ status, restaurantId: RESTAURANT_ID }),
     });
+  }, []);
+
+  // Load existing active orders on mount — the websocket only delivers orders
+  // placed *after* the dashboard connects, so without this the board starts empty.
+  useEffect(() => {
+    const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "";
+    fetch(`${apiUrl}/api/dashboard/orders/active?restaurantId=${RESTAURANT_ID}`, { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: Order[]) => setOrders(data))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -35,12 +51,12 @@ export default function LiveOrdersPage() {
 
     socket.on("connect", () => {
       setConnected(true);
-      socket.emit("join_dashboard", { restaurantId: "REPLACE_WITH_RESTAURANT_ID" });
+      socket.emit("join_dashboard", { restaurantId: RESTAURANT_ID });
     });
     socket.on("disconnect", () => setConnected(false));
 
     socket.on("new_order", (order: Order) => {
-      setOrders((prev) => [order, ...prev]);
+      setOrders((prev) => (prev.some((o) => o.id === order.id) ? prev : [order, ...prev]));
       // Play sound
       const ctx = new AudioContext();
       const osc = ctx.createOscillator();
@@ -57,7 +73,7 @@ export default function LiveOrdersPage() {
     return () => { socket.disconnect(); };
   }, []);
 
-  const liveOrders = orders.filter((o) => !["SERVED", "CANCELLED"].includes(o.status));
+  const liveOrders = orders.filter((o) => ACTIVE_STATUSES.includes(o.status));
 
   return (
     <div className="flex flex-col h-full">

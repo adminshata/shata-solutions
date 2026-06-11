@@ -1,18 +1,20 @@
-import { Controller, Get, Post, Patch, Param, Body, Sse, Headers, ConflictException, VERSION_NEUTRAL } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Param, Query, Body, Headers, Req, Res, ConflictException, VERSION_NEUTRAL } from "@nestjs/common";
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
-import { Observable, Subject } from "rxjs";
-import type { MessageEvent } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import type { Request, Response } from "express";
 import type { PlaceOrderDto } from "@shata/types";
 import { OrdersService } from "./orders.service";
 import { Public } from "../auth/clerk.guard";
 
+const SSE_HEARTBEAT_MS = 20_000;
+
 @ApiTags("Orders")
 @Controller({ version: VERSION_NEUTRAL })
 export class OrdersController {
-  // Per-order subjects for SSE streaming
-  private readonly subjects = new Map<string, Subject<MessageEvent>>();
-
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly events: EventEmitter2
+  ) {}
 
   @Public()
   @Post("sessions/:token/orders")
@@ -47,13 +49,60 @@ export class OrdersController {
 
   @Public()
   @Get("orders/:id/stream")
-  @Sse()
   @ApiOperation({ summary: "SSE stream for live order status updates" })
-  orderStatusStream(@Param("id") orderId: string): Observable<MessageEvent> {
-    if (!this.subjects.has(orderId)) {
-      this.subjects.set(orderId, new Subject<MessageEvent>());
+  async orderStatusStream(
+    @Param("id") orderId: string,
+    @Req() req: Request,
+    @Res() res: Response
+  ): Promise<void> {
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      "Connection": "keep-alive",
+      "X-Accel-Buffering": "no",
+    });
+    res.flushHeaders();
+
+    const send = (data: unknown, event?: string) => {
+      if (event) res.write(`event: ${event}\n`);
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
+    };
+
+    // Initial handshake event so the client knows the stream is live
+    send({ ok: true }, "connected");
+
+    // Send the current status immediately so the UI doesn't wait for the next change
+    try {
+      const order = await this.ordersService.getOrder(orderId);
+      send({ status: order.status });
+    } catch {
+      // Order not found — keep the stream open, client already has it from the initial fetch
     }
-    return this.subjects.get(orderId)!.asObservable();
+
+    const onStatusChange = (payload: { order: { id: string; status: string } }) => {
+      if (payload.order.id !== orderId) return;
+      send({ status: payload.order.status });
+    };
+    this.events.on("order.status_changed", onStatusChange);
+    this.events.on("order.completed", onStatusChange);
+
+    // Heartbeat comment keeps proxies (Railway/Vercel) from closing the idle connection
+    const heartbeat = setInterval(() => {
+      res.write(": heartbeat\n\n");
+    }, SSE_HEARTBEAT_MS);
+
+    req.on("close", () => {
+      clearInterval(heartbeat);
+      this.events.off("order.status_changed", onStatusChange);
+      this.events.off("order.completed", onStatusChange);
+      res.end();
+    });
+  }
+
+  @Get("dashboard/orders/active")
+  @ApiOperation({ summary: "Get active (in-progress) orders for the dashboard live view" })
+  getActiveOrders(@Query("restaurantId") restaurantId: string) {
+    return this.ordersService.getActiveOrders(restaurantId);
   }
 
   @Post("dashboard/orders/manual")
