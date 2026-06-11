@@ -14,7 +14,29 @@ async function bootstrap() {
   // Pino structured logger
   app.useLogger(app.get(Logger));
 
-  // Security headers
+  // CORS — must be configured before helmet so preflight responses are never
+  // affected by other security middleware. Supports ALLOWED_ORIGINS env var
+  // (comma-separated), merged with the known production frontends so a
+  // missing/misconfigured env var can't lock out the deployed apps.
+  const DEFAULT_ALLOWED_ORIGINS = [
+    "https://shata-solutions-o5bo.vercel.app",
+    "https://shata-dashboard.vercel.app",
+    "https://shata-kitchen.vercel.app",
+    "https://shata-admin.vercel.app",
+  ];
+  const envOrigins = (process.env["ALLOWED_ORIGINS"] ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+  const allowedOrigins = Array.from(new Set([...DEFAULT_ALLOWED_ORIGINS, ...envOrigins]));
+
+  app.enableCors({
+    origin: process.env["NODE_ENV"] === "production" ? allowedOrigins : true,
+    credentials: true,
+  });
+
+  // Security headers — CORP disabled entirely so it can never block
+  // cross-origin requests from the customer/dashboard/kitchen/admin apps.
   app.use(helmet({
     contentSecurityPolicy: {
       directives: {
@@ -26,26 +48,11 @@ async function bootstrap() {
       },
     },
     crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginResourcePolicy: false,
   }));
 
   // Response compression — reduces payload size by 60-80%
   app.use(compression());
-
-  // CORS — supports ALLOWED_ORIGINS env var (comma-separated) or individual URL vars
-  const allowedOrigins = process.env["ALLOWED_ORIGINS"]
-    ? process.env["ALLOWED_ORIGINS"].split(",").map((o) => o.trim()).filter(Boolean)
-    : [
-        process.env["CUSTOMER_APP_URL"] ?? "",
-        process.env["DASHBOARD_URL"] ?? "",
-        process.env["KITCHEN_URL"] ?? "",
-        process.env["ADMIN_URL"] ?? "",
-      ].filter(Boolean);
-
-  app.enableCors({
-    origin: process.env["NODE_ENV"] === "production" ? allowedOrigins : true,
-    credentials: true,
-  });
 
   // API versioning
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: "1" });
