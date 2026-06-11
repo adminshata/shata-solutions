@@ -15,10 +15,10 @@ async function bootstrap() {
   app.useLogger(app.get(Logger));
 
   // CORS — must be configured before helmet so preflight responses are never
-  // affected by other security middleware. Supports ALLOWED_ORIGINS env var
-  // (comma-separated), merged with the known production frontends so a
-  // missing/misconfigured env var can't lock out the deployed apps.
-  const DEFAULT_ALLOWED_ORIGINS = [
+  // affected by other security middleware. Reads ALLOWED_ORIGINS env var
+  // (comma-separated); falls back to the known production frontends if the
+  // env var is missing or empty.
+  const fallbackAllowedOrigins = [
     "https://shata-solutions-o5bo.vercel.app",
     "https://shata-dashboard.vercel.app",
     "https://shata-kitchen.vercel.app",
@@ -28,11 +28,22 @@ async function bootstrap() {
     .split(",")
     .map((o) => o.trim())
     .filter(Boolean);
-  const allowedOrigins = Array.from(new Set([...DEFAULT_ALLOWED_ORIGINS, ...envOrigins]));
+  const allowedOrigins = envOrigins.length > 0 ? envOrigins : fallbackAllowedOrigins;
 
   app.enableCors({
-    origin: process.env["NODE_ENV"] === "production" ? allowedOrigins : true,
+    origin:
+      process.env["NODE_ENV"] === "production"
+        ? (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+              callback(null, true);
+            } else {
+              callback(new Error(`Origin ${origin} not allowed by CORS`));
+            }
+          }
+        : true,
     credentials: true,
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   });
 
   // Security headers — CORP disabled entirely so it can never block
