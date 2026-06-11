@@ -43,7 +43,7 @@ async function bootstrap() {
         : true,
     credentials: true,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Idempotency-Key", "idempotency-key"],
   });
 
   // Security headers — CORP disabled entirely so it can never block
