@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Param, Body, Sse, Headers, ConflictExcept
 import { ApiTags, ApiOperation } from "@nestjs/swagger";
 import { Observable, Subject } from "rxjs";
 import type { MessageEvent } from "@nestjs/common";
+import type { PlaceOrderDto } from "@shata/types";
 import { OrdersService } from "./orders.service";
 import { Public } from "../auth/clerk.guard";
 
@@ -17,8 +18,8 @@ export class OrdersController {
   @Post("sessions/:token/orders")
   @ApiOperation({ summary: "Place an order (customer)" })
   async placeOrder(
-    @Param("token") _token: string,
-    @Body() body: Record<string, unknown>,
+    @Param("token") token: string,
+    @Body() body: PlaceOrderDto,
     @Headers("idempotency-key") idempotencyKey?: string
   ) {
     // Idempotency check — if key seen in last 5 min, return 409 so client deduplicates
@@ -26,8 +27,8 @@ export class OrdersController {
       const recent = await this.ordersService.findByIdempotencyKey(idempotencyKey);
       if (recent) throw new ConflictException({ id: recent.id, deduplicated: true });
     }
-    // TODO: decode session token → restaurantId + sessionId
-    return this.ordersService.placeOrder("restaurantId", "sessionId", body as never);
+    // restaurantId/tableId come from the verified session token, never the request body
+    return this.ordersService.placeOrderFromToken(token, body, idempotencyKey);
   }
 
   @Public()

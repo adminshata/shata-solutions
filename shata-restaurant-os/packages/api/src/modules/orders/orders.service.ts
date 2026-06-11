@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   BadRequestException,
 } from "@nestjs/common";
@@ -8,10 +9,13 @@ import { DatabaseService } from "../../shared/database/database.service";
 import { TaxService } from "../../shared/tax/tax.service";
 import { KitchenGateway } from "../../shared/realtime/kitchen.gateway";
 import { DashboardGateway } from "../../shared/realtime/dashboard.gateway";
+import { redactToken, SessionTokenService } from "../auth/session-token.service";
 import type { PlaceOrderDto } from "@shata/types";
 
 @Injectable()
 export class OrdersService {
+  private readonly logger = new Logger("CustomerSession");
+
   // In-memory idempotency cache — evicts after 5 min. Production: use Redis.
   private readonly idempotencyCache = new Map<string, { id: string; expiresAt: number }>();
 
@@ -20,7 +24,8 @@ export class OrdersService {
     private readonly taxService: TaxService,
     private readonly kitchenGateway: KitchenGateway,
     private readonly dashboardGateway: DashboardGateway,
-    private readonly events: EventEmitter2
+    private readonly events: EventEmitter2,
+    private readonly sessionTokenSvc: SessionTokenService
   ) {}
 
   findByIdempotencyKey(key: string): { id: string } | null {
@@ -32,6 +37,32 @@ export class OrdersService {
 
   private cacheIdempotencyKey(key: string, orderId: string): void {
     this.idempotencyCache.set(key, { id: orderId, expiresAt: Date.now() + 5 * 60 * 1000 });
+  }
+
+  /**
+   * Places a customer order from a session token. The token's tableId/restaurantId
+   * are the source of truth — the request body is never trusted for tenant routing.
+   * Finds the table's active session, creating one if it doesn't exist yet.
+   */
+  async placeOrderFromToken(token: string, dto: PlaceOrderDto, idempotencyKey?: string) {
+    const ref = redactToken(token);
+    const { tableId, restaurantId } = await this.sessionTokenSvc.verify(token);
+
+    let session = await this.db.session.findFirst({
+      where: { tableId, restaurantId, status: "ACTIVE" },
+      orderBy: { openedAt: "desc" },
+    });
+
+    if (!session) {
+      session = await this.db.session.create({ data: { tableId, restaurantId } });
+      this.logger.debug(`[CustomerSession] created new active session: ${ref} -> session=${session.id}`);
+    } else {
+      this.logger.debug(`[CustomerSession] using active session: ${ref} -> session=${session.id}`);
+    }
+
+    const order = await this.placeOrder(restaurantId, session.id, dto);
+    if (idempotencyKey) this.cacheIdempotencyKey(idempotencyKey, order.id);
+    return order;
   }
 
   async placeOrder(restaurantId: string, sessionId: string, dto: PlaceOrderDto) {
