@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { DatabaseService } from "../../shared/database/database.service";
 import { RedisService } from "../../shared/redis/redis.service";
-import { SessionTokenService } from "../auth/session-token.service";
+import { redactToken, SessionTokenService } from "../auth/session-token.service";
 import type { SessionContextDto } from "@shata/types";
 import { PaymentProvider, OrderStatus } from "@shata/types";
 
@@ -9,6 +9,8 @@ const SESSION_CONTEXT_TTL = 3600; // 1 hour
 
 @Injectable()
 export class SessionsService {
+  private readonly logger = new Logger("CustomerSession");
+
   constructor(
     private readonly db: DatabaseService,
     private readonly redis: RedisService,
@@ -16,6 +18,8 @@ export class SessionsService {
   ) {}
 
   async getContext(token: string): Promise<SessionContextDto> {
+    const ref = redactToken(token);
+
     // Check cache first
     const cacheKey = `session-ctx:${token}`;
     const cached = await this.redis.getJson<SessionContextDto>(cacheKey);
@@ -24,14 +28,22 @@ export class SessionsService {
     // Verify token
     const { tableId, restaurantId } = await this.sessionTokenSvc.verify(token);
 
-    const table = await this.db.table.findUnique({
-      where: { id: tableId },
-      include: {
-        restaurant: {
-          include: { org: { include: { whiteLabelConfig: true } } },
+    let table;
+    try {
+      table = await this.db.table.findUnique({
+        where: { id: tableId },
+        include: {
+          restaurant: {
+            include: { org: { include: { whiteLabelConfig: true } } },
+          },
         },
-      },
-    });
+      });
+    } catch (err) {
+      this.logger.error(`[CustomerSession] table lookup failed for ${ref}`, err instanceof Error ? err.stack : String(err));
+      throw new InternalServerErrorException("Failed to load session");
+    }
+
+    this.logger.debug(`[CustomerSession] tenant lookup result: ${ref} -> ${table ? `table=${table.id}` : "not found"}`);
 
     if (!table || table.restaurantId !== restaurantId) {
       throw new NotFoundException("Table not found");
@@ -73,28 +85,37 @@ export class SessionsService {
   }
 
   async getLastOrder(token: string) {
+    const ref = redactToken(token);
     const { tableId, restaurantId } = await this.sessionTokenSvc.verify(token);
 
-    const order = await this.db.order.findFirst({
-      where: {
-        restaurantId,
-        session: { tableId },
-        status: OrderStatus.SERVED,
-      },
-      orderBy: { createdAt: "desc" },
-      include: {
-        items: {
-          select: {
-            id: true,
-            quantity: true,
-            unitPrice: true,
-            totalPrice: true,
-            productId: true,
-            product: { select: { name: true, isAvailable: true } },
+    let order;
+    try {
+      order = await this.db.order.findFirst({
+        where: {
+          restaurantId,
+          session: { tableId },
+          status: OrderStatus.SERVED,
+        },
+        orderBy: { createdAt: "desc" },
+        include: {
+          items: {
+            select: {
+              id: true,
+              quantity: true,
+              unitPrice: true,
+              totalPrice: true,
+              productId: true,
+              product: { select: { name: true, isAvailable: true } },
+            },
           },
         },
-      },
-    });
+      });
+    } catch (err) {
+      this.logger.error(`[CustomerSession] last order lookup failed for ${ref}`, err instanceof Error ? err.stack : String(err));
+      throw new InternalServerErrorException("Failed to load last order");
+    }
+
+    this.logger.debug(`[CustomerSession] last order lookup result: ${ref} -> ${order ? `order=${order.id}` : "none"}`);
 
     if (!order) return null;
 

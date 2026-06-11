@@ -27,7 +27,7 @@ export function UpsellSection({ sessionToken, cartProductIds, currency, onAddPro
     // Fetch upsells for the first cart item
     const pid = cartProductIds[0];
     if (!pid) return;
-    fetch(`${API}/api/v1/sessions/${sessionToken}/upsell/${pid}`)
+    fetch(`${API}/api/sessions/${sessionToken}/upsell/${pid}`)
       .then(r => r.ok ? r.json() : [])
       .then((items: UpsellProduct[]) => setSuggestions(items.map(i => ({ ...i, currency }))))
       .catch(() => {});

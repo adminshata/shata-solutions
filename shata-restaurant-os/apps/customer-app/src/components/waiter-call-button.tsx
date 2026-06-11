@@ -29,7 +29,7 @@ export function WaiterCallButton({ sessionToken }: Props) {
 
     pollRef.current = setInterval(async () => {
       try {
-        const res = await fetch(`${API}/api/v1/dashboard/waiter-calls/active?sessionCallId=${callId}`, { cache: "no-store" });
+        const res = await fetch(`${API}/api/dashboard/waiter-calls/active?sessionCallId=${callId}`, { cache: "no-store" });
         if (!res.ok) return;
         const calls = await res.json() as Array<{ id: string; status: string }>;
         const mine = calls.find((c) => c.id === callId);
@@ -50,7 +50,7 @@ export function WaiterCallButton({ sessionToken }: Props) {
   async function call(type: CallType) {
     setSending(true);
     try {
-      const res = await fetch(`${API}/api/v1/sessions/${sessionToken}/waiter-call`, {
+      const res = await fetch(`${API}/api/sessions/${sessionToken}/waiter-call`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type }),

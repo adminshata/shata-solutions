@@ -42,7 +42,7 @@ export default function SessionLayout({ children }: { children: React.ReactNode 
   // Load session context once to get white-label config
   useEffect(() => {
     if (!token) return;
-    fetch(`${API}/api/v1/sessions/${token}`, { cache: "no-store" })
+    fetch(`${API}/api/sessions/${token}`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((ctx: { whiteLabelConfig?: WhiteLabelConfig } | null) => {
         if (ctx?.whiteLabelConfig) setWhiteLabelConfig(ctx.whiteLabelConfig);
