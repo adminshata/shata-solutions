@@ -1,14 +1,25 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { OnEvent } from "@nestjs/event-emitter";
+import { OnEvent, EventEmitter2 } from "@nestjs/event-emitter";
 import { DatabaseService } from "../../shared/database/database.service";
 import { KitchenGateway } from "../../shared/realtime/kitchen.gateway";
+import { DashboardGateway } from "../../shared/realtime/dashboard.gateway";
 import type { KitchenTicketDto } from "@shata/types";
+
+// Maps a kitchen ticket status to the order status it reflects, so the
+// dashboard and customer SSE stream stay in sync with kitchen progress.
+const TICKET_TO_ORDER_STATUS: Record<string, string | undefined> = {
+  IN_PROGRESS: "PREPARING",
+  READY: "READY",
+  SERVED: "SERVED",
+};
 
 @Injectable()
 export class KitchenService {
   constructor(
     private readonly db: DatabaseService,
-    private readonly kitchenGateway: KitchenGateway
+    private readonly kitchenGateway: KitchenGateway,
+    private readonly dashboardGateway: DashboardGateway,
+    private readonly events: EventEmitter2
   ) {}
 
   @OnEvent("order.created")
@@ -73,6 +84,22 @@ export class KitchenService {
 
     const dto = this.toDto(ticket);
     this.kitchenGateway.emitTicketUpdate(restaurantId, dto);
+
+    // Propagate kitchen progress to the order — keeps the dashboard and
+    // customer order-status SSE stream in sync with kitchen bumps.
+    const orderStatus = TICKET_TO_ORDER_STATUS[status];
+    if (orderStatus) {
+      const order = await this.db.order.update({
+        where: { id: ticket.orderId, restaurantId },
+        data: { status: orderStatus as never },
+      });
+      this.dashboardGateway.emitOrderUpdate(restaurantId, order);
+      this.events.emit("order.status_changed", { restaurantId, order });
+      if (orderStatus === "SERVED") {
+        this.events.emit("order.completed", { restaurantId, order });
+      }
+    }
+
     return dto;
   }
 

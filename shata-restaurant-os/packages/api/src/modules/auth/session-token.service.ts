@@ -8,6 +8,10 @@ export interface SessionTokenPayload {
   restaurantId: string;
 }
 
+export interface KitchenTokenPayload {
+  restaurantId: string;
+}
+
 /** Truncates a token for safe logging — never log a full session token. */
 export function redactToken(token: string): string {
   if (!token) return "<empty>";
@@ -70,5 +74,45 @@ export class SessionTokenService {
 
     this.logger.debug(`[CustomerSession] token decoded: tableId=${tableId}, restaurantId=${restaurantId}`);
     return { tableId, restaurantId };
+  }
+
+  /** Verifies a kitchen display device token — signed the same way as session tokens, but with { restaurantId, type: "kitchen" }. */
+  async verifyKitchenToken(token: string): Promise<KitchenTokenPayload> {
+    const ref = redactToken(token);
+    this.logger.debug(`[Kitchen] token received: ${ref}`);
+
+    if (!token || token.split(".").length !== 3) {
+      this.logger.warn(`[Kitchen] malformed token: ${ref}`);
+      throw new BadRequestException("Malformed kitchen device token");
+    }
+
+    let payload: Record<string, unknown>;
+    try {
+      const result = await jwtVerify(token, this.secret);
+      payload = result.payload;
+    } catch (err) {
+      if (err instanceof errors.JWTExpired) {
+        this.logger.warn(`[Kitchen] expired token: ${ref}`);
+        throw new UnauthorizedException("Kitchen device token expired");
+      }
+      if (err instanceof errors.JOSEError) {
+        this.logger.warn(`[Kitchen] invalid token: ${ref} (${err.code})`);
+        throw new UnauthorizedException("Invalid kitchen device token");
+      }
+      const message = err instanceof Error ? err.message : String(err);
+      const stack = err instanceof Error ? err.stack : undefined;
+      this.logger.error(`[Kitchen] error verifying token ${ref}: ${message}`, stack);
+      throw err;
+    }
+
+    const restaurantId = payload["restaurantId"];
+    const type = payload["type"];
+    if (typeof restaurantId !== "string" || type !== "kitchen") {
+      this.logger.warn(`[Kitchen] token decoded but missing restaurantId or wrong type: ${ref}`);
+      throw new UnauthorizedException("Invalid kitchen device token");
+    }
+
+    this.logger.debug(`[Kitchen] token decoded: restaurantId=${restaurantId}`);
+    return { restaurantId };
   }
 }

@@ -6,8 +6,10 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from "@nestjs/websockets";
+import { Logger } from "@nestjs/common";
 import type { Server, Socket } from "socket.io";
 import type { KitchenTicketDto } from "@shata/types";
+import { redactToken, SessionTokenService } from "../../modules/auth/session-token.service";
 
 @WebSocketGateway({
   namespace: "/kitchen",
@@ -18,13 +20,35 @@ export class KitchenGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server!: Server;
+  private readonly logger = new Logger("Kitchen");
+
+  constructor(private readonly sessionTokenSvc: SessionTokenService) {}
 
   afterInit() {
     console.warn("🍳 Kitchen WebSocket gateway initialized");
   }
 
-  handleConnection(client: Socket) {
-    console.warn(`Kitchen client connected: ${client.id}`);
+  async handleConnection(client: Socket) {
+    const deviceToken = client.handshake.auth?.["deviceToken"] as string | undefined;
+
+    if (!deviceToken) {
+      this.logger.warn(`Kitchen client ${client.id} connected without a deviceToken`);
+      client.emit("error", { message: "Missing kitchen device token" });
+      client.disconnect();
+      return;
+    }
+
+    try {
+      const { restaurantId } = await this.sessionTokenSvc.verifyKitchenToken(deviceToken);
+      await client.join(`restaurant:${restaurantId}`);
+      client.emit("connected", { restaurantId });
+      this.logger.log(`Kitchen client connected: ${client.id} -> restaurant=${restaurantId}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Invalid kitchen device token";
+      this.logger.warn(`Kitchen client ${client.id} rejected (${redactToken(deviceToken)}): ${message}`);
+      client.emit("error", { message });
+      client.disconnect();
+    }
   }
 
   handleDisconnect(client: Socket) {
