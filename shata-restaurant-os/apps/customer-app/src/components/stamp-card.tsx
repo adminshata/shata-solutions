@@ -3,11 +3,21 @@
 import { motion, AnimatePresence } from "framer-motion";
 
 interface StampCardProps {
-  stamps: number;
-  stampsRequired: number;
+  stamps?: number | null;
+  stampsRequired?: number | null;
   rewardType: string;
   completedAt: string | null;
   isRedeemed: boolean;
+}
+
+const DEFAULT_STAMPS_REQUIRED = 10;
+
+// Coerces possibly-missing/non-numeric loyalty values to a safe non-negative
+// integer so the UI never renders NaN/undefined when the loyalty fetch
+// returns partial or empty data.
+function toSafeCount(value: number | null | undefined, fallback: number): number {
+  const num = Number(value);
+  return Number.isFinite(num) && num >= 0 ? Math.floor(num) : fallback;
 }
 
 function Stamp({ filled, index }: { filled: boolean; index: number }) {
@@ -20,8 +30,8 @@ function Stamp({ filled, index }: { filled: boolean; index: number }) {
         transition={{ type: "spring", stiffness: 400, damping: 20, delay: index * 0.03 }}
         className={`flex h-7 w-7 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors ${
           filled
-            ? "border-brand bg-brand text-white"
-            : "border-muted bg-background text-muted-foreground"
+            ? "border-success bg-success text-white"
+            : "border-success/20 bg-success/5 text-success/40"
         }`}
       >
         {filled ? "✓" : ""}
@@ -44,20 +54,34 @@ export function StampCard({
   isRedeemed,
 }: StampCardProps) {
   const completed = !!completedAt && !isRedeemed;
-  const progress = Math.min(stamps, stampsRequired);
+  const required = toSafeCount(stampsRequired, DEFAULT_STAMPS_REQUIRED);
+  const current = toSafeCount(stamps, 0);
+  const progress = Math.min(current, required);
+  const remaining = Math.max(required - progress, 0);
+  const percent = required > 0 ? Math.round((progress / required) * 100) : 0;
 
   return (
-    <div className="rounded-2xl border bg-white p-4 shadow-sm">
+    <div className="rounded-2xl border border-success/20 bg-[#FFFCF5] p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <p className="font-semibold">Loyalty Card</p>
-        <p className="text-xs text-muted-foreground">
-          {progress}/{stampsRequired} stamps
+        <p className="text-xs font-medium text-success">
+          {progress}/{required} stamps
         </p>
+      </div>
+
+      {/* Progress bar */}
+      <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-success/10">
+        <motion.div
+          className="h-full rounded-full bg-success"
+          initial={{ width: 0 }}
+          animate={{ width: `${percent}%` }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        />
       </div>
 
       {/* Stamp grid */}
       <div className="flex flex-wrap gap-1.5">
-        {Array.from({ length: stampsRequired }).map((_, i) => (
+        {Array.from({ length: required }).map((_, i) => (
           <Stamp key={i} index={i} filled={i < progress} />
         ))}
       </div>
@@ -84,7 +108,9 @@ export function StampCard({
 
       {!completed && (
         <p className="mt-2 text-xs text-muted-foreground">
-          {stampsRequired - progress} more order{stampsRequired - progress !== 1 ? "s" : ""} to earn {rewardLabel(rewardType)}
+          {remaining === 0
+            ? `One more order to earn ${rewardLabel(rewardType)}!`
+            : `${remaining} more order${remaining !== 1 ? "s" : ""} to earn ${rewardLabel(rewardType)}`}
         </p>
       )}
     </div>
