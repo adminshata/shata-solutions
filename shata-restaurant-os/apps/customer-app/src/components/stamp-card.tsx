@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { Card } from "@/components/ui/Card";
 
 interface StampCardProps {
   stamps?: number | null;
@@ -20,6 +21,14 @@ function toSafeCount(value: number | null | undefined, fallback: number): number
   return Number.isFinite(num) && num >= 0 ? Math.floor(num) : fallback;
 }
 
+function StarIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
+      <path d="M10 1.5l2.59 5.25 5.79.84-4.19 4.08.99 5.77L10 14.77l-5.18 2.67.99-5.77L1.62 7.59l5.79-.84L10 1.5z" />
+    </svg>
+  );
+}
+
 function Stamp({ filled, index }: { filled: boolean; index: number }) {
   return (
     <AnimatePresence>
@@ -28,13 +37,13 @@ function Stamp({ filled, index }: { filled: boolean; index: number }) {
         initial={filled ? { scale: 0.4, opacity: 0 } : false}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 400, damping: 20, delay: index * 0.03 }}
-        className={`flex h-7 w-7 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors ${
+        className={`flex aspect-square items-center justify-center rounded-full border-2 transition-colors ${
           filled
-            ? "border-success bg-success text-white"
-            : "border-success/20 bg-success/5 text-success/40"
+            ? "border-accent bg-accent text-foreground"
+            : "border-border bg-muted text-muted-foreground/30"
         }`}
       >
-        {filled ? "✓" : ""}
+        {filled ? <StarIcon /> : <div className="h-2 w-2 rounded-full bg-current" />}
       </motion.div>
     </AnimatePresence>
   );
@@ -61,26 +70,26 @@ export function StampCard({
   const percent = required > 0 ? Math.round((progress / required) * 100) : 0;
 
   return (
-    <div className="rounded-2xl border border-success/20 bg-[#FFFCF5] p-4 shadow-sm">
+    <Card>
       <div className="mb-3 flex items-center justify-between">
-        <p className="font-semibold">Loyalty Card</p>
-        <p className="text-xs font-medium text-success">
+        <p className="font-bold text-foreground">Loyalty Card</p>
+        <p className="text-xs font-bold text-primary-dark">
           {progress}/{required} stamps
         </p>
       </div>
 
       {/* Progress bar */}
-      <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-success/10">
+      <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
         <motion.div
-          className="h-full rounded-full bg-success"
+          className="h-full rounded-full bg-primary"
           initial={{ width: 0 }}
           animate={{ width: `${percent}%` }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         />
       </div>
 
-      {/* Stamp grid */}
-      <div className="flex flex-wrap gap-1.5">
+      {/* Stamp grid — 5 columns x 2 rows */}
+      <div className="grid grid-cols-5 gap-2">
         {Array.from({ length: required }).map((_, i) => (
           <Stamp key={i} index={i} filled={i < progress} />
         ))}
@@ -96,11 +105,11 @@ export function StampCard({
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="mt-3 rounded-xl bg-success/10 px-3 py-2 text-center">
-              <p className="text-sm font-bold text-success">
+            <div className="mt-3 rounded-xl bg-gradient-to-r from-accent to-accent-light px-3 py-2 text-center">
+              <p className="text-sm font-bold text-foreground">
                 You&apos;ve earned {rewardLabel(rewardType)}!
               </p>
-              <p className="mt-0.5 text-xs text-success/80">Show this to your server to redeem.</p>
+              <p className="mt-0.5 text-xs text-foreground/70">Show this to your server to redeem.</p>
             </div>
           </motion.div>
         )}
@@ -113,6 +122,6 @@ export function StampCard({
             : `${remaining} more order${remaining !== 1 ? "s" : ""} to earn ${rewardLabel(rewardType)}`}
         </p>
       )}
-    </div>
+    </Card>
   );
 }

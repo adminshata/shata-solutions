@@ -75,9 +75,9 @@ export function WaiterCallButton({ sessionToken }: Props) {
 
   const statusMessages: Record<CallStatus, { text: string; color: string; bg: string } | null> = {
     idle: null,
-    sent: { text: "تم الإبلاغ ✓", color: "text-green-700", bg: "bg-green-50 border-green-200" },
-    acknowledged: { text: "في الطريق ✓", color: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
-    resolved: { text: "تم الوصول ✓", color: "text-slate-600", bg: "bg-slate-50 border-slate-200" },
+    sent: { text: "تم الإبلاغ ✓", color: "text-primary-dark", bg: "bg-secondary/60 border-secondary" },
+    acknowledged: { text: "في الطريق ✓", color: "text-foreground", bg: "bg-accent-light border-accent/30" },
+    resolved: { text: "تم الوصول ✓", color: "text-muted-foreground", bg: "bg-muted border-border" },
   };
   const statusMsg = statusMessages[status];
 
@@ -96,7 +96,7 @@ export function WaiterCallButton({ sessionToken }: Props) {
       {/* Floating trigger */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-24 left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-lg border border-slate-200 text-slate-700 hover:bg-slate-50 active:scale-95 transition-transform"
+        className="fixed bottom-24 left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-surface shadow-lg border border-border text-foreground hover:bg-secondary/30 active:scale-95 transition-transform"
         aria-label="Call waiter"
       >
         {status !== "idle" ? (
@@ -114,33 +114,33 @@ export function WaiterCallButton({ sessionToken }: Props) {
       {open && (
         <div className="fixed inset-0 z-50 flex items-end" onClick={() => setOpen(false)}>
           <div
-            className="w-full rounded-t-3xl bg-white p-6 shadow-2xl"
+            className="w-full rounded-t-3xl bg-surface p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {status === "sent" ? (
               <div className="flex flex-col items-center gap-3 py-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-3xl">✓</div>
-                <p className="text-base font-bold text-green-700">تم الإبلاغ ✓</p>
-                <p className="text-sm text-slate-500">Someone will be with you shortly</p>
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-3xl text-primary-dark">✓</div>
+                <p className="text-base font-bold text-primary-dark">تم الإبلاغ ✓</p>
+                <p className="text-sm text-muted-foreground">Someone will be with you shortly</p>
               </div>
             ) : (
               <>
-                <p className="mb-4 text-center text-base font-semibold text-slate-700">كيف يمكننا مساعدتك؟</p>
+                <p className="mb-4 text-center text-base font-semibold text-foreground">كيف يمكننا مساعدتك؟</p>
                 <div className="grid grid-cols-2 gap-3">
                   {CALL_TYPES.map((ct) => (
                     <button
                       key={ct.type}
                       onClick={() => call(ct.type)}
                       disabled={sending}
-                      className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:bg-brand/5 hover:border-brand/30 active:scale-95 transition-all disabled:opacity-50"
+                      className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-muted/50 p-4 hover:bg-secondary/40 hover:border-primary/30 active:scale-95 transition-all disabled:opacity-50"
                     >
                       <span className="text-2xl">{ct.icon}</span>
-                      <span className="text-sm font-semibold text-slate-800">{ct.ar}</span>
-                      <span className="text-xs text-slate-400">{ct.en}</span>
+                      <span className="text-sm font-semibold text-foreground">{ct.ar}</span>
+                      <span className="text-xs text-muted-foreground">{ct.en}</span>
                     </button>
                   ))}
                 </div>
-                <button onClick={() => setOpen(false)} className="mt-4 w-full py-2 text-sm text-slate-400">
+                <button onClick={() => setOpen(false)} className="mt-4 w-full py-2 text-sm text-muted-foreground">
                   Cancel
                 </button>
               </>

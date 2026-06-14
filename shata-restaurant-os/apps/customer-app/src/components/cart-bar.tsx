@@ -34,7 +34,7 @@ export function CartBar({ token, itemCount, total, currency, locale }: CartBarPr
     >
       <button
         onClick={() => router.push(`/t/${token}/cart`)}
-        className="w-full flex items-center justify-between rounded-2xl bg-brand px-5 py-3.5 text-white shadow-[0_8px_30px_rgba(255,69,0,0.4)] hover:bg-brand-dark active:scale-[0.98] transition-all"
+        className="w-full flex items-center justify-between rounded-2xl bg-primary px-5 py-3.5 text-white shadow-[0_8px_30px_rgba(74,46,31,0.35)] hover:bg-primary/90 active:scale-[0.98] transition-all"
       >
         {/* Badge with rolling number */}
         <span className="relative flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-xs font-bold overflow-hidden">
@@ -55,7 +55,7 @@ export function CartBar({ token, itemCount, total, currency, locale }: CartBarPr
         <span className="font-semibold">View Cart</span>
 
         {/* Spring-animated total */}
-        <span className="font-bold tabular-nums">
+        <span className="font-bold tabular-nums text-accent">
           {formatCurrency(displayTotal, currency, locale)}
         </span>
       </button>

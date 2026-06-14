@@ -6,6 +6,7 @@ import { useCartStore } from "@/store/cart";
 import { OfflineBanner } from "@shata/ui";
 import { CartBar } from "@/components/cart-bar";
 import { WhiteLabelInjector } from "@/components/white-label-injector";
+import { SessionInfoProvider, type SessionInfo } from "@/components/session-context";
 
 const API = process.env["NEXT_PUBLIC_API_URL"] ?? "";
 
@@ -18,11 +19,21 @@ interface WhiteLabelConfig {
   hideShataLogo?: boolean;
 }
 
+interface SessionContextResponse {
+  restaurantName?: string;
+  tableNumber?: string;
+  whiteLabelConfig?: WhiteLabelConfig;
+}
+
 export default function SessionLayout({ children }: { children: React.ReactNode }) {
   const params = useParams();
   const token = params["token"] as string;
   const [isOffline, setIsOffline] = useState(false);
   const [whiteLabelConfig, setWhiteLabelConfig] = useState<WhiteLabelConfig | null>(null);
+  const [sessionInfo, setSessionInfo] = useState<SessionInfo>({
+    restaurantName: null,
+    tableNumber: null,
+  });
   const itemCount = useCartStore((s) => s.items.reduce((a, i) => a + i.quantity, 0));
   const total = useCartStore((s) => s.total);
   const currency = useCartStore((s) => s.currency);
@@ -39,31 +50,39 @@ export default function SessionLayout({ children }: { children: React.ReactNode 
     };
   }, []);
 
-  // Load session context once to get white-label config
+  // Load session context once to get white-label config, restaurant name & table number
   useEffect(() => {
     if (!token) return;
     fetch(`${API}/api/sessions/${token}`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((ctx: { whiteLabelConfig?: WhiteLabelConfig } | null) => {
+      .then((ctx: SessionContextResponse | null) => {
         if (ctx?.whiteLabelConfig) setWhiteLabelConfig(ctx.whiteLabelConfig);
+        if (ctx) {
+          setSessionInfo({
+            restaurantName: ctx.restaurantName ?? null,
+            tableNumber: ctx.tableNumber ?? null,
+          });
+        }
       })
       .catch(() => {/* session load failure is non-fatal — branding simply not applied */});
   }, [token]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <WhiteLabelInjector config={whiteLabelConfig} />
-      {isOffline && <OfflineBanner />}
-      <main className="flex-1 pb-24">{children}</main>
-      {itemCount > 0 && (
-        <CartBar
-          token={token}
-          itemCount={itemCount}
-          total={total}
-          currency={currency}
-          locale={locale}
-        />
-      )}
-    </div>
+    <SessionInfoProvider value={sessionInfo}>
+      <div className="min-h-screen flex flex-col">
+        <WhiteLabelInjector config={whiteLabelConfig} />
+        {isOffline && <OfflineBanner />}
+        <main className="flex-1 pb-24">{children}</main>
+        {itemCount > 0 && (
+          <CartBar
+            token={token}
+            itemCount={itemCount}
+            total={total}
+            currency={currency}
+            locale={locale}
+          />
+        )}
+      </div>
+    </SessionInfoProvider>
   );
 }

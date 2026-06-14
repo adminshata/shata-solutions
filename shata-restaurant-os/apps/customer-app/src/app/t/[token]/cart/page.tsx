@@ -4,6 +4,26 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart";
 import { formatCurrency } from "@shata/ui";
 import { WaiterCallButton } from "@/components/waiter-call-button";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { BottomBar } from "@/components/ui/BottomBar";
+
+function BackIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+    </svg>
+  );
+}
+
+function EmptyCartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-12 w-12 text-primary-dark/30" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.836l.84 3.15M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.81-3.866 2.84-7.5H5.357M16.5 17.25a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm-9 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
+    </svg>
+  );
+}
 
 export default function CartPage({ params }: { params: { token: string } }) {
   const router = useRouter();
@@ -11,46 +31,43 @@ export default function CartPage({ params }: { params: { token: string } }) {
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4 text-slate-400 px-6">
-        <p className="text-xl font-bold text-slate-700">Your cart is empty</p>
-        <button
-          onClick={() => router.push(`/t/${params.token}/menu`)}
-          className="rounded-xl bg-brand px-6 py-3 text-sm font-bold text-white"
-        >
+      <div className="flex h-screen flex-col items-center justify-center gap-4 px-6 text-center">
+        <EmptyCartIcon />
+        <p className="text-xl font-bold text-foreground">Your cart is empty</p>
+        <p className="text-sm text-muted-foreground">Add something delicious from the menu.</p>
+        <Button variant="primary" onClick={() => router.push(`/t/${params.token}/menu`)}>
           Browse Menu
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
+    <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-10 flex h-14 items-center justify-between bg-white border-b px-4">
-        <button
-          onClick={() => router.back()}
-          className="text-sm font-semibold text-brand"
-        >
-          ← Menu
-        </button>
-        <h1 className="font-bold text-slate-900">Your Order</h1>
-        <div className="w-16" />
-      </header>
+      <PageHeader
+        title={
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-foreground transition-colors hover:text-primary-dark"
+          >
+            <BackIcon />
+            <span>Your Order</span>
+          </button>
+        }
+      />
 
       {/* Items */}
-      <div className="flex-1 p-4 space-y-3">
+      <div className="flex-1 space-y-3 p-4">
         {items.map((item) => (
-          <div
-            key={item.productId}
-            className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm"
-          >
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-slate-900 truncate">{item.name}</p>
-              <p className="text-sm text-brand font-bold">
+          <Card key={item.productId} className="flex items-center gap-3 p-4">
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-bold text-foreground">{item.name}</p>
+              <p className="text-sm font-bold text-accent">
                 {formatCurrency(item.price, currency, locale)}
               </p>
               {item.notes && (
-                <p className="text-xs text-slate-400 italic">"{item.notes}"</p>
+                <p className="mt-0.5 text-xs italic text-muted-foreground">&ldquo;{item.notes}&rdquo;</p>
               )}
             </div>
 
@@ -58,16 +75,16 @@ export default function CartPage({ params }: { params: { token: string } }) {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200"
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-primary-dark text-sm font-bold transition-colors hover:bg-secondary/70"
               >
                 −
               </button>
-              <span className="w-5 text-center font-bold text-slate-900">
+              <span className="w-5 text-center font-bold text-foreground">
                 {item.quantity}
               </span>
               <button
                 onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200"
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-primary-dark text-sm font-bold transition-colors hover:bg-secondary/70"
               >
                 +
               </button>
@@ -75,29 +92,31 @@ export default function CartPage({ params }: { params: { token: string } }) {
 
             <button
               onClick={() => removeItem(item.productId)}
-              className="ml-1 text-slate-300 hover:text-red-500 transition-colors text-lg leading-none"
+              className="ml-1 text-lg leading-none text-muted-foreground transition-colors hover:text-error"
+              aria-label="Remove item"
             >
               ×
             </button>
-          </div>
+          </Card>
         ))}
       </div>
 
       {/* Footer */}
-      <div className="sticky bottom-0 bg-white border-t p-4 space-y-3">
+      <BottomBar className="space-y-3">
         <div className="flex justify-between text-sm">
-          <span className="font-semibold text-slate-600">Total</span>
-          <span className="font-black text-slate-900 text-lg">
+          <span className="font-semibold text-muted-foreground">Total</span>
+          <span className="text-lg font-black text-foreground">
             {formatCurrency(total, currency, locale)}
           </span>
         </div>
-        <button
+        <Button
+          variant="accent"
           onClick={() => router.push(`/t/${params.token}/checkout`)}
-          className="w-full rounded-2xl bg-brand py-3.5 text-sm font-bold text-white hover:bg-brand-dark transition-colors"
+          className="w-full"
         >
           Proceed to Checkout
-        </button>
-      </div>
+        </Button>
+      </BottomBar>
       <WaiterCallButton sessionToken={params.token} />
     </div>
   );
