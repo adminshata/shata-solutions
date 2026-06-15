@@ -1,7 +1,7 @@
 {
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npm install && npx turbo build --filter=@shata/api..."
+    "buildCommand": "npm install --include=dev && npx turbo build --filter=@shata/api..."
   },
   "deploy": {
     "startCommand": "node packages/api/dist/main.js",

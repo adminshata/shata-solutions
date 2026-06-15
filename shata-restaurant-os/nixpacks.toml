@@ -2,7 +2,11 @@
 # Root directory MUST be set to: shata-restaurant-os (not packages/api)
 
 [phases.install]
-cmds = ["npm install"]
+# --include=dev: Railway sets NODE_ENV=production for builds, which makes npm
+# default to omitting devDependencies. @nestjs/cli (the `nest` build CLI) is a
+# devDependency of @shata/api, so without this flag `nest build` fails with
+# "nest: not found".
+cmds = ["npm install --include=dev"]
 
 [phases.build]
 cmds = [
