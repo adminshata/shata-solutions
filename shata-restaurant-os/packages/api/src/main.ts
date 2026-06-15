@@ -23,6 +23,9 @@ async function bootstrap() {
     "https://shata-dashboard.vercel.app",
     "https://shata-kitchen.vercel.app",
     "https://shata-admin.vercel.app",
+    // Local customer-app dev server — UI review against the production API
+    "http://localhost:3010",
+    "http://127.0.0.1:3010",
   ];
   const envOrigins = (process.env["ALLOWED_ORIGINS"] ?? "")
     .split(",")
