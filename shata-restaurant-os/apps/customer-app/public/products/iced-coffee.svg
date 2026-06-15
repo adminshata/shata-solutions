@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <defs>
+    <linearGradient id="ic-liquid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C49A6C"/>
+      <stop offset="1" stop-color="#8B5A2B"/>
+    </linearGradient>
+    <linearGradient id="ic-glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#F1F1F1" stop-opacity="0.75"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="120" cy="208" rx="58" ry="9" fill="#0F8A5F" opacity="0.08"/>
+  <rect x="142" y="34" width="8" height="80" rx="4" fill="#11936A" transform="rotate(12 146 74)"/>
+  <path d="M76 66 H164 L150 198 H90 Z" fill="url(#ic-glass)" stroke="#E4E7E2" stroke-width="1.5"/>
+  <path d="M82 110 H158 L150 198 H90 Z" fill="url(#ic-liquid)" opacity="0.85"/>
+  <rect x="96" y="92" width="20" height="20" rx="3" fill="#FFFFFF" opacity="0.85" transform="rotate(10 106 102)"/>
+  <rect x="128" y="120" width="18" height="18" rx="3" fill="#FFFFFF" opacity="0.8" transform="rotate(-12 137 129)"/>
+  <rect x="100" y="146" width="16" height="16" rx="3" fill="#FFFFFF" opacity="0.75" transform="rotate(8 108 154)"/>
+  <rect x="72" y="55" width="96" height="14" rx="7" fill="#FFFFFF" stroke="#E4E7E2" stroke-width="1.5"/>
+</svg>

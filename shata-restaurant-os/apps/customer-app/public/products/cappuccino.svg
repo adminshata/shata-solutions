@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <defs>
+    <linearGradient id="cap-mug" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F0F2EF"/>
+    </linearGradient>
+    <radialGradient id="cap-foam" cx="0.5" cy="0.4" r="0.65">
+      <stop offset="0" stop-color="#FBF3E6"/>
+      <stop offset="1" stop-color="#E6D2B5"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="120" cy="206" rx="64" ry="9" fill="#0F8A5F" opacity="0.08"/>
+  <ellipse cx="120" cy="186" rx="66" ry="10" fill="#FFFFFF" stroke="#E4E7E2" stroke-width="1.5"/>
+  <path d="M64 92 H164 V150 a48 48 0 0 1-96 0 Z" fill="url(#cap-mug)" stroke="#E4E7E2" stroke-width="1.5"/>
+  <ellipse cx="114" cy="100" rx="44" ry="20" fill="url(#cap-foam)"/>
+  <path d="M98 96c8 6 26 6 32-2" stroke="#B98E5E" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M164 108c20 0 20 36 0 36" stroke="#E4E7E2" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M164 110c16 0 16 32 0 32" stroke="#11936A" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.45"/>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <defs>
+    <linearGradient id="dn-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F4B6C2"/>
+      <stop offset="1" stop-color="#D9748A"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="120" cy="196" rx="70" ry="11" fill="#0F8A5F" opacity="0.08"/>
+  <ellipse cx="120" cy="180" rx="74" ry="13" fill="#FFFFFF" stroke="#E4E7E2" stroke-width="1.5"/>
+  <circle cx="120" cy="120" r="62" fill="#F0DDBE"/>
+  <circle cx="120" cy="120" r="56" fill="url(#dn-body)"/>
+  <circle cx="120" cy="120" r="20" fill="#FFFFFF"/>
+  <rect x="90" y="78" width="6" height="14" rx="3" fill="#11936A" transform="rotate(30 93 85)"/>
+  <rect x="146" y="84" width="6" height="14" rx="3" fill="#E3A23C" transform="rotate(-20 149 91)"/>
+  <rect x="160" y="120" width="6" height="14" rx="3" fill="#FFFFFF" transform="rotate(60 163 127)"/>
+  <rect x="84" y="148" width="6" height="14" rx="3" fill="#11936A" transform="rotate(-40 87 155)"/>
+  <rect x="140" y="156" width="6" height="14" rx="3" fill="#E3A23C" transform="rotate(15 143 163)"/>
+</svg>

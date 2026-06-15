@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <defs>
+    <linearGradient id="hc-cup" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#ECEFEA"/>
+    </linearGradient>
+    <linearGradient id="hc-band" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#11936A"/>
+      <stop offset="1" stop-color="#0B7A4B"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="120" cy="208" rx="58" ry="9" fill="#0F8A5F" opacity="0.08"/>
+  <path d="M104 46c-6 6-2 12 2 16s4 10-2 16" stroke="#CFE9DC" stroke-width="4" stroke-linecap="round"/>
+  <path d="M126 42c-6 6-2 12 2 16s4 10-2 16" stroke="#CFE9DC" stroke-width="4" stroke-linecap="round"/>
+  <path d="M72 66 H168 L153 198 H87 Z" fill="url(#hc-cup)" stroke="#E4E7E2" stroke-width="1.5"/>
+  <rect x="68" y="55" width="104" height="16" rx="8" fill="#FFFFFF" stroke="#E4E7E2" stroke-width="1.5"/>
+  <circle cx="120" cy="63" r="3" fill="#C8CCC8"/>
+  <path d="M81 118 H159 L153 162 H87 Z" fill="url(#hc-band)"/>
+  <circle cx="120" cy="140" r="11" fill="#FFFFFF" opacity="0.16"/>
+</svg>

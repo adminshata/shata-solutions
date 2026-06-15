@@ -20,7 +20,7 @@
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
-    "db:seed": "ts-node prisma/seed.ts",
+    "db:seed": "ts-node -P prisma/tsconfig.scripts.json prisma/seed.ts",
     "db:generate-demo-token": "ts-node -P prisma/tsconfig.scripts.json prisma/generate-demo-token.ts",
     "db:generate-kitchen-token": "ts-node -P prisma/tsconfig.scripts.json prisma/generate-kitchen-token.ts"
   },

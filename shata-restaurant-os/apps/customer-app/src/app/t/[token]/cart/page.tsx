@@ -60,9 +60,12 @@ export default function CartPage({ params }: { params: { token: string } }) {
       {/* Items */}
       <div className="flex-1 space-y-3 p-4">
         {items.map((item) => (
-          <Card key={item.productId} className="flex items-center gap-3 p-4">
+          <Card key={item.cartItemId} className="flex items-center gap-3 p-4">
             <div className="min-w-0 flex-1">
               <p className="truncate font-bold text-foreground">{item.name}</p>
+              {item.selectedOptionsLabel && (
+                <p className="mt-0.5 truncate text-xs text-muted-foreground">{item.selectedOptionsLabel}</p>
+              )}
               <p className="text-sm font-bold text-accent">
                 {formatCurrency(item.price, currency, locale)}
               </p>
@@ -74,7 +77,7 @@ export default function CartPage({ params }: { params: { token: string } }) {
             {/* Quantity controls */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
                 className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-primary-dark text-sm font-bold transition-colors hover:bg-secondary/70"
               >
                 −
@@ -83,7 +86,7 @@ export default function CartPage({ params }: { params: { token: string } }) {
                 {item.quantity}
               </span>
               <button
-                onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                 className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary text-primary-dark text-sm font-bold transition-colors hover:bg-secondary/70"
               >
                 +
@@ -91,7 +94,7 @@ export default function CartPage({ params }: { params: { token: string } }) {
             </div>
 
             <button
-              onClick={() => removeItem(item.productId)}
+              onClick={() => removeItem(item.cartItemId)}
               className="ml-1 text-lg leading-none text-muted-foreground transition-colors hover:text-error"
               aria-label="Remove item"
             >

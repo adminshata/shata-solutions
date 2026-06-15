@@ -134,9 +134,12 @@ export default function CheckoutPage({ params }: { params: { token: string } }) 
           <h2 className="mb-3 text-sm font-bold text-foreground">Order Summary</h2>
           <div className="space-y-2">
             {items.map((item) => (
-              <div key={item.productId} className="flex justify-between text-sm">
+              <div key={item.cartItemId} className="flex justify-between text-sm">
                 <span className="text-muted-foreground">
                   {item.quantity}× {item.name}
+                  {item.selectedOptionsLabel && (
+                    <span className="block text-xs text-muted-foreground/80">{item.selectedOptionsLabel}</span>
+                  )}
                 </span>
                 <span className="font-semibold text-foreground">
                   {formatCurrency(item.price * item.quantity, currency, locale)}

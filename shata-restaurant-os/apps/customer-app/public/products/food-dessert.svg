@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <defs>
+    <linearGradient id="fd-top" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FBE9C8"/>
+      <stop offset="1" stop-color="#E3A23C"/>
+    </linearGradient>
+    <linearGradient id="fd-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D9C4A8"/>
+      <stop offset="1" stop-color="#B9824A"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="120" cy="206" rx="62" ry="9" fill="#0F8A5F" opacity="0.08"/>
+  <ellipse cx="120" cy="180" rx="76" ry="14" fill="#FFFFFF" stroke="#E4E7E2" stroke-width="1.5"/>
+  <path d="M70 168 L120 70 L170 168 Z" fill="url(#fd-body)"/>
+  <path d="M70 168 L120 70 L170 168 Z" fill="none" stroke="#A06B3C" stroke-width="1.5" opacity="0.35"/>
+  <path d="M88 132 L120 70 L152 132 Z" fill="url(#fd-top)" opacity="0.95"/>
+  <circle cx="120" cy="88" r="7" fill="#11936A"/>
+  <circle cx="100" cy="160" r="2.5" fill="#B9824A"/>
+  <circle cx="142" cy="156" r="2" fill="#B9824A"/>
+</svg>

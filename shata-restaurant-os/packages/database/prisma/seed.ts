@@ -84,8 +84,8 @@ async function main() {
   });
   const coldDrinks = await prisma.category.upsert({
     where: { id: "cat-cold-drinks" },
-    update: {},
-    create: { id: "cat-cold-drinks", restaurantId: restaurant.id, name: "Cold Drinks", nameAr: "مشروبات باردة", sortOrder: 2 },
+    update: { name: "Cold & Iced Drinks", nameAr: "مشروبات بارده ومثلجة" },
+    create: { id: "cat-cold-drinks", restaurantId: restaurant.id, name: "Cold & Iced Drinks", nameAr: "مشروبات بارده ومثلجة", sortOrder: 2 },
   });
   const food = await prisma.category.upsert({
     where: { id: "cat-food" },
@@ -188,7 +188,320 @@ async function main() {
     foodProductIds.push(item.id);
   }
 
-  const allProductIds = [...hotProducts, ...coldProducts, ...foodProductIds];
+  // ── FRÍO Menu (real client menu — expands/replaces demo placeholders) ────
+
+  // New categories from the FRÍO menu PDF
+  const bakery = await prisma.category.upsert({
+    where: { id: "cat-bakery" },
+    update: {},
+    create: { id: "cat-bakery", restaurantId: restaurant.id, name: "Bakery", sortOrder: 4 },
+  });
+  const freshSalad = await prisma.category.upsert({
+    where: { id: "cat-fresh-salad" },
+    update: {},
+    create: { id: "cat-fresh-salad", restaurantId: restaurant.id, name: "Fresh Salad", sortOrder: 5 },
+  });
+  const sandwich = await prisma.category.upsert({
+    where: { id: "cat-sandwich" },
+    update: {},
+    create: { id: "cat-sandwich", restaurantId: restaurant.id, name: "Sandwich", sortOrder: 6 },
+  });
+  const classicCoffee = await prisma.category.upsert({
+    where: { id: "cat-classic-coffee" },
+    update: {},
+    create: { id: "cat-classic-coffee", restaurantId: restaurant.id, name: "Classic Coffee", sortOrder: 7 },
+  });
+
+  // Shared "Customizations" modifier groups from the FRÍO menu (milk type / extra flavor / extra additions)
+  const frioCustomizationGroups = [
+    {
+      name: "Milk Type", type: "SINGLE" as const, required: false, minSelect: 0, maxSelect: 1, sortOrder: 2,
+      options: { create: [
+        { name: "Whole Milk", priceDelta: 0, sortOrder: 1 },
+        { name: "Skimmed Milk", priceDelta: 0, sortOrder: 2 },
+        { name: "Almond Milk", priceDelta: 15, sortOrder: 3 },
+        { name: "Coconut Milk", priceDelta: 0, sortOrder: 4 },
+        { name: "Oat Milk", priceDelta: 0, sortOrder: 5 },
+      ]},
+    },
+    {
+      name: "Extra Flavor", type: "MULTI" as const, required: false, minSelect: 0, maxSelect: 3, sortOrder: 3,
+      options: { create: [
+        { name: "Caramel", priceDelta: 10, sortOrder: 1 },
+        { name: "Vanilla", priceDelta: 10, sortOrder: 2 },
+        { name: "Hazelnut", priceDelta: 10, sortOrder: 3 },
+        { name: "Irish", priceDelta: 10, sortOrder: 4 },
+        { name: "Cinnamon", priceDelta: 10, sortOrder: 5 },
+        { name: "Honey", priceDelta: 10, sortOrder: 6 },
+      ]},
+    },
+    {
+      name: "Extra Additions", type: "MULTI" as const, required: false, minSelect: 0, maxSelect: 4, sortOrder: 4,
+      options: { create: [
+        { name: "Whipped Cream", priceDelta: 5, sortOrder: 1 },
+        { name: "Marshmallow", priceDelta: 5, sortOrder: 2 },
+        { name: "Espresso Shot", priceDelta: 10, sortOrder: 3 },
+        { name: "Cookies", priceDelta: 10, sortOrder: 4 },
+      ]},
+    },
+  ];
+  const frioCustomizations = { create: frioCustomizationGroups };
+
+  // "Size" modifier group — required single-select; option priceDeltas are relative to
+  // product.price (the Small price), e.g. a "Large" delta of 10 means Large = price + 10.
+  function frioSizeGroup(options: { name: string; priceDelta: number }[]) {
+    return {
+      name: "Size", type: "SINGLE" as const, required: true, minSelect: 1, maxSelect: 1, sortOrder: 1,
+      options: { create: options.map((o, i) => ({ name: o.name, priceDelta: o.priceDelta, sortOrder: i + 1 })) },
+    };
+  }
+
+  // Full modifier set for a sized hot-drink product: Size (required) + Milk/Flavor/Extras
+  function frioSizedModifiers(sizeOptions: { name: string; priceDelta: number }[]) {
+    return { create: [frioSizeGroup(sizeOptions), ...frioCustomizationGroups] };
+  }
+
+  // Idempotently replace a product's modifier groups (delete then recreate) — used for
+  // products that already exist from earlier seed runs with different/legacy modifiers.
+  async function replaceModifierGroups(
+    productId: string,
+    groups: Array<{
+      name: string; type: "SINGLE" | "MULTI"; required: boolean; minSelect: number; maxSelect: number; sortOrder: number;
+      options: { create: Array<{ name: string; priceDelta: number; sortOrder: number }> };
+    }>
+  ) {
+    await prisma.modifierGroup.deleteMany({ where: { productId } });
+    for (const group of groups) {
+      await prisma.modifierGroup.create({ data: { productId, ...group } });
+    }
+  }
+
+  // Repurpose existing placeholder products into FRÍO base products. Size is now
+  // represented via a "Size" modifier group (Small = product.price) rather than
+  // separate "<Name> Small"/"<Name> Large" rows — keeps the IDs already referenced by
+  // demo orders intact, just updates name/price/modifiers to the real menu.
+  await prisma.product.update({ where: { id: "prod-espresso" }, data: { name: "Espresso", price: 20 } });
+  await replaceModifierGroups("prod-espresso", [
+    frioSizeGroup([{ name: "Small", priceDelta: 0 }, { name: "Double", priceDelta: 5 }]),
+    ...frioCustomizationGroups,
+  ]);
+
+  await prisma.product.update({ where: { id: "prod-cappuccino" }, data: { name: "Cappuccino", price: 30 } });
+  await replaceModifierGroups("prod-cappuccino", [
+    frioSizeGroup([{ name: "Small", priceDelta: 0 }, { name: "Large", priceDelta: 10 }]),
+    ...frioCustomizationGroups,
+  ]);
+
+  await prisma.product.update({ where: { id: "prod-latte" }, data: { name: "Latte", price: 25 } });
+  await replaceModifierGroups("prod-latte", [
+    frioSizeGroup([{ name: "Small", priceDelta: 0 }, { name: "Large", priceDelta: 10 }]),
+    ...frioCustomizationGroups,
+  ]);
+
+  await prisma.product.update({ where: { id: "prod-americano" }, data: { name: "Americano", price: 20 } });
+  await replaceModifierGroups("prod-americano", [
+    frioSizeGroup([{ name: "Small", priceDelta: 0 }, { name: "Large", priceDelta: 10 }]),
+    ...frioCustomizationGroups,
+  ]);
+
+  await prisma.product.update({ where: { id: "prod-croissant" }, data: { name: "Croissant", price: 15, categoryId: bakery.id } });
+
+  // ── FRÍO Hot Drinks (PDF page 1) — single-price items (no Size variants) ────
+  const frioHotSingleItems = [
+    { id: "prod-flat-white", name: "Flat White", price: 25 },
+    { id: "prod-cortado",    name: "Cortado",     price: 25 },
+  ];
+  const frioHotProductIds: string[] = [];
+  for (const item of frioHotSingleItems) {
+    await prisma.product.upsert({
+      where: { id: item.id },
+      update: {},
+      create: {
+        id: item.id, restaurantId: restaurant.id, categoryId: hotDrinks.id,
+        name: item.name, price: item.price, avgPrepMinutes: 4,
+        isAvailable: true, modifierGroups: frioCustomizations,
+      },
+    });
+    frioHotProductIds.push(item.id);
+  }
+
+  // ── FRÍO Hot Drinks — sized items: base product (Small price) + "Size" modifier ──
+  const frioHotSizedItems = [
+    { id: "prod-macchiato",         name: "Macchiato",              price: 25, sizes: [{ name: "Small", priceDelta: 0 }, { name: "Double", priceDelta: 5 }] },
+    { id: "prod-spanish-latte",     name: "Spanish Latte",          price: 30, sizes: [{ name: "Small", priceDelta: 0 }, { name: "Large", priceDelta: 10 }] },
+    { id: "prod-mocha",             name: "Mocha",                  price: 30, sizes: [{ name: "Small", priceDelta: 0 }, { name: "Large", priceDelta: 10 }] },
+    { id: "prod-caramel-macchiato", name: "Caramel Macchiato",      price: 30, sizes: [{ name: "Small", priceDelta: 0 }, { name: "Large", priceDelta: 10 }] },
+    { id: "prod-matcha-latte",      name: "Matcha Green Tea Latte", price: 30, sizes: [{ name: "Small", priceDelta: 0 }, { name: "Large", priceDelta: 10 }] },
+    { id: "prod-hot-chocolate",     name: "Hot Chocolate",          price: 30, sizes: [{ name: "Small", priceDelta: 0 }, { name: "Large", priceDelta: 5 }] },
+    { id: "prod-hot-cider",         name: "Hot Cider",              price: 25, sizes: [{ name: "Small", priceDelta: 0 }, { name: "Large", priceDelta: 5 }] },
+    { id: "prod-cinnamon-milk",     name: "Cinnamon Milk",          price: 20, sizes: [{ name: "Small", priceDelta: 0 }, { name: "Large", priceDelta: 10 }] },
+  ];
+  for (const item of frioHotSizedItems) {
+    await prisma.product.upsert({
+      where: { id: item.id },
+      update: {},
+      create: {
+        id: item.id, restaurantId: restaurant.id, categoryId: hotDrinks.id,
+        name: item.name, price: item.price, avgPrepMinutes: 4,
+        isAvailable: true, modifierGroups: frioSizedModifiers(item.sizes),
+      },
+    });
+    frioHotProductIds.push(item.id);
+  }
+
+  // Tea — has its own flavor add-on list (Latte/Lemon/Mango/Strawberry/Green), not modeled here
+  await prisma.product.upsert({
+    where: { id: "prod-tea" },
+    update: {},
+    create: {
+      id: "prod-tea", restaurantId: restaurant.id, categoryId: hotDrinks.id,
+      name: "Tea", price: 10, avgPrepMinutes: 3, isAvailable: true,
+    },
+  });
+  frioHotProductIds.push("prod-tea");
+
+  // ── FRÍO Cold & Iced Drinks (PDF page 2) ─────────────────────────────────
+  const frioColdItems = [
+    { id: "prod-iced-latte",             name: "Iced Latte",                  price: 35, withCustomizations: true },
+    { id: "prod-iced-mocha",             name: "Iced Mocha",                  price: 40, withCustomizations: true },
+    { id: "prod-frappuccino",            name: "Frappuccino",                 price: 40, withCustomizations: false },
+    { id: "prod-iced-caramel-macchiato", name: "Ice Caramel Macchiato",       price: 40, withCustomizations: true },
+    { id: "prod-iced-chocolate",         name: "Iced Chocolate",              price: 35, withCustomizations: true },
+    { id: "prod-oreo",                   name: "Oreo",                        price: 40, withCustomizations: false },
+    { id: "prod-milkshake",              name: "Milkshake",                   price: 35, withCustomizations: false },
+    { id: "prod-smoothie",               name: "Smoothie",                    price: 35, withCustomizations: false },
+    { id: "prod-sunshine",               name: "Sunshine",                    price: 30, withCustomizations: false },
+    { id: "prod-cherry-cola",            name: "Cherry Cola",                 price: 25, withCustomizations: false },
+    { id: "prod-espresso-redbull",       name: "Espresso Redbull",            price: 45, withCustomizations: false },
+    { id: "prod-redbull",                name: "Redbull",                     price: 35, withCustomizations: false },
+    { id: "prod-redbull-white",          name: "Redbull White",               price: 35, withCustomizations: false },
+    { id: "prod-redbull-white-mixes",    name: "Redbull White Mixes",         price: 40, withCustomizations: false },
+    { id: "prod-redbull-sugar-free",     name: "Redbull Sugar Free",          price: 35, withCustomizations: false },
+    { id: "prod-redbull-mixes",          name: "Redbull Mixes",               price: 40, withCustomizations: false },
+    { id: "prod-iced-matcha-latte",      name: "Iced Matcha Green Tea Latte", price: 40, withCustomizations: true },
+    { id: "prod-iced-tea",               name: "Iced Tea",                    price: 30, withCustomizations: false },
+    { id: "prod-water",                  name: "Water",                       price: 5,  withCustomizations: false },
+  ];
+  const frioColdProductIds: string[] = [];
+  for (const item of frioColdItems) {
+    await prisma.product.upsert({
+      where: { id: item.id },
+      update: {},
+      create: {
+        id: item.id, restaurantId: restaurant.id, categoryId: coldDrinks.id,
+        name: item.name, price: item.price, avgPrepMinutes: 4,
+        isAvailable: true, modifierGroups: item.withCustomizations ? frioCustomizations : undefined,
+      },
+    });
+    frioColdProductIds.push(item.id);
+  }
+
+  // ── FRÍO Bakery (PDF page 3) — Croissant repurposed above, two new items here ──
+  const frioBakeryItems = [
+    { id: "prod-cookies",        name: "Cookies",              price: 15 },
+    { id: "prod-granola-yogurt", name: "Granola Greek Yogurt", price: 35 },
+  ];
+  const frioBakeryProductIds: string[] = [];
+  for (const item of frioBakeryItems) {
+    await prisma.product.upsert({
+      where: { id: item.id },
+      update: {},
+      create: {
+        id: item.id, restaurantId: restaurant.id, categoryId: bakery.id,
+        name: item.name, price: item.price, avgPrepMinutes: 5, isAvailable: true,
+      },
+    });
+    frioBakeryProductIds.push(item.id);
+  }
+
+  // ── FRÍO Fresh Salad (PDF page 3) — no prices listed, created unavailable (price 0) ──
+  const frioSaladItems = [
+    { id: "prod-pasta-salad",   name: "Pasta Salad" },
+    { id: "prod-chicken-salad", name: "Chicken Salad" },
+    { id: "prod-cezer-salad",   name: "Cezer Salad" },
+    { id: "prod-greek-salad",   name: "Greek Salad" },
+    { id: "prod-avocado-salad", name: "Avocado Salad" },
+  ];
+  for (const item of frioSaladItems) {
+    await prisma.product.upsert({
+      where: { id: item.id },
+      update: {},
+      create: {
+        id: item.id, restaurantId: restaurant.id, categoryId: freshSalad.id,
+        name: item.name, price: 0, avgPrepMinutes: 8, isAvailable: false,
+      },
+    });
+  }
+
+  // ── FRÍO Sandwich (PDF page 3) — no prices listed, created unavailable (price 0) ──
+  const frioSandwichItems = [
+    { id: "prod-smoke-turkey-sandwich", name: "Smoke Turkey Baguette Sandwich" },
+    { id: "prod-smoke-beef-sandwich",   name: "Smoke Beef Baguette Sandwich" },
+    { id: "prod-salami-sandwich",       name: "Salami Baguette Sandwich" },
+    { id: "prod-pastarami-sandwich",    name: "Pastarami Baguette Sandwich" },
+  ];
+  for (const item of frioSandwichItems) {
+    await prisma.product.upsert({
+      where: { id: item.id },
+      update: {},
+      create: {
+        id: item.id, restaurantId: restaurant.id, categoryId: sandwich.id,
+        name: item.name, price: 0, avgPrepMinutes: 8, isAvailable: false,
+      },
+    });
+  }
+
+  // ── FRÍO Classic Coffee (PDF page 4) — base product (Small price) + "Size" modifier ──
+  const frioClassicItems = [
+    { id: "prod-turkish-coffee",        name: "Turkish Coffee",        price: 20, sizes: [{ name: "Small", priceDelta: 0 }, { name: "Double", priceDelta: 5 }] },
+    { id: "prod-french-coffee",         name: "French Coffee",         price: 25, sizes: [{ name: "Small", priceDelta: 0 }, { name: "Double", priceDelta: 5 }] },
+    { id: "prod-nutella-french-coffee", name: "Nutella French Coffee", price: 30, sizes: [{ name: "Small", priceDelta: 0 }, { name: "Double", priceDelta: 5 }] },
+  ];
+  const frioClassicProductIds: string[] = [];
+  for (const item of frioClassicItems) {
+    await prisma.product.upsert({
+      where: { id: item.id },
+      update: {},
+      create: {
+        id: item.id, restaurantId: restaurant.id, categoryId: classicCoffee.id,
+        name: item.name, price: item.price, avgPrepMinutes: 5,
+        isAvailable: true, modifierGroups: frioSizedModifiers(item.sizes),
+      },
+    });
+    frioClassicProductIds.push(item.id);
+  }
+
+  // ── Hide deprecated size-specific product rows from earlier seed runs ───
+  // These rows are now represented as a single base product + "Size" modifier
+  // (see frioHotSizedItems / frioClassicItems above). They can't be hard-deleted
+  // because OrderItem.product is a restricted FK, so mark them unavailable instead.
+  // updateMany is a no-op for IDs that don't exist, so this is safe on any DB state.
+  const deprecatedProductIds = [
+    "prod-espresso-double",
+    "prod-macchiato-small", "prod-macchiato-double",
+    "prod-latte-large",
+    "prod-spanish-latte-small", "prod-spanish-latte-large",
+    "prod-cappuccino-large",
+    "prod-mocha-small", "prod-mocha-large",
+    "prod-americano-large",
+    "prod-caramel-macchiato-small", "prod-caramel-macchiato-large",
+    "prod-matcha-latte-small", "prod-matcha-latte-large",
+    "prod-hot-chocolate-small", "prod-hot-chocolate-large",
+    "prod-hot-cider-small", "prod-hot-cider-large",
+    "prod-cinnamon-milk-small", "prod-cinnamon-milk-large",
+    "prod-turkish-coffee-small", "prod-turkish-coffee-double",
+    "prod-french-coffee-small", "prod-french-coffee-double",
+    "prod-nutella-french-coffee-small", "prod-nutella-french-coffee-double",
+  ];
+  await prisma.product.updateMany({
+    where: { id: { in: deprecatedProductIds } },
+    data: { isAvailable: false },
+  });
+
+  const allProductIds = [
+    ...hotProducts, ...coldProducts, ...foodProductIds,
+    ...frioHotProductIds, ...frioColdProductIds, ...frioBakeryProductIds, ...frioClassicProductIds,
+  ];
 
   // ── Customers ────────────────────────────────────────────────────────────
   const customerData = [
@@ -359,7 +672,7 @@ async function main() {
   console.warn("\n✅ Demo restaurant ready!");
   console.warn(`   Restaurant: ${restaurant.name} (EGP, 14% VAT, Africa/Cairo)`);
   console.warn(`   Tables created: ${tables.length}`);
-  console.warn(`   Products created: ${allProductIds.length} (5 hot drinks + 4 cold + 4 food)`);
+  console.warn(`   Products created/updated: ${allProductIds.length} order-eligible (plus 9 unavailable FRÍO salad/sandwich placeholders)`);
   console.warn(`   Demo orders: ${ordersCreated}`);
   console.warn(`   Reviews: ${reviewsCreated}`);
   console.warn(`   Staff: ${staffData.length}`);

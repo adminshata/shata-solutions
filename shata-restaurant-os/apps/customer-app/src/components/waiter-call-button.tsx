@@ -14,14 +14,43 @@ const CALL_TYPES = [
 type CallType = (typeof CALL_TYPES)[number]["type"];
 type CallStatus = "idle" | "sent" | "acknowledged" | "resolved";
 
-interface Props { sessionToken: string }
+interface Props {
+  sessionToken: string;
+  isArabic?: boolean;
+}
 
-export function WaiterCallButton({ sessionToken }: Props) {
+const TEXT = {
+  en: {
+    sheetTitle: "How can we help?",
+    sentTitle: "Request sent",
+    sentSubtitle: "Someone will be with you shortly",
+    cancel: "Cancel",
+    statusSent: "Request sent",
+    statusAcknowledged: "On the way",
+    statusResolved: "Resolved",
+    label: "Call waiter",
+    dismiss: "Dismiss",
+  },
+  ar: {
+    sheetTitle: "كيف يمكننا مساعدتك؟",
+    sentTitle: "تم الإبلاغ",
+    sentSubtitle: "سيتم الوصول إليك قريبًا",
+    cancel: "إلغاء",
+    statusSent: "تم الإبلاغ",
+    statusAcknowledged: "في الطريق",
+    statusResolved: "تم الوصول",
+    label: "نداء النادل",
+    dismiss: "إغلاق",
+  },
+};
+
+export function WaiterCallButton({ sessionToken, isArabic = false }: Props) {
   const [open, setOpen] = useState(false);
   const [sending, setSending] = useState(false);
   const [callId, setCallId] = useState<string | null>(null);
   const [status, setStatus] = useState<CallStatus>("idle");
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const t = isArabic ? TEXT.ar : TEXT.en;
 
   // Poll for acknowledgment every 10s after a call is placed
   useEffect(() => {
@@ -73,11 +102,11 @@ export function WaiterCallButton({ sessionToken }: Props) {
     if (pollRef.current) clearInterval(pollRef.current);
   }
 
-  const statusMessages: Record<CallStatus, { text: string; color: string; bg: string } | null> = {
+  const statusMessages: Record<CallStatus, { text: string; icon: string } | null> = {
     idle: null,
-    sent: { text: "تم الإبلاغ ✓", color: "text-primary-dark", bg: "bg-secondary/60 border-secondary" },
-    acknowledged: { text: "في الطريق ✓", color: "text-foreground", bg: "bg-accent-light border-accent/30" },
-    resolved: { text: "تم الوصول ✓", color: "text-muted-foreground", bg: "bg-muted border-border" },
+    sent: { text: t.statusSent, icon: "✓" },
+    acknowledged: { text: t.statusAcknowledged, icon: "🚶" },
+    resolved: { text: t.statusResolved, icon: "✅" },
   };
   const statusMsg = statusMessages[status];
 
@@ -85,24 +114,25 @@ export function WaiterCallButton({ sessionToken }: Props) {
     <>
       {/* Status toast — appears after call is placed */}
       {statusMsg && (
-        <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-2xl border px-4 py-2.5 shadow-lg text-sm font-semibold ${statusMsg.bg} ${statusMsg.color}`}>
+        <div className="fixed top-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[#1F2A24] shadow-[0_4px_16px_rgba(0,0,0,0.1)] ring-1 ring-black/[0.05]">
+          <span className="text-[#0F8A5F]">{statusMsg.icon}</span>
           {statusMsg.text}
           {status !== "idle" && (
-            <button onClick={dismiss} className="ml-2 opacity-50 hover:opacity-100 text-xs">✕</button>
+            <button onClick={dismiss} className="ml-1 text-[#9AA8A1] hover:text-[#1F2A24]" aria-label={t.dismiss}>
+              ✕
+            </button>
           )}
         </div>
       )}
 
-      {/* Floating trigger */}
+      {/* Floating trigger — sits above the cart bar / bottom nav, never overlapping product cards */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-24 left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-surface shadow-lg border border-border text-foreground hover:bg-secondary/30 active:scale-95 transition-transform"
-        aria-label="Call waiter"
+        className="fixed bottom-40 left-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-white text-[#0F8A5F] shadow-[0_4px_14px_rgba(15,138,95,0.2)] ring-1 ring-black/[0.05] transition-transform active:scale-95"
+        aria-label={t.label}
       >
         {status !== "idle" ? (
-          <span className="text-base">
-            {status === "sent" ? "✓" : status === "acknowledged" ? "🚶" : "✅"}
-          </span>
+          <span className="text-base">{statusMsg?.icon}</span>
         ) : (
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
@@ -113,35 +143,36 @@ export function WaiterCallButton({ sessionToken }: Props) {
       {/* Bottom sheet */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-end" onClick={() => setOpen(false)}>
+          <div className="absolute inset-0 bg-black/30" />
           <div
-            className="w-full rounded-t-3xl bg-surface p-6 shadow-2xl"
+            className="relative w-full rounded-t-3xl bg-white p-6 shadow-2xl"
+            dir={isArabic ? "rtl" : "ltr"}
             onClick={(e) => e.stopPropagation()}
           >
             {status === "sent" ? (
               <div className="flex flex-col items-center gap-3 py-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-3xl text-primary-dark">✓</div>
-                <p className="text-base font-bold text-primary-dark">تم الإبلاغ ✓</p>
-                <p className="text-sm text-muted-foreground">Someone will be with you shortly</p>
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#0F8A5F]/10 text-3xl text-[#0F8A5F]">✓</div>
+                <p className="text-base font-bold text-[#1F2A24]">{t.sentTitle}</p>
+                <p className="text-sm text-[#9AA8A1]">{t.sentSubtitle}</p>
               </div>
             ) : (
               <>
-                <p className="mb-4 text-center text-base font-semibold text-foreground">كيف يمكننا مساعدتك؟</p>
+                <p className="mb-4 text-center text-base font-bold text-[#1F2A24]">{t.sheetTitle}</p>
                 <div className="grid grid-cols-2 gap-3">
                   {CALL_TYPES.map((ct) => (
                     <button
                       key={ct.type}
                       onClick={() => call(ct.type)}
                       disabled={sending}
-                      className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-muted/50 p-4 hover:bg-secondary/40 hover:border-primary/30 active:scale-95 transition-all disabled:opacity-50"
+                      className="flex flex-col items-center gap-2 rounded-2xl bg-[#F6F8F6] p-4 ring-1 ring-black/[0.04] transition-colors hover:bg-[#0F8A5F]/10 active:scale-95 disabled:opacity-50"
                     >
                       <span className="text-2xl">{ct.icon}</span>
-                      <span className="text-sm font-semibold text-foreground">{ct.ar}</span>
-                      <span className="text-xs text-muted-foreground">{ct.en}</span>
+                      <span className="text-sm font-semibold text-[#1F2A24]">{isArabic ? ct.ar : ct.en}</span>
                     </button>
                   ))}
                 </div>
-                <button onClick={() => setOpen(false)} className="mt-4 w-full py-2 text-sm text-muted-foreground">
-                  Cancel
+                <button onClick={() => setOpen(false)} className="mt-4 w-full py-2 text-sm font-semibold text-[#9AA8A1]">
+                  {t.cancel}
                 </button>
               </>
             )}
